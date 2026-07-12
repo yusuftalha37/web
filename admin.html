@@ -61,7 +61,7 @@
       <div class="admin-panel">
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Ürün</th><th>Kategori</th><th>Fiyat</th><th>Stok</th><th></th></tr></thead>
+            <thead><tr><th>Görsel</th><th>Ürün</th><th>Kategori</th><th>Fiyat</th><th>Stok</th><th></th></tr></thead>
             <tbody id="productRows"></tbody>
           </table>
         </div>
@@ -127,6 +127,18 @@
           <label for="pfName">Ürün adı *</label>
           <input type="text" id="pfName" required placeholder="Örn. 460W Monokristal Güneş Paneli">
         </div>
+        <div class="form-group">
+          <label>Ürün fotoğrafı</label>
+          <div class="photo-row">
+            <div class="photo-preview" id="pfPreview"><span>Fotoğraf<br>yok</span></div>
+            <div class="photo-inputs">
+              <input type="file" id="pfPhotoFile" accept="image/*">
+              <input type="text" id="pfPhotoUrl" placeholder="veya görsel bağlantısı: https://...">
+              <button type="button" class="row-btn row-btn-danger" id="pfPhotoRemove">Fotoğrafı Kaldır</button>
+            </div>
+          </div>
+          <small class="photo-hint">Bilgisayarınızdan yükleyin (otomatik küçültülür) ya da internetten bir görsel bağlantısı yapıştırın. Fotoğraf yoksa kategoriye uygun çizim gösterilir.</small>
+        </div>
         <div class="form-row">
           <div class="form-group">
             <label for="pfCat">Kategori</label>
@@ -138,7 +150,7 @@
             </select>
           </div>
           <div class="form-group">
-            <label for="pfImg">Görsel</label>
+            <label for="pfImg">Yedek çizim <small>(fotoğraf yoksa)</small></label>
             <select id="pfImg">
               <option value="panel">Panel</option>
               <option value="flex">Esnek panel</option>

@@ -208,6 +208,80 @@
 
 .pill-warn { background: #fef3c7; color: #b45309; }
 
+.table-thumb {
+  width: 46px;
+  height: 46px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 1px solid var(--border);
+  display: block;
+}
+
+.table-thumb-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f1f5f9;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+/* ---- Fotoğraf yükleme ---- */
+.photo-row {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.photo-preview {
+  width: 92px;
+  height: 92px;
+  flex-shrink: 0;
+  border: 1px dashed var(--border);
+  border-radius: 10px;
+  background: #f8fafc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.75rem;
+  overflow: hidden;
+}
+
+.photo-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.photo-inputs {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.photo-inputs input[type="file"] { font-size: 0.85rem; }
+
+.photo-inputs input[type="text"] {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-family: inherit;
+}
+
+.photo-inputs .row-btn { align-self: flex-start; margin-left: 0; }
+
+.photo-hint {
+  display: block;
+  color: var(--muted);
+  font-size: 0.78rem;
+  margin-top: 8px;
+}
+
 /* ---- Siparişler ---- */
 .order-card {
   border: 1px solid var(--border);

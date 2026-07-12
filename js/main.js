@@ -52,11 +52,11 @@ const navAccount = document.getElementById("navAccount");
 const currentUser = Store.session();
 
 if (currentUser) {
+  // Menü kalabalıklaşmasın diye admin için isim yerine panel linki gösterilir
   navAccount.innerHTML =
     (currentUser.role === "admin"
       ? '<a href="admin.html" class="admin-link">Yönetim Paneli</a>'
-      : "") +
-    '<span class="account-name">' + escHtml(currentUser.name.split(" ")[0]) + "</span>" +
+      : '<span class="account-name">' + escHtml(currentUser.name.split(" ")[0]) + "</span>") +
     '<a href="#" id="logoutLink">Çıkış</a>';
   document.getElementById("logoutLink").addEventListener("click", (e) => {
     e.preventDefault();
@@ -148,6 +148,12 @@ const PRODUCT_ART = {
 const shopGrid = document.getElementById("shopGrid");
 const shopFilters = document.getElementById("shopFilters");
 
+function productMedia(p) {
+  return p.photo
+    ? `<img src="${escHtml(p.photo)}" alt="${escHtml(p.name)}" loading="lazy">`
+    : (PRODUCT_ART[p.img] || PRODUCT_ART.panel);
+}
+
 function renderShop(cat) {
   const list = cat === "all" ? PRODUCTS : PRODUCTS.filter((p) => p.cat === cat);
   shopGrid.innerHTML = list
@@ -155,9 +161,9 @@ function renderShop(cat) {
       const low = p.stock <= 5;
       return `
       <article class="product">
-        <div class="product-img">
+        <div class="product-img${p.photo ? " has-photo" : ""}">
           <span class="stock-badge${low ? " low" : ""}">${low ? "Son " + p.stock + " adet" : "Stokta"}</span>
-          ${PRODUCT_ART[p.img]}
+          ${productMedia(p)}
         </div>
         <div class="product-body">
           <span class="product-cat">${CAT_NAMES[p.cat] || ""}</span>
@@ -229,6 +235,7 @@ function renderCart() {
       .map(
         (e) => `
       <div class="cart-item">
+        <div class="cart-thumb">${productMedia(e.product)}</div>
         <div class="cart-item-info">
           <strong>${escHtml(e.product.name)}</strong>
           <span>${tlFmt(e.product.price)} × ${e.qty} = ${tlFmt(e.product.price * e.qty)}</span>

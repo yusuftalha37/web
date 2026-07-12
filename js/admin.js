@@ -80,11 +80,18 @@ function renderDashboard() {
 const productModal = document.getElementById("productModal");
 const productForm = document.getElementById("productForm");
 
+function thumbHtml(p) {
+  return p.photo
+    ? `<img class="table-thumb" src="${escHtml(p.photo)}" alt="">`
+    : '<span class="table-thumb table-thumb-empty">—</span>';
+}
+
 function renderProducts() {
   const products = Store.getProducts();
   document.getElementById("productRows").innerHTML =
     products.map((p) => `
       <tr>
+        <td>${thumbHtml(p)}</td>
         <td class="cell-strong">${escHtml(p.name)}</td>
         <td>${CAT_NAMES[p.cat] || p.cat}</td>
         <td>${tlFmt(p.price)}</td>
@@ -94,8 +101,59 @@ function renderProducts() {
           <button class="row-btn row-btn-danger" data-act="del" data-id="${p.id}">Sil</button>
         </td>
       </tr>`).join("") ||
-    '<tr><td colspan="5" class="empty-row">Ürün yok. "Yeni Ürün Ekle" ile başlayın.</td></tr>';
+    '<tr><td colspan="6" class="empty-row">Ürün yok. "Yeni Ürün Ekle" ile başlayın.</td></tr>';
 }
+
+// --- Fotoğraf yükleme ---
+const photoPreview = document.getElementById("pfPreview");
+const photoFile = document.getElementById("pfPhotoFile");
+const photoUrl = document.getElementById("pfPhotoUrl");
+let currentPhoto = "";
+
+function setPhoto(src) {
+  currentPhoto = src || "";
+  photoPreview.innerHTML = currentPhoto
+    ? `<img src="${escHtml(currentPhoto)}" alt="Önizleme">`
+    : "<span>Fotoğraf<br>yok</span>";
+}
+
+// Seçilen dosyayı en fazla 900px olacak şekilde küçültüp JPEG'e çevirir;
+// böylece localStorage kotası dolmaz, sunucuya geçince de küçük dosya gider.
+photoFile.addEventListener("change", () => {
+  const file = photoFile.files[0];
+  if (!file) return;
+  const img = new Image();
+  img.onload = () => {
+    const MAX = 900;
+    const scale = Math.min(1, MAX / Math.max(img.width, img.height));
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.round(img.width * scale);
+    canvas.height = Math.round(img.height * scale);
+    canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
+    setPhoto(canvas.toDataURL("image/jpeg", 0.82));
+    URL.revokeObjectURL(img.src);
+    photoUrl.value = "";
+  };
+  img.onerror = () => alert("Bu dosya bir görsel olarak okunamadı.");
+  img.src = URL.createObjectURL(file);
+});
+
+photoUrl.addEventListener("change", () => {
+  const url = photoUrl.value.trim();
+  if (!url) return;
+  if (!/^https?:\/\//.test(url)) {
+    alert("Görsel bağlantısı http:// veya https:// ile başlamalıdır.");
+    return;
+  }
+  setPhoto(url);
+  photoFile.value = "";
+});
+
+document.getElementById("pfPhotoRemove").addEventListener("click", () => {
+  setPhoto("");
+  photoFile.value = "";
+  photoUrl.value = "";
+});
 
 function openProductModal(product) {
   document.getElementById("productModalTitle").textContent = product ? "Ürünü Düzenle" : "Yeni Ürün";
@@ -106,6 +164,9 @@ function openProductModal(product) {
   document.getElementById("pfPrice").value = product ? product.price : "";
   document.getElementById("pfStock").value = product ? product.stock : "";
   document.getElementById("pfSpecs").value = product ? product.specs.join("\n") : "";
+  photoFile.value = "";
+  photoUrl.value = product && product.photo && !product.photo.startsWith("data:") ? product.photo : "";
+  setPhoto(product ? product.photo : "");
   productModal.hidden = false;
   document.getElementById("pfName").focus();
 }
@@ -131,18 +192,25 @@ document.getElementById("productRows").addEventListener("click", (e) => {
 productForm.addEventListener("submit", (e) => {
   e.preventDefault();
   const id = document.getElementById("pfId").value || "p-" + Date.now();
-  Store.saveProduct({
-    id,
-    name: document.getElementById("pfName").value.trim(),
-    cat: document.getElementById("pfCat").value,
-    img: document.getElementById("pfImg").value,
-    price: parseInt(document.getElementById("pfPrice").value, 10) || 0,
-    stock: parseInt(document.getElementById("pfStock").value, 10) || 0,
-    specs: document.getElementById("pfSpecs").value
-      .split("\n")
-      .map((s) => s.trim())
-      .filter(Boolean)
-  });
+  try {
+    Store.saveProduct({
+      id,
+      name: document.getElementById("pfName").value.trim(),
+      cat: document.getElementById("pfCat").value,
+      img: document.getElementById("pfImg").value,
+      photo: currentPhoto,
+      price: parseInt(document.getElementById("pfPrice").value, 10) || 0,
+      stock: parseInt(document.getElementById("pfStock").value, 10) || 0,
+      specs: document.getElementById("pfSpecs").value
+        .split("\n")
+        .map((s) => s.trim())
+        .filter(Boolean)
+    });
+  } catch (err) {
+    // localStorage kotası dolduysa (çok sayıda büyük fotoğraf)
+    alert("Kayıt başarısız: tarayıcı depolama alanı doldu. Daha az/küçük fotoğraf kullanın veya görsel bağlantısı tercih edin.");
+    return;
+  }
   productModal.hidden = true;
   renderAll();
 });

@@ -7,6 +7,7 @@ Tamamen statik olduğu için herhangi bir sunucu kurulumu gerektirmez.
 
 - Mobil uyumlu (responsive) tek sayfa tasarım
 - **Ürün mağazası**: panel, invertör, akü ve hazır paket kategorileriyle 10 örnek ürün, kategori filtresi, stok rozetleri
+- **Ürün fotoğrafları**: admin panelinden bilgisayardan yükleme (otomatik küçültülür) veya görsel bağlantısı; fotoğrafı olmayan ürünlerde kategoriye uygun çizim gösterilir
 - **Sepet**: localStorage ile kalıcı sepet, adet artır/azalt, WhatsApp üzerinden sipariş gönderme
 - Hizmetler: çatı GES, endüstriyel GES, tarımsal sulama, depolamalı sistemler
 - Etkileşimli tasarruf hesaplayıcı (fatura tutarına göre sistem gücü, yıllık tasarruf, geri ödeme süresi)
