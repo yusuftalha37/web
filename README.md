@@ -1,4 +1,4 @@
-# GüneşPark Enerji — Örnek Solar Enerji Satış Sitesi
+# Quantora Solar Enerji — Örnek Solar Enerji Satış Sitesi
 
 Güneş enerjisi sistemleri satışı için hazırlanmış örnek/demo web sitesi.
 Tamamen statik olduğu için herhangi bir sunucu kurulumu gerektirmez.
@@ -13,7 +13,7 @@ Tamamen statik olduğu için herhangi bir sunucu kurulumu gerektirmez.
 - Etkileşimli tasarruf hesaplayıcı (fatura tutarına göre sistem gücü, yıllık tasarruf, geri ödeme süresi)
 - Müşteri referansları ve S.S.S. bölümü
 - Doğrulamalı iletişim/keşif talep formu — talepler admin paneline düşer
-- **Kullanıcı girişi & kayıt** (`giris.html`) — demo yönetici: `admin@gunespark.com.tr` / `admin123`
+- **Kullanıcı girişi & kayıt** (`giris.html`) — demo yönetici: `admin@quantorasolar.com.tr` / `admin123`
 - **Admin paneli** (`admin.html`) — ürün ekleme/düzenleme/silme, sipariş talepleri, keşif talepleri, WhatsApp numarası ayarı
 - Harici bağımlılık yok: saf HTML + CSS + JavaScript
 

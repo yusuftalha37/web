@@ -111,7 +111,7 @@ const Store = (() => {
     if (!users) {
       users = [{
         name: "Site Yöneticisi",
-        email: "admin@gunespark.com.tr",
+        email: "admin@quantorasolar.com.tr",
         phone: "",
         pass: hash("admin123"),
         role: "admin",
