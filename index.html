@@ -13,94 +13,68 @@
   <!-- ÜST BİLGİ ÇUBUĞU -->
   <div class="topbar">
     <div class="container topbar-inner">
-      <span>📞 0850 000 00 00</span>
-      <span>✉️ info@gunespark.com.tr</span>
-      <span class="topbar-right">Türkiye geneli keşif ve kurulum</span>
+      <span>Tel: 0850 000 00 00</span>
+      <span>E-posta: info@gunespark.com.tr</span>
+      <span class="topbar-right">Türkiye geneli keşif ve kurulum hizmeti</span>
     </div>
   </div>
 
-  <!-- NAVİGASYON -->
-  <header class="navbar" id="navbar">
-    <div class="container nav-inner">
+  <!-- BAŞLIK -->
+  <header class="siteheader">
+    <div class="container header-row">
       <a href="#" class="logo">
-        <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
           <circle cx="12" cy="12" r="4"/>
           <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
         </svg>
-        Güneş<span>Park</span>
+        <span class="logo-text">Güneş<span>Park</span> <small>Enerji Sistemleri San. Tic. Ltd. Şti.</small></span>
       </a>
-      <nav class="nav-links" id="navLinks">
-        <a href="#anasayfa">Ana Sayfa</a>
-        <a href="#hizmetler">Hizmetler</a>
-        <a href="#urunler">Ürünler</a>
-        <a href="#hesaplayici">Tasarruf Hesapla</a>
-        <a href="#referanslar">Referanslar</a>
+      <div class="header-contact">
+        <strong>0850 000 00 00</strong>
+        <span>Ücretsiz keşif için hemen arayın</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ANA MENÜ -->
+  <nav class="mainmenu">
+    <div class="container mainmenu-inner">
+      <button class="hamburger" id="hamburger" aria-label="Menüyü aç">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="nav-links" id="navLinks">
+        <a href="#anasayfa">ANA SAYFA</a>
+        <a href="#hizmetler">HİZMETLERİMİZ</a>
+        <a href="#urunler">ÜRÜNLER</a>
+        <a href="#hesaplayici">TASARRUF HESAPLA</a>
+        <a href="#referanslar">REFERANSLAR</a>
+        <a href="#iletisim">İLETİŞİM</a>
         <span class="nav-account" id="navAccount"></span>
-        <a href="#iletisim" class="btn btn-small">Teklif Al</a>
-      </nav>
+      </div>
       <button class="cart-btn" id="cartBtn" aria-label="Sepeti aç">
-        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="9" cy="21" r="1.6"/>
           <circle cx="19" cy="21" r="1.6"/>
           <path d="M2.5 3h3l2.6 12.5a2 2 0 0 0 2 1.5h8.7a2 2 0 0 0 2-1.6L22.5 8H6.2"/>
         </svg>
+        SEPET
         <span class="cart-count" id="cartCount" hidden>0</span>
       </button>
-      <button class="hamburger" id="hamburger" aria-label="Menüyü aç">
-        <span></span><span></span><span></span>
-      </button>
     </div>
-  </header>
+  </nav>
 
-  <!-- HERO -->
+  <!-- BANNER -->
   <section class="hero" id="anasayfa">
-    <div class="container hero-inner">
-      <div class="hero-text">
-        <span class="badge">☀️ Temiz Enerji, Akıllı Yatırım</span>
-        <h1>Elektrik Faturanızı <em>Güneşe</em> Ödetin</h1>
-        <p>Ev ve işyeriniz için anahtar teslim güneş enerjisi sistemleri. Keşiften kuruluma, devlet teşviklerinden bakıma kadar her adımda yanınızdayız. Ortalama <strong>4-6 yılda</strong> yatırımınızı geri kazanın.</p>
-        <div class="hero-actions">
-          <a href="#iletisim" class="btn">Ücretsiz Keşif Talep Et</a>
-          <a href="#hesaplayici" class="btn btn-outline">Tasarrufunu Hesapla</a>
-        </div>
-        <div class="hero-stats">
-          <div><strong data-count="1250">0</strong><span>Tamamlanan Proje</span></div>
-          <div><strong data-count="18">0</strong><span>MW Kurulu Güç</span></div>
-          <div><strong data-count="12">0</strong><span>Yıllık Tecrübe</span></div>
-          <div><strong data-count="98">0</strong><span>% Müşteri Memnuniyeti</span></div>
-        </div>
+    <div class="container">
+      <h1>Elektrik Faturanıza Son Verin,<br>Güneş Enerjisine Geçin</h1>
+      <p>Ev, işyeri ve tarım arazileri için anahtar teslim güneş enerjisi sistemleri kuruyoruz.
+      Keşif, projelendirme, resmi izin işlemleri ve montaj dahil tüm süreç firmamız güvencesi altındadır.
+      Yatırımınız ortalama 4-6 yılda kendini geri öder.</p>
+      <div class="hero-actions">
+        <a href="#iletisim" class="btn">Ücretsiz Keşif Talep Et</a>
+        <a href="#urunler" class="btn btn-ghost">Ürünlerimizi İnceleyin</a>
       </div>
-      <div class="hero-visual" aria-hidden="true">
-        <svg viewBox="0 0 400 320" class="hero-svg">
-          <!-- güneş -->
-          <circle cx="320" cy="60" r="34" fill="#FFC94D"/>
-          <g stroke="#FFC94D" stroke-width="5" stroke-linecap="round">
-            <line x1="320" y1="8" x2="320" y2="20"/>
-            <line x1="320" y1="100" x2="320" y2="112"/>
-            <line x1="268" y1="60" x2="280" y2="60"/>
-            <line x1="360" y1="60" x2="372" y2="60"/>
-            <line x1="283" y1="23" x2="292" y2="32"/>
-            <line x1="348" y1="88" x2="357" y2="97"/>
-            <line x1="283" y1="97" x2="292" y2="88"/>
-            <line x1="348" y1="32" x2="357" y2="23"/>
-          </g>
-          <!-- çatı -->
-          <polygon points="40,200 200,110 360,200" fill="#27415e"/>
-          <rect x="60" y="200" width="280" height="90" fill="#33526f"/>
-          <rect x="180" y="235" width="44" height="55" fill="#1d3249"/>
-          <!-- paneller -->
-          <g transform="rotate(-29 200 160)">
-            <rect x="105" y="140" width="52" height="36" rx="3" fill="#1668b0" stroke="#0d4a80" stroke-width="2"/>
-            <rect x="163" y="140" width="52" height="36" rx="3" fill="#1668b0" stroke="#0d4a80" stroke-width="2"/>
-            <rect x="221" y="140" width="52" height="36" rx="3" fill="#1668b0" stroke="#0d4a80" stroke-width="2"/>
-            <rect x="105" y="182" width="52" height="36" rx="3" fill="#1f7cc4" stroke="#0d4a80" stroke-width="2"/>
-            <rect x="163" y="182" width="52" height="36" rx="3" fill="#1f7cc4" stroke="#0d4a80" stroke-width="2"/>
-            <rect x="221" y="182" width="52" height="36" rx="3" fill="#1f7cc4" stroke="#0d4a80" stroke-width="2"/>
-          </g>
-          <!-- zemin -->
-          <rect x="0" y="290" width="400" height="8" rx="4" fill="#d9e6d0"/>
-        </svg>
-      </div>
+      <div class="hero-facts">1.250'den fazla tamamlanmış proje &nbsp;•&nbsp; 18 MW kurulu güç &nbsp;•&nbsp; 12 yıllık sektör tecrübesi</div>
     </div>
   </section>
 
@@ -118,38 +92,31 @@
   <section class="section" id="hizmetler">
     <div class="container">
       <div class="section-head">
-        <span class="eyebrow">Hizmetlerimiz</span>
-        <h2>Keşiften Kuruluma Anahtar Teslim Çözüm</h2>
+        <h2>Hizmetlerimiz</h2>
         <p>Güneş enerjisine geçiş sandığınızdan kolay. Tüm süreci sizin adınıza biz yönetiyoruz.</p>
       </div>
       <div class="cards">
         <article class="card">
-          <div class="card-icon">🏠</div>
           <h3>Çatı GES (Konut)</h3>
           <p>Müstakil evler ve apartmanlar için şebeke bağlantılı (on-grid) çatı sistemleri. Ürettiğiniz fazla elektriği şebekeye satın.</p>
         </article>
         <article class="card">
-          <div class="card-icon">🏭</div>
           <h3>Ticari &amp; Endüstriyel GES</h3>
           <p>Fabrika, depo ve ticari binalar için yüksek kapasiteli sistemler. Enerji maliyetlerinizi %90'a kadar düşürün.</p>
         </article>
         <article class="card">
-          <div class="card-icon">🌾</div>
           <h3>Tarımsal Sulama</h3>
           <p>Şebekeden bağımsız (off-grid) solar sulama çözümleri. Mazot ve elektrik masrafı olmadan tarlanızı sulayın.</p>
         </article>
         <article class="card">
-          <div class="card-icon">🔋</div>
           <h3>Depolamalı Sistemler</h3>
           <p>Lityum batarya destekli hibrit sistemlerle elektrik kesintilerinden etkilenmeyin, gece de güneş enerjisi kullanın.</p>
         </article>
         <article class="card">
-          <div class="card-icon">🔧</div>
           <h3>Bakım &amp; Onarım</h3>
           <p>Periyodik panel temizliği, invertör kontrolü ve uzaktan izleme ile sisteminiz her zaman maksimum verimde çalışsın.</p>
         </article>
         <article class="card">
-          <div class="card-icon">📋</div>
           <h3>Proje &amp; İzin Danışmanlığı</h3>
           <p>Çağrı mektubu, proje onayı ve kabul işlemleri dahil tüm resmi süreçleri sizin adınıza yürütüyoruz.</p>
         </article>
@@ -161,7 +128,6 @@
   <section class="section section-alt" id="urunler">
     <div class="container">
       <div class="section-head">
-        <span class="eyebrow">Mağaza</span>
         <h2>Ürünlerimiz</h2>
         <p>Tüm ürünler orijinal, faturalı ve garantilidir. Stoktaki ürünler aynı gün kargoya verilir. Toplu alım ve kurulumlu fiyat için teklif isteyin.</p>
       </div>
@@ -181,16 +147,17 @@
   <section class="section" id="hesaplayici">
     <div class="container calc-wrap">
       <div class="calc-info">
-        <span class="eyebrow">Tasarruf Hesaplayıcı</span>
         <h2>Güneş Size Ne Kazandırır?</h2>
         <p>Aylık elektrik faturanızı girin, size uygun sistem gücünü ve yıllık tasarrufunuzu anında görün. Hesaplama Türkiye ortalama güneşlenme verilerine göre tahminidir.</p>
         <ul class="calc-notes">
-          <li>☀️ Türkiye yıllık ortalama 2.740 saat güneşlenme</li>
-          <li>📉 Faturanızda %90'a varan azalma</li>
-          <li>💰 Fazla üretimi şebekeye satma imkânı</li>
+          <li>Türkiye yıllık ortalama 2.740 saat güneşlenme süresine sahiptir</li>
+          <li>Elektrik faturanızda %90'a varan azalma sağlanır</li>
+          <li>Fazla üretiminizi şebekeye satabilirsiniz</li>
         </ul>
       </div>
       <div class="calc-box">
+        <div class="box-title">Tasarruf Hesaplama</div>
+        <div class="box-body">
         <label for="billInput">Aylık ortalama elektrik faturanız</label>
         <div class="calc-input-row">
           <input type="range" id="billInput" min="500" max="20000" step="100" value="2500">
@@ -216,6 +183,7 @@
         </div>
         <a href="#iletisim" class="btn btn-block">Detaylı Teklif Al</a>
         <p class="calc-disclaimer">* Değerler tahminidir, bağlayıcı değildir. Kesin rakamlar ücretsiz keşif sonrası sunulur.</p>
+        </div>
       </div>
     </div>
   </section>
@@ -224,7 +192,6 @@
   <section class="section section-alt" id="surec">
     <div class="container">
       <div class="section-head">
-        <span class="eyebrow">Nasıl Çalışır?</span>
         <h2>4 Adımda Güneşe Geçin</h2>
       </div>
       <div class="steps">
@@ -256,7 +223,6 @@
   <section class="section" id="referanslar">
     <div class="container">
       <div class="section-head">
-        <span class="eyebrow">Referanslar</span>
         <h2>Müşterilerimiz Ne Diyor?</h2>
       </div>
       <div class="testimonials">
@@ -283,7 +249,6 @@
   <section class="section section-alt" id="sss">
     <div class="container narrow">
       <div class="section-head">
-        <span class="eyebrow">Merak Edilenler</span>
         <h2>Sık Sorulan Sorular</h2>
       </div>
       <details class="faq">
@@ -322,17 +287,18 @@
   <section class="section" id="iletisim">
     <div class="container contact-wrap">
       <div class="contact-info">
-        <span class="eyebrow">İletişim</span>
         <h2>Ücretsiz Keşif Talep Edin</h2>
         <p>Formu doldurun, enerji danışmanımız 24 saat içinde size ulaşsın.</p>
         <ul class="contact-list">
-          <li>📍 Örnek Mah. Enerji Cad. No:1, Ankara</li>
-          <li>📞 0850 000 00 00</li>
-          <li>✉️ info@gunespark.com.tr</li>
-          <li>🕘 Hafta içi 09:00 - 18:00, Cumartesi 10:00 - 15:00</li>
+          <li><strong>Adres:</strong> Örnek Mah. Enerji Cad. No:1, Ankara</li>
+          <li><strong>Telefon:</strong> 0850 000 00 00</li>
+          <li><strong>E-posta:</strong> info@gunespark.com.tr</li>
+          <li><strong>Çalışma Saatleri:</strong> Hafta içi 09:00 - 18:00, Cumartesi 10:00 - 15:00</li>
         </ul>
       </div>
       <form class="contact-form" id="contactForm" novalidate>
+        <div class="box-title">Keşif Talep Formu</div>
+        <div class="box-body">
         <div class="form-row">
           <div class="form-group">
             <label for="name">Ad Soyad *</label>
@@ -365,6 +331,7 @@
         </div>
         <button type="submit" class="btn btn-block">Keşif Talebi Gönder</button>
         <p class="form-status" id="formStatus" role="status"></p>
+        </div>
       </form>
     </div>
   </section>

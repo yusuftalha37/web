@@ -15,38 +15,6 @@ navLinks.querySelectorAll("a").forEach((link) => {
   });
 });
 
-// ============ İSTATİSTİK SAYAÇLARI ============
-const counters = document.querySelectorAll("[data-count]");
-
-function animateCounter(el) {
-  const target = parseInt(el.dataset.count, 10);
-  const duration = 1600;
-  const start = performance.now();
-
-  function tick(now) {
-    const progress = Math.min((now - start) / duration, 1);
-    // easeOutCubic
-    const eased = 1 - Math.pow(1 - progress, 3);
-    el.textContent = Math.round(target * eased).toLocaleString("tr-TR");
-    if (progress < 1) requestAnimationFrame(tick);
-  }
-  requestAnimationFrame(tick);
-}
-
-const counterObserver = new IntersectionObserver(
-  (entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        animateCounter(entry.target);
-        counterObserver.unobserve(entry.target);
-      }
-    });
-  },
-  { threshold: 0.6 }
-);
-
-counters.forEach((c) => counterObserver.observe(c));
-
 // ============ HESAP / OTURUM ============
 const navAccount = document.getElementById("navAccount");
 const currentUser = Store.session();
