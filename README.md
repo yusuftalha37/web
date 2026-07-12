@@ -11,7 +11,9 @@ Tamamen statik olduğu için herhangi bir sunucu kurulumu gerektirmez.
 - Hizmetler: çatı GES, endüstriyel GES, tarımsal sulama, depolamalı sistemler
 - Etkileşimli tasarruf hesaplayıcı (fatura tutarına göre sistem gücü, yıllık tasarruf, geri ödeme süresi)
 - Müşteri referansları ve S.S.S. bölümü
-- Doğrulamalı iletişim/keşif talep formu (demo — backend yok)
+- Doğrulamalı iletişim/keşif talep formu — talepler admin paneline düşer
+- **Kullanıcı girişi & kayıt** (`giris.html`) — demo yönetici: `admin@gunespark.com.tr` / `admin123`
+- **Admin paneli** (`admin.html`) — ürün ekleme/düzenleme/silme, sipariş talepleri, keşif talepleri, WhatsApp numarası ayarı
 - Harici bağımlılık yok: saf HTML + CSS + JavaScript
 
 ## Çalıştırma
@@ -27,10 +29,27 @@ python3 -m http.server 8000
 ## Dosya Yapısı
 
 ```
-├── index.html      # Tüm sayfa içeriği
-├── css/style.css   # Tasarım
-└── js/main.js      # Menü, sayaçlar, hesaplayıcı, form doğrulama
+├── index.html      # Ana sayfa (mağaza, hesaplayıcı, iletişim)
+├── giris.html      # Kullanıcı girişi / kayıt
+├── admin.html      # Yönetim paneli
+├── css/
+│   ├── style.css   # Site tasarımı
+│   └── admin.css   # Admin paneli tasarımı
+└── js/
+    ├── store.js    # VERİ KATMANI (localStorage; sunucuya bağlarken burayı değiştirin)
+    ├── main.js     # Mağaza, sepet, hesaplayıcı, form
+    ├── auth.js     # Giriş/kayıt mantığı
+    └── admin.js    # Admin paneli mantığı
 ```
+
+## Sunucuya Bağlama
+
+Tüm veriler şimdilik tarayıcıda (localStorage) tutulur. Sunucunuz hazır olduğunda
+**yalnızca `js/store.js`** içindeki fonksiyonları (`getProducts`, `login`,
+`addLead` vb.) kendi API'nize `fetch()` çağrıları yapacak şekilde değiştirmeniz
+yeterlidir; sitenin geri kalanı bu fonksiyonları kullandığı için başka değişiklik
+gerekmez. Şifre doğrulama ve yetki kontrolü sunucu tarafında yapılmalıdır —
+istemcideki kontroller yalnızca arayüz içindir.
 
 ## Özelleştirme
 

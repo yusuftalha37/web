@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Giriş Yap | GüneşPark Enerji</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>☀️</text></svg>">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="auth-body">
+
+  <div class="auth-card">
+    <a href="index.html" class="logo auth-logo">
+      <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <circle cx="12" cy="12" r="4"/>
+        <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+      </svg>
+      Güneş<span>Park</span>
+    </a>
+
+    <div class="auth-tabs">
+      <button class="auth-tab active" data-tab="login">Giriş Yap</button>
+      <button class="auth-tab" data-tab="register">Kayıt Ol</button>
+    </div>
+
+    <!-- GİRİŞ -->
+    <form id="loginForm" class="auth-form" novalidate>
+      <div class="form-group">
+        <label for="loginEmail">E-posta</label>
+        <input type="email" id="loginEmail" required placeholder="ornek@eposta.com" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label for="loginPass">Şifre</label>
+        <input type="password" id="loginPass" required placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <button type="submit" class="btn btn-block">Giriş Yap</button>
+      <p class="form-status" id="loginStatus" role="status"></p>
+    </form>
+
+    <!-- KAYIT -->
+    <form id="registerForm" class="auth-form" hidden novalidate>
+      <div class="form-group">
+        <label for="regName">Ad Soyad</label>
+        <input type="text" id="regName" required placeholder="Adınız Soyadınız" autocomplete="name">
+      </div>
+      <div class="form-group">
+        <label for="regEmail">E-posta</label>
+        <input type="email" id="regEmail" required placeholder="ornek@eposta.com" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label for="regPhone">Telefon</label>
+        <input type="tel" id="regPhone" placeholder="05__ ___ __ __" autocomplete="tel">
+      </div>
+      <div class="form-group">
+        <label for="regPass">Şifre <small>(en az 6 karakter)</small></label>
+        <input type="password" id="regPass" required placeholder="••••••••" autocomplete="new-password">
+      </div>
+      <div class="form-group">
+        <label for="regPass2">Şifre (tekrar)</label>
+        <input type="password" id="regPass2" required placeholder="••••••••" autocomplete="new-password">
+      </div>
+      <button type="submit" class="btn btn-block">Hesap Oluştur</button>
+      <p class="form-status" id="registerStatus" role="status"></p>
+    </form>
+
+    <div class="auth-demo">
+      <strong>Demo yönetici girişi:</strong><br>
+      admin@gunespark.com.tr &nbsp;/&nbsp; admin123
+    </div>
+
+    <a href="index.html" class="auth-back">← Siteye dön</a>
+  </div>
+
+  <script src="js/store.js"></script>
+  <script src="js/auth.js"></script>
+</body>
+</html>

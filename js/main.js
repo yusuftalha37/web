@@ -47,70 +47,29 @@ const counterObserver = new IntersectionObserver(
 
 counters.forEach((c) => counterObserver.observe(c));
 
+// ============ HESAP / OTURUM ============
+const navAccount = document.getElementById("navAccount");
+const currentUser = Store.session();
+
+if (currentUser) {
+  navAccount.innerHTML =
+    (currentUser.role === "admin"
+      ? '<a href="admin.html" class="admin-link">Yönetim Paneli</a>'
+      : "") +
+    '<span class="account-name">' + escHtml(currentUser.name.split(" ")[0]) + "</span>" +
+    '<a href="#" id="logoutLink">Çıkış</a>';
+  document.getElementById("logoutLink").addEventListener("click", (e) => {
+    e.preventDefault();
+    Store.logout();
+    location.reload();
+  });
+} else {
+  navAccount.innerHTML = '<a href="giris.html">Giriş Yap</a>';
+}
+
 // ============ ÜRÜNLER ============
-// Fiyatlar TL, KDV dahil örnek fiyatlardır.
-const PRODUCTS = [
-  {
-    id: "pnl-460", cat: "panel", img: "panel",
-    name: "460W Half-Cut Monokristal Güneş Paneli",
-    specs: ["120 hücre · %21,3 verim", "Çerçeve: eloksallı alüminyum, IP68 bağlantı kutusu", "25 yıl performans garantisi"],
-    price: 4850, stock: 25
-  },
-  {
-    id: "pnl-550", cat: "panel", img: "panel",
-    name: "550W Monokristal Güneş Paneli",
-    specs: ["144 hücre · %21,7 verim", "Çift cam (bifacial) teknoloji", "30 yıl performans garantisi"],
-    price: 5950, stock: 18
-  },
-  {
-    id: "pnl-flx", cat: "panel", img: "flex",
-    name: "285W Esnek Güneş Paneli",
-    specs: ["Karavan, tekne ve tiny house için", "Yarı esnek ETFE yüzey", "Sadece 4,8 kg"],
-    price: 6750, stock: 4
-  },
-  {
-    id: "inv-5g", cat: "inverter", img: "inverter",
-    name: "5 kW On-Grid İnvertör (Monofaze)",
-    specs: ["2 MPPT girişi", "Wi-Fi izleme modülü dahil", "5 yıl garanti"],
-    price: 38500, stock: 9
-  },
-  {
-    id: "inv-6h", cat: "inverter", img: "inverter",
-    name: "6 kW Hibrit İnvertör 48V",
-    specs: ["120A MPPT şarj kontrollü", "Şebeke + akü + jeneratör girişi", "Paralellenebilir (9 adede kadar)"],
-    price: 52900, stock: 7
-  },
-  {
-    id: "inv-3s", cat: "inverter", img: "inverter",
-    name: "3 kW Tam Sinüs İnvertör 24V",
-    specs: ["Off-grid kullanım için", "LCD ekran, USB çıkış", "Düşük bekleme tüketimi"],
-    price: 14750, stock: 14
-  },
-  {
-    id: "aku-lfp", cat: "aku", img: "battery",
-    name: "48V 100Ah LiFePO4 Lityum Akü",
-    specs: ["5,12 kWh kapasite", "6.000+ çevrim ömrü", "Dahili BMS, Bluetooth takip"],
-    price: 58900, stock: 6
-  },
-  {
-    id: "aku-jel", cat: "aku", img: "battery",
-    name: "12V 150Ah Derin Döngü Jel Akü",
-    specs: ["Bakım gerektirmez", "Solar sistemler için optimize", "2 yıl garanti"],
-    price: 9850, stock: 22
-  },
-  {
-    id: "kit-krv", cat: "paket", img: "kit",
-    name: "Karavan Solar Paketi 410W",
-    specs: ["410W panel + 30A MPPT regülatör", "Kablolama ve montaj aparatları dahil", "Kurulum şeması ile birlikte"],
-    price: 32500, stock: 3
-  },
-  {
-    id: "kit-bag", cat: "paket", img: "kit",
-    name: "Bağ Evi Off-Grid Paketi 3 kW",
-    specs: ["4 × 460W panel + 3 kW invertör", "12V 150Ah × 2 jel akü", "Telefonla kurulum desteği"],
-    price: 94500, stock: 5
-  }
-];
+// Ürün listesi veri katmanından gelir; admin panelinden yönetilir.
+const PRODUCTS = Store.getProducts();
 
 const CAT_NAMES = {
   panel: "Güneş Paneli",
@@ -119,8 +78,9 @@ const CAT_NAMES = {
   paket: "Hazır Paket"
 };
 
-// Sipariş mesajlarının gideceği WhatsApp numarası (uluslararası formatta)
-const WHATSAPP_NUMBER = "908500000000";
+// Sipariş mesajlarının gideceği WhatsApp numarası (admin panelindeki
+// Ayarlar bölümünden değiştirilebilir)
+const WHATSAPP_NUMBER = Store.getSettings().whatsapp;
 
 const tlFmt = (n) => "₺" + Math.round(n).toLocaleString("tr-TR");
 
@@ -200,9 +160,9 @@ function renderShop(cat) {
           ${PRODUCT_ART[p.img]}
         </div>
         <div class="product-body">
-          <span class="product-cat">${CAT_NAMES[p.cat]}</span>
-          <h3>${p.name}</h3>
-          <ul class="product-specs">${p.specs.map((s) => `<li>${s}</li>`).join("")}</ul>
+          <span class="product-cat">${CAT_NAMES[p.cat] || ""}</span>
+          <h3>${escHtml(p.name)}</h3>
+          <ul class="product-specs">${p.specs.map((s) => `<li>${escHtml(s)}</li>`).join("")}</ul>
           <div class="product-foot">
             <div class="product-price">${tlFmt(p.price)}<span>KDV dahil</span></div>
             <button class="add-btn" data-id="${p.id}">Sepete Ekle</button>
@@ -270,7 +230,7 @@ function renderCart() {
         (e) => `
       <div class="cart-item">
         <div class="cart-item-info">
-          <strong>${e.product.name}</strong>
+          <strong>${escHtml(e.product.name)}</strong>
           <span>${tlFmt(e.product.price)} × ${e.qty} = ${tlFmt(e.product.price * e.qty)}</span>
         </div>
         <div class="cart-qty">
@@ -339,6 +299,18 @@ clearCartBtn.addEventListener("click", () => {
   renderCart();
 });
 
+// WhatsApp'a yönlendirilen siparişi admin panelinde görünmesi için kaydet
+waOrder.addEventListener("click", () => {
+  const entries = cartEntries();
+  if (entries.length === 0) return;
+  Store.addOrder({
+    customer: currentUser ? currentUser.name : "Ziyaretçi",
+    email: currentUser ? currentUser.email : "",
+    items: entries.map((e) => ({ name: e.product.name, qty: e.qty, price: e.product.price })),
+    total: entries.reduce((s, e) => s + e.product.price * e.qty, 0)
+  });
+});
+
 renderCart();
 
 // ============ TASARRUF HESAPLAYICI ============
@@ -404,9 +376,17 @@ form.addEventListener("submit", (e) => {
     return;
   }
 
-  // Demo site: gerçek bir backend olmadığı için gönderim simüle edilir.
+  // Talep, admin panelinin "Talepler" bölümünde listelenmek üzere kaydedilir.
+  Store.addLead({
+    name: name.value.trim(),
+    phone: phone.value.trim(),
+    city: form.city.value.trim(),
+    type: form.type.value,
+    message: form.message.value.trim()
+  });
+
   formStatus.textContent =
-    "Teşekkürler " + name.value.trim() + "! Talebiniz alındı, 24 saat içinde sizi arayacağız. (Demo)";
+    "Teşekkürler " + name.value.trim() + "! Talebiniz alındı, 24 saat içinde sizi arayacağız.";
   formStatus.className = "form-status ok";
   form.reset();
 });

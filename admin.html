@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Yönetim Paneli | GüneşPark Enerji</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>☀️</text></svg>">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body class="admin-body">
+
+  <!-- KENAR MENÜ -->
+  <aside class="admin-sidebar">
+    <a href="index.html" class="logo logo-light admin-logo">
+      <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <circle cx="12" cy="12" r="4"/>
+        <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+      </svg>
+      Güneş<span>Park</span>
+    </a>
+    <nav class="admin-nav">
+      <button class="admin-nav-btn active" data-view="dashboard">Genel Bakış</button>
+      <button class="admin-nav-btn" data-view="products">Ürünler</button>
+      <button class="admin-nav-btn" data-view="orders">Siparişler</button>
+      <button class="admin-nav-btn" data-view="leads">Keşif Talepleri</button>
+      <button class="admin-nav-btn" data-view="settings">Ayarlar</button>
+    </nav>
+    <div class="admin-sidebar-foot">
+      <a href="index.html">← Siteye Dön</a>
+      <a href="#" id="adminLogout">Çıkış Yap</a>
+    </div>
+  </aside>
+
+  <!-- ANA İÇERİK -->
+  <main class="admin-main">
+    <header class="admin-topbar">
+      <h1 id="viewTitle">Genel Bakış</h1>
+      <span class="admin-user" id="adminUser"></span>
+    </header>
+
+    <!-- GENEL BAKIŞ -->
+    <section class="admin-view" id="view-dashboard">
+      <div class="stat-grid" id="statGrid"></div>
+      <div class="admin-panel">
+        <h2>Son Keşif Talepleri</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Tarih</th><th>Ad Soyad</th><th>Telefon</th><th>Şehir</th><th>Sistem</th></tr></thead>
+            <tbody id="recentLeads"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ÜRÜNLER -->
+    <section class="admin-view" id="view-products" hidden>
+      <div class="view-actions">
+        <button class="btn btn-small" id="newProductBtn">+ Yeni Ürün Ekle</button>
+      </div>
+      <div class="admin-panel">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Ürün</th><th>Kategori</th><th>Fiyat</th><th>Stok</th><th></th></tr></thead>
+            <tbody id="productRows"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- SİPARİŞLER -->
+    <section class="admin-view" id="view-orders" hidden>
+      <div class="admin-panel">
+        <p class="panel-hint">WhatsApp'a yönlendirilen sipariş talepleri burada listelenir.</p>
+        <div id="orderList"></div>
+      </div>
+    </section>
+
+    <!-- TALEPLER -->
+    <section class="admin-view" id="view-leads" hidden>
+      <div class="admin-panel">
+        <p class="panel-hint">Sitedeki iletişim formundan gelen keşif talepleri.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Tarih</th><th>Ad Soyad</th><th>Telefon</th><th>Şehir</th><th>Sistem</th><th>Mesaj</th><th></th></tr></thead>
+            <tbody id="leadRows"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- AYARLAR -->
+    <section class="admin-view" id="view-settings" hidden>
+      <div class="admin-panel settings-panel">
+        <h2>Sipariş Ayarları</h2>
+        <form id="settingsForm">
+          <div class="form-group">
+            <label for="waNumber">WhatsApp sipariş numarası</label>
+            <input type="text" id="waNumber" placeholder="905xxxxxxxxx">
+            <small>Uluslararası formatta, başında + olmadan yazın. Örn: 905321234567</small>
+          </div>
+          <button type="submit" class="btn btn-small">Kaydet</button>
+          <p class="form-status" id="settingsStatus" role="status"></p>
+        </form>
+      </div>
+      <div class="admin-panel settings-panel">
+        <h2>Sunucu Bağlantısı</h2>
+        <p class="panel-hint">
+          Şu an tüm veriler bu tarayıcıda (localStorage) saklanıyor. Sunucunuz hazır olduğunda
+          <code>js/store.js</code> dosyasındaki fonksiyonları API çağrılarıyla değiştirmeniz yeterlidir —
+          sitenin geri kalanında değişiklik gerekmez.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <!-- ÜRÜN EKLE/DÜZENLE PENCERESİ -->
+  <div class="modal-overlay" id="productModal" hidden>
+    <div class="modal">
+      <div class="modal-head">
+        <h2 id="productModalTitle">Yeni Ürün</h2>
+        <button class="modal-close" id="productModalClose" aria-label="Kapat">×</button>
+      </div>
+      <form id="productForm">
+        <input type="hidden" id="pfId">
+        <div class="form-group">
+          <label for="pfName">Ürün adı *</label>
+          <input type="text" id="pfName" required placeholder="Örn. 460W Monokristal Güneş Paneli">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="pfCat">Kategori</label>
+            <select id="pfCat">
+              <option value="panel">Güneş Paneli</option>
+              <option value="inverter">İnvertör</option>
+              <option value="aku">Akü</option>
+              <option value="paket">Hazır Paket</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="pfImg">Görsel</label>
+            <select id="pfImg">
+              <option value="panel">Panel</option>
+              <option value="flex">Esnek panel</option>
+              <option value="inverter">İnvertör</option>
+              <option value="battery">Akü</option>
+              <option value="kit">Paket</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="pfPrice">Fiyat (₺, KDV dahil) *</label>
+            <input type="number" id="pfPrice" required min="1" step="1" placeholder="4850">
+          </div>
+          <div class="form-group">
+            <label for="pfStock">Stok adedi *</label>
+            <input type="number" id="pfStock" required min="0" step="1" placeholder="10">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="pfSpecs">Özellikler <small>(her satıra bir özellik)</small></label>
+          <textarea id="pfSpecs" rows="3" placeholder="120 hücre · %21,3 verim&#10;25 yıl performans garantisi"></textarea>
+        </div>
+        <button type="submit" class="btn btn-block">Kaydet</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/store.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

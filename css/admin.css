@@ -1,0 +1,329 @@
+/* ============ YÖNETİM PANELİ ============ */
+.admin-body {
+  display: flex;
+  min-height: 100vh;
+  background: #f1f5f9;
+}
+
+/* ---- Kenar menü ---- */
+.admin-sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  background: var(--navy);
+  color: #cbd8e4;
+  display: flex;
+  flex-direction: column;
+  padding: 22px 16px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+
+.admin-logo { margin-bottom: 30px; font-size: 1.25rem; }
+
+.admin-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.admin-nav-btn {
+  background: none;
+  border: none;
+  text-align: left;
+  color: #cbd8e4;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: 11px 14px;
+  border-radius: 9px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.admin-nav-btn:hover { background: var(--navy-2); color: #fff; }
+
+.admin-nav-btn.active {
+  background: var(--primary);
+  color: #fff;
+}
+
+.admin-sidebar-foot {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border-top: 1px solid #24405c;
+  padding-top: 14px;
+}
+
+.admin-sidebar-foot a {
+  color: #9fb3c8;
+  text-decoration: none;
+  font-size: 0.88rem;
+  padding: 4px 14px;
+}
+
+.admin-sidebar-foot a:hover { color: #fff; }
+
+/* ---- Ana içerik ---- */
+.admin-main {
+  flex: 1;
+  padding: 26px 32px 48px;
+  min-width: 0;
+}
+
+.admin-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.admin-topbar h1 { font-size: 1.5rem; }
+
+.admin-user {
+  font-weight: 700;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.view-actions { margin-bottom: 18px; }
+
+.admin-panel {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px 24px;
+  margin-bottom: 22px;
+}
+
+.admin-panel h2 { font-size: 1.1rem; margin-bottom: 14px; }
+
+.panel-hint {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin-bottom: 16px;
+}
+
+.panel-hint code {
+  background: #f1f5f9;
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-size: 0.85em;
+}
+
+/* ---- İstatistik kartları ---- */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+.stat-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+}
+
+.stat-card span {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--muted);
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.stat-card strong {
+  font-size: 1.5rem;
+  color: var(--navy);
+}
+
+/* ---- Tablolar ---- */
+.table-wrap { overflow-x: auto; }
+
+.admin-panel table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.admin-panel th {
+  text-align: left;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  padding: 10px 12px;
+  border-bottom: 2px solid var(--border);
+  white-space: nowrap;
+}
+
+.admin-panel td {
+  padding: 12px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+
+.cell-strong { font-weight: 700; color: var(--navy); }
+
+.cell-msg { max-width: 260px; color: var(--muted); }
+
+.cell-actions { white-space: nowrap; text-align: right; }
+
+.empty-row {
+  text-align: center;
+  color: var(--muted);
+  padding: 28px 12px !important;
+}
+
+.row-btn {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--navy);
+  padding: 6px 12px;
+  cursor: pointer;
+  margin-left: 6px;
+}
+
+.row-btn:hover { border-color: var(--primary); color: var(--primary-dark); }
+
+.row-btn-danger { color: #dc2626; border-color: #fecaca; }
+
+.row-btn-danger:hover { border-color: #dc2626; color: #b91c1c; }
+
+.pill {
+  display: inline-block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+
+.pill-warn { background: #fef3c7; color: #b45309; }
+
+/* ---- Siparişler ---- */
+.order-card {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px 18px;
+  margin-bottom: 14px;
+}
+
+.order-head {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.order-head span { color: var(--muted); font-size: 0.85rem; }
+
+.order-items {
+  list-style: none;
+  margin-bottom: 10px;
+}
+
+.order-items li {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+  font-size: 0.9rem;
+  border-bottom: 1px dashed var(--border);
+}
+
+.order-items li span { color: var(--muted); }
+
+.order-total {
+  text-align: right;
+  font-size: 0.95rem;
+}
+
+.order-total strong { color: var(--navy); font-size: 1.1rem; }
+
+/* ---- Ayarlar ---- */
+.settings-panel { max-width: 560px; }
+
+.settings-panel small {
+  display: block;
+  color: var(--muted);
+  margin-top: 6px;
+  font-size: 0.8rem;
+}
+
+.settings-panel .form-status { text-align: left; }
+
+/* ---- Modal ---- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 28, 42, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 300;
+}
+
+.modal-overlay[hidden] { display: none; }
+
+.modal {
+  background: #fff;
+  border-radius: var(--radius);
+  width: 520px;
+  max-width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 24px 26px 26px;
+}
+
+.modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.modal-head h2 { font-size: 1.2rem; }
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  line-height: 1;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.modal-close:hover { color: var(--navy); }
+
+/* ---- Responsive ---- */
+@media (max-width: 860px) {
+  .admin-body { flex-direction: column; }
+
+  .admin-sidebar {
+    width: 100%;
+    height: auto;
+    position: static;
+    padding: 16px;
+  }
+
+  .admin-nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .admin-sidebar-foot {
+    flex-direction: row;
+    gap: 18px;
+  }
+
+  .admin-main { padding: 20px 16px 40px; }
+
+  .stat-grid { grid-template-columns: repeat(2, 1fr); }
+}
