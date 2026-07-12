@@ -37,6 +37,14 @@
         <a href="#referanslar">Referanslar</a>
         <a href="#iletisim" class="btn btn-small">Teklif Al</a>
       </nav>
+      <button class="cart-btn" id="cartBtn" aria-label="Sepeti aç">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="9" cy="21" r="1.6"/>
+          <circle cx="19" cy="21" r="1.6"/>
+          <path d="M2.5 3h3l2.6 12.5a2 2 0 0 0 2 1.5h8.7a2 2 0 0 0 2-1.6L22.5 8H6.2"/>
+        </svg>
+        <span class="cart-count" id="cartCount" hidden>0</span>
+      </button>
       <button class="hamburger" id="hamburger" aria-label="Menüyü aç">
         <span></span><span></span><span></span>
       </button>
@@ -98,10 +106,10 @@
   <!-- AVANTAJLAR ŞERİDİ -->
   <section class="features-strip">
     <div class="container strip-inner">
-      <div class="strip-item">✅ 25 Yıl Panel Garantisi</div>
-      <div class="strip-item">🏦 36 Aya Varan Taksit</div>
-      <div class="strip-item">🛠️ Ücretsiz Keşif &amp; Projelendirme</div>
-      <div class="strip-item">📄 Tüm İzin &amp; Evrak Takibi Bizde</div>
+      <div class="strip-item"><span class="tick">✓</span> 25 Yıl Panel Garantisi</div>
+      <div class="strip-item"><span class="tick">✓</span> 36 Aya Varan Taksit</div>
+      <div class="strip-item"><span class="tick">✓</span> Ücretsiz Keşif &amp; Projelendirme</div>
+      <div class="strip-item"><span class="tick">✓</span> Aynı Gün Kargo (Stok Ürünlerde)</div>
     </div>
   </section>
 
@@ -148,61 +156,23 @@
     </div>
   </section>
 
-  <!-- ÜRÜNLER / PAKETLER -->
+  <!-- ÜRÜNLER / MAĞAZA -->
   <section class="section section-alt" id="urunler">
     <div class="container">
       <div class="section-head">
-        <span class="eyebrow">Paketlerimiz</span>
-        <h2>Size Uygun Sistemi Seçin</h2>
-        <p>Tüm paketlere kurulum, işçilik ve devreye alma dahildir. Fiyatlar örnektir; keşif sonrası netleşir.</p>
+        <span class="eyebrow">Mağaza</span>
+        <h2>Ürünlerimiz</h2>
+        <p>Tüm ürünler orijinal, faturalı ve garantilidir. Stoktaki ürünler aynı gün kargoya verilir. Toplu alım ve kurulumlu fiyat için teklif isteyin.</p>
       </div>
-      <div class="pricing">
-        <article class="price-card">
-          <h3>Başlangıç</h3>
-          <div class="price-power">5 kW</div>
-          <p class="price-desc">2-3 kişilik hane için ideal</p>
-          <div class="price-tag">₺185.000<span>'den başlayan</span></div>
-          <ul>
-            <li>~12 adet 450W monokristal panel</li>
-            <li>5 kW on-grid invertör</li>
-            <li>Aylık ~650 kWh üretim</li>
-            <li>Mobil uygulamayla izleme</li>
-            <li>25 yıl panel performans garantisi</li>
-          </ul>
-          <a href="#iletisim" class="btn btn-outline btn-block">Teklif İste</a>
-        </article>
-        <article class="price-card featured">
-          <div class="ribbon">En Çok Tercih Edilen</div>
-          <h3>Aile</h3>
-          <div class="price-power">10 kW</div>
-          <p class="price-desc">Geniş aileler ve klima/ısı pompası kullananlar</p>
-          <div class="price-tag">₺340.000<span>'den başlayan</span></div>
-          <ul>
-            <li>~22 adet 450W monokristal panel</li>
-            <li>10 kW on-grid invertör</li>
-            <li>Aylık ~1.300 kWh üretim</li>
-            <li>Mobil uygulamayla izleme</li>
-            <li>25 yıl panel performans garantisi</li>
-            <li>2 yıl ücretsiz bakım</li>
-          </ul>
-          <a href="#iletisim" class="btn btn-block">Teklif İste</a>
-        </article>
-        <article class="price-card">
-          <h3>Ticari</h3>
-          <div class="price-power">30 kW+</div>
-          <p class="price-desc">İşletmeler, atölyeler, çiftlikler</p>
-          <div class="price-tag">Projeye özel<span> fiyatlandırma</span></div>
-          <ul>
-            <li>İhtiyaca göre panel konfigürasyonu</li>
-            <li>Trifaze endüstriyel invertör</li>
-            <li>Opsiyonel batarya depolama</li>
-            <li>SCADA / uzaktan izleme</li>
-            <li>Amortisman ve fizibilite raporu</li>
-            <li>KDV avantajı danışmanlığı</li>
-          </ul>
-          <a href="#iletisim" class="btn btn-outline btn-block">Teklif İste</a>
-        </article>
+      <div class="shop-filters" id="shopFilters">
+        <button class="filter-btn active" data-cat="all">Tümü</button>
+        <button class="filter-btn" data-cat="panel">Güneş Panelleri</button>
+        <button class="filter-btn" data-cat="inverter">İnvertörler</button>
+        <button class="filter-btn" data-cat="aku">Aküler</button>
+        <button class="filter-btn" data-cat="paket">Hazır Paketler</button>
       </div>
+      <div class="shop-grid" id="shopGrid"></div>
+      <p class="shop-note">Aradığınız ürünü bulamadınız mı? <a href="#iletisim">Bize yazın</a>, tedarik edelim. Fiyatlar KDV dahildir; kur ve stok durumuna göre güncellenebilir.</p>
     </div>
   </section>
 
@@ -398,6 +368,22 @@
     </div>
   </section>
 
+  <!-- SEPET -->
+  <div class="cart-overlay" id="cartOverlay"></div>
+  <aside class="cart-drawer" id="cartDrawer" aria-label="Sepet">
+    <div class="cart-head">
+      <h3>Sepetim</h3>
+      <button class="cart-close" id="cartClose" aria-label="Sepeti kapat">×</button>
+    </div>
+    <div class="cart-items" id="cartItems"></div>
+    <div class="cart-foot">
+      <div class="cart-total-row"><span>Ara Toplam</span><strong id="cartTotal">₺0</strong></div>
+      <p class="cart-note">Fiyatlara KDV dahildir. Kargo ücreti sipariş onayında bildirilir.</p>
+      <a class="btn btn-block" id="waOrder" href="#" target="_blank" rel="noopener">WhatsApp ile Sipariş Ver</a>
+      <button class="btn btn-outline btn-block" id="clearCart" type="button">Sepeti Temizle</button>
+    </div>
+  </aside>
+
   <!-- FOOTER -->
   <footer class="footer">
     <div class="container footer-grid">
@@ -414,7 +400,7 @@
       <div>
         <h4>Hızlı Erişim</h4>
         <a href="#hizmetler">Hizmetler</a>
-        <a href="#urunler">Paketler</a>
+        <a href="#urunler">Mağaza</a>
         <a href="#hesaplayici">Tasarruf Hesapla</a>
         <a href="#sss">S.S.S.</a>
       </div>
