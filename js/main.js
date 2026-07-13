@@ -43,7 +43,8 @@ const CAT_NAMES = {
   panel: "Güneş Paneli",
   inverter: "İnvertör",
   aku: "Akü",
-  paket: "Hazır Paket"
+  paket: "Hazır Paket",
+  aksesuar: "Aksesuar"
 };
 
 // Sipariş mesajlarının gideceği WhatsApp numarası (admin panelindeki
@@ -109,6 +110,50 @@ const PRODUCT_ART = {
       <rect x="30" y="92" width="70" height="9" fill="#f59e0b"/>
       <rect x="40" y="79" width="9" height="6" rx="1.5" fill="#dc2626"/>
       <rect x="80" y="79" width="9" height="6" rx="1.5" fill="#12314e"/>
+    </svg>`,
+  controller: `
+    <svg viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg">
+      <rect x="42" y="14" width="76" height="84" rx="7" fill="#1c2b3a" stroke="#0f1c28" stroke-width="3"/>
+      <rect x="52" y="24" width="56" height="24" rx="3" fill="#0a2138"/>
+      <text x="80" y="41" font-size="12" font-family="monospace" fill="#4ade80" text-anchor="middle">13.8V</text>
+      <circle cx="64" cy="64" r="7" fill="#f59e0b"/>
+      <circle cx="96" cy="64" r="7" fill="#22c55e"/>
+      <rect x="54" y="78" width="20" height="12" rx="2" fill="#33475a"/>
+      <rect x="86" y="78" width="20" height="12" rx="2" fill="#33475a"/>
+      <path d="M56 98 v12 M72 98 v12 M88 98 v12 M104 98 v12" stroke="#8395a5" stroke-width="4"/>
+    </svg>`,
+  streetlight: `
+    <svg viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg">
+      <rect x="76" y="30" width="8" height="84" fill="#5b6770"/>
+      <rect x="52" y="108" width="56" height="7" rx="3" fill="#8395a5"/>
+      <g transform="rotate(-24 96 24)">
+        <rect x="70" y="14" width="52" height="20" rx="2" fill="#12314e" stroke="#0a2138" stroke-width="2"/>
+        <line x1="96" y1="14" x2="96" y2="34" stroke="#3d719c" stroke-width="1.5"/>
+      </g>
+      <rect x="46" y="40" width="42" height="12" rx="6" fill="#33475a"/>
+      <ellipse cx="58" cy="52" rx="9" ry="4" fill="#ffe9a8"/>
+      <path d="M50 58 L44 78 M58 58 L58 80 M66 58 L72 78" stroke="#ffe9a8" stroke-width="2" opacity="0.7"/>
+    </svg>`,
+  mount: `
+    <svg viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg">
+      <rect x="16" y="88" width="128" height="8" rx="2" fill="#8395a5"/>
+      <polygon points="40,88 40,46 92,88" fill="none" stroke="#5b6770" stroke-width="6"/>
+      <polygon points="112,88 112,46 60,88" fill="none" stroke="#98a6b3" stroke-width="6"/>
+      <rect x="24" y="30" width="112" height="10" rx="2" fill="#c2ccd6" stroke="#98a6b3" stroke-width="2" transform="rotate(-14 80 35)"/>
+      <rect x="30" y="46" width="100" height="10" rx="2" fill="#c2ccd6" stroke="#98a6b3" stroke-width="2" transform="rotate(-14 80 51)"/>
+      <circle cx="40" cy="46" r="4" fill="#33475a"/>
+      <circle cx="112" cy="46" r="4" fill="#33475a"/>
+    </svg>`,
+  cable: `
+    <svg viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg">
+      <g fill="none" stroke="#1c2b3a" stroke-width="9">
+        <circle cx="72" cy="62" r="34"/>
+        <circle cx="88" cy="62" r="34" opacity="0.75"/>
+      </g>
+      <path d="M104 36 q26 -14 38 -4" fill="none" stroke="#1c2b3a" stroke-width="9" stroke-linecap="round"/>
+      <rect x="134" y="22" width="22" height="12" rx="6" fill="#dc2626"/>
+      <path d="M52 92 q-20 12 -36 6" fill="none" stroke="#1c2b3a" stroke-width="9" stroke-linecap="round"/>
+      <rect x="4" y="90" width="22" height="12" rx="6" fill="#12314e"/>
     </svg>`
 };
 

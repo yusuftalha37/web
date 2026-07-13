@@ -699,6 +699,38 @@ img, svg { max-width: 100%; }
 
 .step p { color: var(--muted); font-size: 12px; }
 
+/* ============ PROJE GALERİSİ ============ */
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+
+.gallery-item {
+  margin: 0;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.gallery-item svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.gallery-item:hover { border-color: #b8b8b8; }
+
+.gallery-caption {
+  font-size: 11.5px;
+  color: var(--muted);
+  text-align: center;
+  padding: 8px 10px;
+  border-top: 1px solid var(--border);
+  background: #fafafa;
+}
+
 /* ============ REFERANSLAR ============ */
 .testimonials {
   display: grid;
@@ -1173,7 +1205,7 @@ img, svg { max-width: 100%; }
 /* ============ RESPONSIVE ============ */
 @media (max-width: 960px) {
   .cards, .testimonials { grid-template-columns: 1fr 1fr; }
-  .shop-grid { grid-template-columns: repeat(2, 1fr); }
+  .shop-grid, .gallery { grid-template-columns: repeat(2, 1fr); }
   .steps { grid-template-columns: repeat(2, 1fr); }
   .calc-wrap, .contact-wrap { grid-template-columns: 1fr; }
   .footer-grid { grid-template-columns: 1fr 1fr; }
@@ -1222,7 +1254,7 @@ img, svg { max-width: 100%; }
   .cart-btn { margin-left: auto; }
 
   .cards, .testimonials, .steps { grid-template-columns: 1fr; }
-  .shop-grid { grid-template-columns: 1fr; }
+  .shop-grid, .gallery { grid-template-columns: 1fr; }
   .form-row { grid-template-columns: 1fr; }
   .calc-results { grid-template-columns: 1fr; }
   .footer-grid { grid-template-columns: 1fr; }

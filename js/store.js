@@ -77,14 +77,52 @@ const Store = (() => {
       name: "Bağ Evi Off-Grid Paketi 3 kW",
       specs: ["4 × 460W panel + 3 kW invertör", "12V 150Ah × 2 jel akü", "Telefonla kurulum desteği"],
       price: 94500, stock: 5
+    },
+    {
+      id: "aks-mppt", cat: "aksesuar", img: "controller",
+      name: "30A MPPT Şarj Kontrol Cihazı 12/24V",
+      specs: ["LCD ekran, otomatik voltaj seçimi", "Aşırı şarj ve kısa devre koruması", "2 yıl garanti"],
+      price: 4250, stock: 16
+    },
+    {
+      id: "aks-lamba", cat: "aksesuar", img: "streetlight",
+      name: "Solar Sokak / Bahçe Lambası 100W",
+      specs: ["Dahili panel ve lityum batarya", "Alacakaranlık sensörü, kumandalı", "IP65 dış mekan koruması"],
+      price: 3980, stock: 12
+    },
+    {
+      id: "aks-montaj", cat: "aksesuar", img: "mount",
+      name: "Çatı Montaj Konstrüksiyon Seti (10 Panel)",
+      specs: ["Eloksallı alüminyum ray ve kelepçeler", "Kiremit ve sac çatıya uygun", "Paslanmaz bağlantı elemanları"],
+      price: 7500, stock: 9
+    },
+    {
+      id: "aks-kablo", cat: "aksesuar", img: "cable",
+      name: "6mm² Solar Kablo 50m + MC4 Konnektör Seti",
+      specs: ["UV dayanımlı çift izolasyon", "2 çift MC4 konnektör dahil", "TSE belgeli"],
+      price: 2450, stock: 30
     }
   ];
+
+  // Varsayılan ürün listesine yeni ürünler eklendiğinde bu sürümü artırın;
+  // mevcut tarayıcılardaki listelere yalnızca eksik olanlar eklenir.
+  const SEED_VERSION = 2;
 
   function getProducts() {
     let list = read("gp-products", null);
     if (!list) {
       list = DEFAULT_PRODUCTS;
       write("gp-products", list);
+      write("gp-seed", SEED_VERSION);
+      return list;
+    }
+    if (read("gp-seed", 1) < SEED_VERSION) {
+      const ids = new Set(list.map((p) => p.id));
+      DEFAULT_PRODUCTS.forEach((p) => {
+        if (!ids.has(p.id)) list.push(p);
+      });
+      write("gp-products", list);
+      write("gp-seed", SEED_VERSION);
     }
     return list;
   }

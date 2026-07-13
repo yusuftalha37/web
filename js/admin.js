@@ -12,7 +12,8 @@ const CAT_NAMES = {
   panel: "Güneş Paneli",
   inverter: "İnvertör",
   aku: "Akü",
-  paket: "Hazır Paket"
+  paket: "Hazır Paket",
+  aksesuar: "Aksesuar"
 };
 
 const tlFmt = (n) => "₺" + Math.round(n).toLocaleString("tr-TR");
