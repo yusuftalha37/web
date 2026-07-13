@@ -332,6 +332,73 @@
 
 .settings-panel .form-status { text-align: left; }
 
+/* ---- Ürün yükleme ekranı ---- */
+.upload-grid {
+  display: grid;
+  grid-template-columns: 1.25fr 1fr;
+  gap: 22px;
+  align-items: start;
+}
+
+.drop-zone {
+  border: 2px dashed #b8c4cf;
+  border-radius: var(--radius);
+  background: #fafbfc;
+  padding: 22px 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.drop-zone:hover { border-color: var(--primary); }
+
+.drop-zone.drag {
+  border-color: var(--primary);
+  background: #fdf3e7;
+}
+
+.drop-zone.has-photo { padding: 12px; }
+
+.drop-zone-inner strong {
+  display: block;
+  color: var(--navy);
+  font-size: 0.95rem;
+  margin-bottom: 4px;
+}
+
+.drop-zone-inner span {
+  display: block;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.drop-zone-inner img {
+  max-height: 150px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+}
+
+.up-url {
+  width: 100%;
+  margin-top: 8px;
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 0.85rem;
+  font-family: inherit;
+}
+
+#upPhotoRemove { margin-top: 8px; margin-left: 0; }
+
+.upload-preview .product {
+  max-width: 270px;
+  margin: 0 auto;
+}
+
+.upload-preview .add-btn { pointer-events: none; }
+
+#upStatus { text-align: left; }
+
 /* ---- Modal ---- */
 .modal-overlay {
   position: fixed;
@@ -400,4 +467,5 @@
   .admin-main { padding: 20px 16px 40px; }
 
   .stat-grid { grid-template-columns: repeat(2, 1fr); }
+  .upload-grid { grid-template-columns: 1fr; }
 }

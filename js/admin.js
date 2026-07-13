@@ -32,10 +32,29 @@ document.getElementById("adminLogout").addEventListener("click", (e) => {
 const VIEW_TITLES = {
   dashboard: "Genel Bakış",
   products: "Ürünler",
+  upload: "Ürün Yükle",
   orders: "Siparişler",
   leads: "Keşif Talepleri",
   settings: "Ayarlar"
 };
+
+// Görsel dosyasını en fazla 900px olacak şekilde küçültüp JPEG'e çevirir;
+// hem düzenleme penceresi hem ürün yükleme ekranı kullanır.
+function readImageFile(file, cb) {
+  const img = new Image();
+  img.onload = () => {
+    const MAX = 900;
+    const scale = Math.min(1, MAX / Math.max(img.width, img.height));
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.round(img.width * scale);
+    canvas.height = Math.round(img.height * scale);
+    canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
+    URL.revokeObjectURL(img.src);
+    cb(canvas.toDataURL("image/jpeg", 0.82));
+  };
+  img.onerror = () => alert("Bu dosya bir görsel olarak okunamadı.");
+  img.src = URL.createObjectURL(file);
+}
 
 document.querySelectorAll(".admin-nav-btn").forEach((btn) => {
   btn.addEventListener("click", () => {
@@ -118,25 +137,13 @@ function setPhoto(src) {
     : "<span>Fotoğraf<br>yok</span>";
 }
 
-// Seçilen dosyayı en fazla 900px olacak şekilde küçültüp JPEG'e çevirir;
-// böylece localStorage kotası dolmaz, sunucuya geçince de küçük dosya gider.
 photoFile.addEventListener("change", () => {
   const file = photoFile.files[0];
   if (!file) return;
-  const img = new Image();
-  img.onload = () => {
-    const MAX = 900;
-    const scale = Math.min(1, MAX / Math.max(img.width, img.height));
-    const canvas = document.createElement("canvas");
-    canvas.width = Math.round(img.width * scale);
-    canvas.height = Math.round(img.height * scale);
-    canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
-    setPhoto(canvas.toDataURL("image/jpeg", 0.82));
-    URL.revokeObjectURL(img.src);
+  readImageFile(file, (dataUrl) => {
+    setPhoto(dataUrl);
     photoUrl.value = "";
-  };
-  img.onerror = () => alert("Bu dosya bir görsel olarak okunamadı.");
-  img.src = URL.createObjectURL(file);
+  });
 });
 
 photoUrl.addEventListener("change", () => {
@@ -172,7 +179,10 @@ function openProductModal(product) {
   document.getElementById("pfName").focus();
 }
 
-document.getElementById("newProductBtn").addEventListener("click", () => openProductModal(null));
+// "Yeni Ürün Ekle" butonu Ürün Yükle ekranına götürür
+document.getElementById("newProductBtn").addEventListener("click", () => {
+  document.querySelector('.admin-nav-btn[data-view="upload"]').click();
+});
 document.getElementById("productModalClose").addEventListener("click", () => (productModal.hidden = true));
 productModal.addEventListener("click", (e) => {
   if (e.target === productModal) productModal.hidden = true;
@@ -215,6 +225,143 @@ productForm.addEventListener("submit", (e) => {
   productModal.hidden = true;
   renderAll();
 });
+
+// ---------- ÜRÜN YÜKLE EKRANI ----------
+const uploadForm = document.getElementById("uploadForm");
+const dropZone = document.getElementById("dropZone");
+const dropZoneInner = document.getElementById("dropZoneInner");
+const upPhotoFile = document.getElementById("upPhotoFile");
+const upPhotoUrl = document.getElementById("upPhotoUrl");
+const uploadPreview = document.getElementById("uploadPreview");
+const upStatus = document.getElementById("upStatus");
+let uploadPhoto = "";
+
+const DROP_ZONE_DEFAULT = dropZoneInner.innerHTML;
+
+function setUploadPhoto(src) {
+  uploadPhoto = src || "";
+  dropZoneInner.innerHTML = uploadPhoto
+    ? `<img src="${escHtml(uploadPhoto)}" alt="Önizleme"><span>Değiştirmek için tıklayın veya yeni fotoğraf sürükleyin</span>`
+    : DROP_ZONE_DEFAULT;
+  dropZone.classList.toggle("has-photo", !!uploadPhoto);
+  renderUploadPreview();
+}
+
+dropZone.addEventListener("click", () => upPhotoFile.click());
+
+dropZone.addEventListener("dragover", (e) => {
+  e.preventDefault();
+  dropZone.classList.add("drag");
+});
+
+dropZone.addEventListener("dragleave", () => dropZone.classList.remove("drag"));
+
+dropZone.addEventListener("drop", (e) => {
+  e.preventDefault();
+  dropZone.classList.remove("drag");
+  const file = e.dataTransfer.files[0];
+  if (!file) return;
+  readImageFile(file, (dataUrl) => {
+    setUploadPhoto(dataUrl);
+    upPhotoUrl.value = "";
+  });
+});
+
+upPhotoFile.addEventListener("change", () => {
+  const file = upPhotoFile.files[0];
+  if (!file) return;
+  readImageFile(file, (dataUrl) => {
+    setUploadPhoto(dataUrl);
+    upPhotoUrl.value = "";
+  });
+});
+
+upPhotoUrl.addEventListener("change", () => {
+  const url = upPhotoUrl.value.trim();
+  if (!url) return;
+  if (!/^https?:\/\//.test(url)) {
+    alert("Görsel bağlantısı http:// veya https:// ile başlamalıdır.");
+    return;
+  }
+  setUploadPhoto(url);
+  upPhotoFile.value = "";
+});
+
+document.getElementById("upPhotoRemove").addEventListener("click", () => {
+  setUploadPhoto("");
+  upPhotoFile.value = "";
+  upPhotoUrl.value = "";
+});
+
+// Mağazadaki ürün kartının birebir önizlemesi
+function renderUploadPreview() {
+  const name = document.getElementById("upName").value.trim() || "Ürün adı";
+  const cat = document.getElementById("upCat").value;
+  const img = document.getElementById("upImg").value;
+  const price = parseInt(document.getElementById("upPrice").value, 10) || 0;
+  const stock = parseInt(document.getElementById("upStock").value, 10);
+  const specs = document.getElementById("upSpecs").value
+    .split("\n").map((s) => s.trim()).filter(Boolean);
+  const low = !isNaN(stock) && stock <= 5;
+
+  uploadPreview.innerHTML = `
+    <article class="product">
+      <div class="product-img${uploadPhoto ? " has-photo" : ""}">
+        <span class="stock-badge${low ? " low" : ""}">${low ? "Son " + stock + " adet" : "Stokta"}</span>
+        ${uploadPhoto
+          ? `<img src="${escHtml(uploadPhoto)}" alt="">`
+          : (PRODUCT_ART[img] || PRODUCT_ART.panel)}
+      </div>
+      <div class="product-body">
+        <span class="product-cat">${CAT_NAMES[cat]}</span>
+        <h3>${escHtml(name)}</h3>
+        <ul class="product-specs">${specs.map((s) => `<li>${escHtml(s)}</li>`).join("") || "<li>Ürün özellikleri</li>"}</ul>
+        <div class="product-foot">
+          <div class="product-price">${tlFmt(price)}<span>KDV dahil</span></div>
+          <button class="add-btn" type="button">Sepete Ekle</button>
+        </div>
+      </div>
+    </article>`;
+}
+
+["upName", "upCat", "upImg", "upPrice", "upStock", "upSpecs"].forEach((id) => {
+  document.getElementById(id).addEventListener("input", renderUploadPreview);
+});
+
+uploadForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const name = document.getElementById("upName").value.trim();
+  const price = parseInt(document.getElementById("upPrice").value, 10) || 0;
+  if (!name || price <= 0) {
+    upStatus.textContent = "Lütfen ürün adını ve geçerli bir fiyat girin.";
+    upStatus.className = "form-status err";
+    return;
+  }
+  try {
+    Store.saveProduct({
+      id: "p-" + Date.now(),
+      name,
+      cat: document.getElementById("upCat").value,
+      img: document.getElementById("upImg").value,
+      photo: uploadPhoto,
+      price,
+      stock: parseInt(document.getElementById("upStock").value, 10) || 0,
+      specs: document.getElementById("upSpecs").value
+        .split("\n").map((s) => s.trim()).filter(Boolean)
+    });
+  } catch (err) {
+    upStatus.textContent = "Kayıt başarısız: tarayıcı depolama alanı doldu. Daha küçük fotoğraf kullanın.";
+    upStatus.className = "form-status err";
+    return;
+  }
+  upStatus.textContent = '"' + name + '" mağazaya eklendi.';
+  upStatus.className = "form-status ok";
+  uploadForm.reset();
+  setUploadPhoto("");
+  renderAll();
+});
+
+renderUploadPreview();
 
 // ---------- SİPARİŞLER ----------
 function renderOrders() {

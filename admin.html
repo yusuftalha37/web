@@ -22,6 +22,7 @@
     <nav class="admin-nav">
       <button class="admin-nav-btn active" data-view="dashboard">Genel Bakış</button>
       <button class="admin-nav-btn" data-view="products">Ürünler</button>
+      <button class="admin-nav-btn" data-view="upload">Ürün Yükle</button>
       <button class="admin-nav-btn" data-view="orders">Siparişler</button>
       <button class="admin-nav-btn" data-view="leads">Keşif Talepleri</button>
       <button class="admin-nav-btn" data-view="settings">Ayarlar</button>
@@ -64,6 +65,80 @@
             <thead><tr><th>Görsel</th><th>Ürün</th><th>Kategori</th><th>Fiyat</th><th>Stok</th><th></th></tr></thead>
             <tbody id="productRows"></tbody>
           </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ÜRÜN YÜKLE -->
+    <section class="admin-view" id="view-upload" hidden>
+      <div class="upload-grid">
+        <div class="admin-panel">
+          <h2>Yeni Ürün Yükle</h2>
+          <form id="uploadForm">
+            <div class="form-group">
+              <label for="upName">Ürün adı *</label>
+              <input type="text" id="upName" required placeholder="Örn. 460W Monokristal Güneş Paneli">
+            </div>
+            <div class="form-group">
+              <label>Ürün fotoğrafı</label>
+              <div class="drop-zone" id="dropZone">
+                <input type="file" id="upPhotoFile" accept="image/*" hidden>
+                <div class="drop-zone-inner" id="dropZoneInner">
+                  <strong>Fotoğrafı buraya sürükleyip bırakın</strong>
+                  <span>veya tıklayıp bilgisayarınızdan seçin — otomatik küçültülür</span>
+                </div>
+              </div>
+              <input type="text" id="upPhotoUrl" class="up-url" placeholder="veya görsel bağlantısı: https://...">
+              <button type="button" class="row-btn row-btn-danger" id="upPhotoRemove">Fotoğrafı Kaldır</button>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="upCat">Kategori</label>
+                <select id="upCat">
+                  <option value="panel">Güneş Paneli</option>
+                  <option value="inverter">İnvertör</option>
+                  <option value="aku">Akü</option>
+                  <option value="paket">Hazır Paket</option>
+                  <option value="aksesuar">Aksesuar</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="upImg">Yedek çizim <small>(fotoğraf yoksa)</small></label>
+                <select id="upImg">
+                  <option value="panel">Panel</option>
+                  <option value="flex">Esnek panel</option>
+                  <option value="inverter">İnvertör</option>
+                  <option value="battery">Akü</option>
+                  <option value="kit">Paket</option>
+                  <option value="controller">Şarj kontrol cihazı</option>
+                  <option value="streetlight">Solar lamba</option>
+                  <option value="mount">Montaj seti</option>
+                  <option value="cable">Kablo / konnektör</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="upPrice">Fiyat (₺, KDV dahil) *</label>
+                <input type="number" id="upPrice" required min="1" step="1" placeholder="4850">
+              </div>
+              <div class="form-group">
+                <label for="upStock">Stok adedi *</label>
+                <input type="number" id="upStock" required min="0" step="1" placeholder="10">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="upSpecs">Özellikler <small>(her satıra bir özellik)</small></label>
+              <textarea id="upSpecs" rows="3" placeholder="120 hücre · %21,3 verim&#10;25 yıl performans garantisi"></textarea>
+            </div>
+            <button type="submit" class="btn btn-block">Ürünü Mağazaya Yükle</button>
+            <p class="form-status" id="upStatus" role="status"></p>
+          </form>
+        </div>
+        <div class="admin-panel">
+          <h2>Mağaza Önizlemesi</h2>
+          <div class="upload-preview" id="uploadPreview"></div>
+          <p class="panel-hint">Ürününüz mağazada bu şekilde görünecek. Formu doldurdukça önizleme güncellenir.</p>
         </div>
       </div>
     </section>
