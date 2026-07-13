@@ -45,7 +45,7 @@ const VIEW_TITLES = {
   upload: "Ürün Yükle",
   categories: "Kategoriler",
   orders: "Siparişler",
-  leads: "Keşif Talepleri",
+  leads: "İletişim Talepleri",
   settings: "Ayarlar"
 };
 
@@ -92,7 +92,7 @@ function renderDashboard() {
     <div class="stat-card"><span>Toplam Stok</span><strong>${totalStock}</strong></div>
     <div class="stat-card"><span>Sipariş Talebi</span><strong>${orders.length}</strong></div>
     <div class="stat-card"><span>Sipariş Hacmi</span><strong>${tlFmt(orderTotal)}</strong></div>
-    <div class="stat-card"><span>Keşif Talebi</span><strong>${leads.length}</strong></div>
+    <div class="stat-card"><span>İletişim Talebi</span><strong>${leads.length}</strong></div>
   `;
 
   document.getElementById("recentLeads").innerHTML =
@@ -104,7 +104,7 @@ function renderDashboard() {
         <td>${escHtml(l.city || "—")}</td>
         <td>${escHtml(l.type || "—")}</td>
       </tr>`).join("") ||
-    '<tr><td colspan="5" class="empty-row">Henüz keşif talebi yok.</td></tr>';
+    '<tr><td colspan="5" class="empty-row">Henüz iletişim talebi yok.</td></tr>';
 }
 
 // ---------- ÜRÜNLER ----------
@@ -475,7 +475,7 @@ function renderLeads() {
         <td class="cell-msg">${escHtml(l.message || "—")}</td>
         <td class="cell-actions"><button class="row-btn row-btn-danger" data-i="${i}">Sil</button></td>
       </tr>`).join("") ||
-    '<tr><td colspan="7" class="empty-row">Henüz keşif talebi yok.</td></tr>';
+    '<tr><td colspan="7" class="empty-row">Henüz iletişim talebi yok.</td></tr>';
 }
 
 document.getElementById("leadRows").addEventListener("click", (e) => {

@@ -1,0 +1,10 @@
+# Quantora Solar Enerji
+# Alan adınızı yayınladığınızda aşağıdaki adresi kendi alan adınızla değiştirin.
+
+User-agent: *
+Allow: /
+Disallow: /admin.html
+Disallow: /giris.html
+Disallow: /hesap.html
+
+Sitemap: https://www.quantorasolar.com.tr/sitemap.xml
