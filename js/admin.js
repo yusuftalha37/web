@@ -8,13 +8,23 @@ if (!adminSession || adminSession.role !== "admin") {
   location.href = "giris.html";
 }
 
-const CAT_NAMES = {
-  panel: "Güneş Paneli",
-  inverter: "İnvertör",
-  aku: "Akü",
-  paket: "Hazır Paket",
-  aksesuar: "Aksesuar"
-};
+function catName(id) {
+  const c = Store.getCategories().find((c) => c.id === id);
+  return c ? c.name : "Diğer";
+}
+
+// Ürün formlarındaki kategori listelerini doldurur (seçim korunur)
+function populateCatSelects() {
+  const options = Store.getCategories()
+    .map((c) => `<option value="${c.id}">${escHtml(c.name)}</option>`)
+    .join("");
+  ["pfCat", "upCat"].forEach((id) => {
+    const sel = document.getElementById(id);
+    const current = sel.value;
+    sel.innerHTML = options;
+    if (current && [...sel.options].some((o) => o.value === current)) sel.value = current;
+  });
+}
 
 const tlFmt = (n) => "₺" + Math.round(n).toLocaleString("tr-TR");
 const dateFmt = (ts) =>
@@ -33,6 +43,7 @@ const VIEW_TITLES = {
   dashboard: "Genel Bakış",
   products: "Ürünler",
   upload: "Ürün Yükle",
+  categories: "Kategoriler",
   orders: "Siparişler",
   leads: "Keşif Talepleri",
   settings: "Ayarlar"
@@ -113,7 +124,7 @@ function renderProducts() {
       <tr>
         <td>${thumbHtml(p)}</td>
         <td class="cell-strong">${escHtml(p.name)}</td>
-        <td>${CAT_NAMES[p.cat] || p.cat}</td>
+        <td>${escHtml(catName(p.cat))}</td>
         <td>${tlFmt(p.price)}</td>
         <td>${p.stock <= 5 ? `<span class="pill pill-warn">${p.stock} adet</span>` : p.stock + " adet"}</td>
         <td class="cell-actions">
@@ -313,7 +324,7 @@ function renderUploadPreview() {
           : (PRODUCT_ART[img] || PRODUCT_ART.panel)}
       </div>
       <div class="product-body">
-        <span class="product-cat">${CAT_NAMES[cat]}</span>
+        <span class="product-cat">${escHtml(catName(cat))}</span>
         <h3>${escHtml(name)}</h3>
         <ul class="product-specs">${specs.map((s) => `<li>${escHtml(s)}</li>`).join("") || "<li>Ürün özellikleri</li>"}</ul>
         <div class="product-foot">
@@ -362,6 +373,72 @@ uploadForm.addEventListener("submit", (e) => {
 });
 
 renderUploadPreview();
+
+// ---------- KATEGORİLER ----------
+function renderCategories() {
+  const cats = Store.getCategories();
+  const products = Store.getProducts();
+  document.getElementById("catRows").innerHTML =
+    cats.map((c) => {
+      const count = products.filter((p) => p.cat === c.id).length;
+      return `
+      <tr>
+        <td class="cell-strong">${escHtml(c.name)}</td>
+        <td>${count} ürün</td>
+        <td class="cell-actions">
+          <button class="row-btn" data-act="rename" data-id="${c.id}">Yeniden Adlandır</button>
+          <button class="row-btn row-btn-danger" data-act="delcat" data-id="${c.id}">Sil</button>
+        </td>
+      </tr>`;
+    }).join("") ||
+    '<tr><td colspan="3" class="empty-row">Henüz kategori yok.</td></tr>';
+}
+
+document.getElementById("catForm").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const input = document.getElementById("catNameInput");
+  const status = document.getElementById("catStatus");
+  const name = input.value.trim();
+  if (!name) return;
+  if (Store.getCategories().some((c) => c.name.toLowerCase() === name.toLowerCase())) {
+    status.textContent = "Bu isimde bir kategori zaten var.";
+    status.className = "form-status err";
+    return;
+  }
+  Store.saveCategory({ name });
+  status.textContent = '"' + name + '" kategorisi eklendi.';
+  status.className = "form-status ok";
+  input.value = "";
+  renderAll();
+});
+
+document.getElementById("catRows").addEventListener("click", (e) => {
+  const btn = e.target.closest(".row-btn");
+  if (!btn) return;
+  const { id, act } = btn.dataset;
+  const cat = Store.getCategories().find((c) => c.id === id);
+  if (!cat) return;
+
+  if (act === "rename") {
+    const name = prompt("Kategorinin yeni adı:", cat.name);
+    if (name && name.trim()) {
+      Store.saveCategory({ id, name });
+      renderAll();
+    }
+  }
+
+  if (act === "delcat") {
+    const count = Store.getProducts().filter((p) => p.cat === id).length;
+    if (count > 0) {
+      alert('"' + cat.name + '" kategorisinde ' + count + " ürün var. Silmeden önce bu ürünleri başka bir kategoriye taşıyın veya silin.");
+      return;
+    }
+    if (confirm('"' + cat.name + '" kategorisi silinsin mi?')) {
+      Store.deleteCategory(id);
+      renderAll();
+    }
+  }
+});
 
 // ---------- SİPARİŞLER ----------
 function renderOrders() {
@@ -428,10 +505,13 @@ document.getElementById("settingsForm").addEventListener("submit", (e) => {
 
 // ---------- TÜMÜNÜ ÇİZ ----------
 function renderAll() {
+  populateCatSelects();
   renderDashboard();
   renderProducts();
+  renderCategories();
   renderOrders();
   renderLeads();
+  renderUploadPreview();
 }
 
 renderAll();

@@ -544,6 +544,14 @@ img, svg { max-width: 100%; }
 
 .add-btn.added { background: #2e8b2e; border-color: #226b22; }
 
+.shop-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: var(--muted);
+  font-size: 13px;
+  padding: 24px 0;
+}
+
 .shop-note {
   margin-top: 20px;
   color: var(--muted);

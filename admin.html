@@ -23,6 +23,7 @@
       <button class="admin-nav-btn active" data-view="dashboard">Genel Bakış</button>
       <button class="admin-nav-btn" data-view="products">Ürünler</button>
       <button class="admin-nav-btn" data-view="upload">Ürün Yükle</button>
+      <button class="admin-nav-btn" data-view="categories">Kategoriler</button>
       <button class="admin-nav-btn" data-view="orders">Siparişler</button>
       <button class="admin-nav-btn" data-view="leads">Keşif Talepleri</button>
       <button class="admin-nav-btn" data-view="settings">Ayarlar</button>
@@ -94,13 +95,7 @@
             <div class="form-row">
               <div class="form-group">
                 <label for="upCat">Kategori</label>
-                <select id="upCat">
-                  <option value="panel">Güneş Paneli</option>
-                  <option value="inverter">İnvertör</option>
-                  <option value="aku">Akü</option>
-                  <option value="paket">Hazır Paket</option>
-                  <option value="aksesuar">Aksesuar</option>
-                </select>
+                <select id="upCat"></select>
               </div>
               <div class="form-group">
                 <label for="upImg">Yedek çizim <small>(fotoğraf yoksa)</small></label>
@@ -139,6 +134,30 @@
           <h2>Mağaza Önizlemesi</h2>
           <div class="upload-preview" id="uploadPreview"></div>
           <p class="panel-hint">Ürününüz mağazada bu şekilde görünecek. Formu doldurdukça önizleme güncellenir.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- KATEGORİLER -->
+    <section class="admin-view" id="view-categories" hidden>
+      <div class="admin-panel settings-panel">
+        <h2>Yeni Kategori Ekle</h2>
+        <form id="catForm">
+          <div class="form-group">
+            <label for="catNameInput">Kategori adı</label>
+            <input type="text" id="catNameInput" required placeholder="Örn. Şarj Kontrol Cihazları">
+          </div>
+          <button type="submit" class="btn btn-small">Kategori Ekle</button>
+          <p class="form-status" id="catStatus" role="status"></p>
+        </form>
+      </div>
+      <div class="admin-panel">
+        <p class="panel-hint">Kategoriler mağazadaki filtre butonlarında ve ürün formlarında kullanılır. İçinde ürün bulunan kategori silinemez; önce ürünleri başka kategoriye taşıyın.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Kategori</th><th>Ürün Sayısı</th><th></th></tr></thead>
+            <tbody id="catRows"></tbody>
+          </table>
         </div>
       </div>
     </section>
@@ -217,13 +236,7 @@
         <div class="form-row">
           <div class="form-group">
             <label for="pfCat">Kategori</label>
-            <select id="pfCat">
-              <option value="panel">Güneş Paneli</option>
-              <option value="inverter">İnvertör</option>
-              <option value="aku">Akü</option>
-              <option value="paket">Hazır Paket</option>
-              <option value="aksesuar">Aksesuar</option>
-            </select>
+            <select id="pfCat"></select>
           </div>
           <div class="form-group">
             <label for="pfImg">Yedek çizim <small>(fotoğraf yoksa)</small></label>

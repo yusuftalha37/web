@@ -36,16 +36,14 @@ if (currentUser) {
 }
 
 // ============ ÜRÜNLER ============
-// Ürün listesi veri katmanından gelir; admin panelinden yönetilir.
+// Ürün ve kategori listeleri veri katmanından gelir; admin panelinden yönetilir.
 const PRODUCTS = Store.getProducts();
+const CATEGORIES = Store.getCategories();
 
-const CAT_NAMES = {
-  panel: "Güneş Paneli",
-  inverter: "İnvertör",
-  aku: "Akü",
-  paket: "Hazır Paket",
-  aksesuar: "Aksesuar"
-};
+function catName(id) {
+  const c = CATEGORIES.find((c) => c.id === id);
+  return c ? c.name : "Diğer";
+}
 
 // Sipariş mesajlarının gideceği WhatsApp numarası (admin panelindeki
 // Ayarlar bölümünden değiştirilebilir)
@@ -63,8 +61,20 @@ function productMedia(p) {
     : (PRODUCT_ART[p.img] || PRODUCT_ART.panel);
 }
 
+function renderFilters() {
+  shopFilters.innerHTML =
+    '<button class="filter-btn active" data-cat="all">Tümü</button>' +
+    CATEGORIES.map(
+      (c) => `<button class="filter-btn" data-cat="${c.id}">${escHtml(c.name)}</button>`
+    ).join("");
+}
+
 function renderShop(cat) {
   const list = cat === "all" ? PRODUCTS : PRODUCTS.filter((p) => p.cat === cat);
+  if (list.length === 0) {
+    shopGrid.innerHTML = '<p class="shop-empty">Bu kategoride henüz ürün bulunmuyor.</p>';
+    return;
+  }
   shopGrid.innerHTML = list
     .map((p) => {
       const low = p.stock <= 5;
@@ -75,7 +85,7 @@ function renderShop(cat) {
           ${productMedia(p)}
         </div>
         <div class="product-body">
-          <span class="product-cat">${CAT_NAMES[p.cat] || ""}</span>
+          <span class="product-cat">${escHtml(catName(p.cat))}</span>
           <h3>${escHtml(p.name)}</h3>
           <ul class="product-specs">${p.specs.map((s) => `<li>${escHtml(s)}</li>`).join("")}</ul>
           <div class="product-foot">
@@ -96,6 +106,7 @@ shopFilters.addEventListener("click", (e) => {
   renderShop(btn.dataset.cat);
 });
 
+renderFilters();
 renderShop("all");
 
 // ---- Sepet ----

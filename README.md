@@ -6,7 +6,7 @@ Tamamen statik olduğu için herhangi bir sunucu kurulumu gerektirmez.
 ## Özellikler
 
 - Mobil uyumlu (responsive) tek sayfa tasarım
-- **Ürün mağazası**: panel, invertör, akü ve hazır paket kategorileriyle 10 örnek ürün, kategori filtresi, stok rozetleri
+- **Ürün mağazası**: 14 örnek ürün, admin panelinden yönetilebilen kategoriler ve filtre butonları, stok rozetleri
 - **Ürün fotoğrafları**: admin panelinden bilgisayardan yükleme (otomatik küçültülür) veya görsel bağlantısı; fotoğrafı olmayan ürünlerde kategoriye uygun çizim gösterilir
 - **Sepet**: localStorage ile kalıcı sepet, adet artır/azalt, WhatsApp üzerinden sipariş gönderme
 - Hizmetler: çatı GES, endüstriyel GES, tarımsal sulama, depolamalı sistemler
@@ -15,7 +15,7 @@ Tamamen statik olduğu için herhangi bir sunucu kurulumu gerektirmez.
 - Doğrulamalı iletişim/keşif talep formu — talepler admin paneline düşer
 - **Kullanıcı girişi & kayıt** (`giris.html`) — demo yönetici: `admin@quantorasolar.com.tr` / `admin123`
 - **Hesabım sayfası** (`hesap.html`) — profil güncelleme, şifre değiştirme, sipariş geçmişi
-- **Admin paneli** (`admin.html`) — ürün ekleme/düzenleme/silme, sipariş talepleri, keşif talepleri, WhatsApp numarası ayarı
+- **Admin paneli** (`admin.html`) — ürün yükleme/düzenleme/silme, kategori yönetimi, sipariş talepleri, keşif talepleri, WhatsApp numarası ayarı
 - Harici bağımlılık yok: saf HTML + CSS + JavaScript
 
 ## Çalıştırma

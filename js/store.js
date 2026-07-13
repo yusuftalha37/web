@@ -104,6 +104,39 @@ const Store = (() => {
     }
   ];
 
+  // ---------- KATEGORİLER ----------
+  const DEFAULT_CATEGORIES = [
+    { id: "panel", name: "Güneş Panelleri" },
+    { id: "inverter", name: "İnvertörler" },
+    { id: "aku", name: "Aküler" },
+    { id: "paket", name: "Hazır Paketler" },
+    { id: "aksesuar", name: "Aksesuarlar" }
+  ];
+
+  function getCategories() {
+    let cats = read("gp-cats", null);
+    if (!cats) {
+      cats = DEFAULT_CATEGORIES;
+      write("gp-cats", cats);
+    }
+    return cats;
+  }
+
+  function saveCategory(cat) {
+    const cats = getCategories();
+    if (cat.id) {
+      const existing = cats.find((c) => c.id === cat.id);
+      if (existing) existing.name = cat.name.trim();
+    } else {
+      cats.push({ id: "c-" + Date.now(), name: cat.name.trim() });
+    }
+    write("gp-cats", cats);
+  }
+
+  function deleteCategory(id) {
+    write("gp-cats", getCategories().filter((c) => c.id !== id));
+  }
+
   // Varsayılan ürün listesine yeni ürünler eklendiğinde bu sürümü artırın;
   // mevcut tarayıcılardaki listelere yalnızca eksik olanlar eklenir.
   const SEED_VERSION = 2;
@@ -260,6 +293,7 @@ const Store = (() => {
 
   return {
     getProducts, saveProduct, deleteProduct,
+    getCategories, saveCategory, deleteCategory,
     register, login, logout, session,
     getUser, updateProfile, changePassword,
     addLead, getLeads, deleteLead,
