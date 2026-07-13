@@ -310,6 +310,29 @@ img, svg { max-width: 100%; }
   padding-top: 12px;
 }
 
+/* ============ SAYFA BANDI (iç sayfalar) ============ */
+.page-band {
+  background: var(--blue-dark) repeating-linear-gradient(
+    -45deg,
+    rgba(255, 255, 255, 0.025) 0 2px,
+    transparent 2px 14px
+  );
+  border-bottom: 3px solid var(--orange);
+  color: #fff;
+  padding: 26px 0;
+}
+
+.page-band h1 {
+  color: #fff;
+  font-size: 24px;
+  margin-bottom: 4px;
+}
+
+.page-band p {
+  color: #b9cddd;
+  font-size: 13px;
+}
+
 /* ============ AVANTAJ ŞERİDİ ============ */
 .features-strip {
   background: var(--bg-alt);
@@ -565,6 +588,11 @@ img, svg { max-width: 100%; }
   margin-top: 20px;
   color: var(--muted);
   font-size: 12px;
+}
+
+.shop-more {
+  text-align: center;
+  margin-top: 26px;
 }
 
 .shop-note a { color: var(--blue); }
@@ -1590,6 +1618,19 @@ img, svg { max-width: 100%; }
 
 .pill-warn { background: #fef3c7; color: #b45309; }
 
+.hit-star { color: var(--primary); }
+
+.check-label {
+  display: block;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 4px 0 14px;
+  cursor: pointer;
+}
+
+.check-label input { margin-right: 6px; }
+
 .table-thumb {
   width: 46px;
   height: 46px;
@@ -1892,7 +1933,7 @@ img, svg { max-width: 100%; }
       <div class="nav-links" id="navLinks">
         <a href="#anasayfa">ANA SAYFA</a>
         <a href="#hizmetler">HİZMETLERİMİZ</a>
-        <a href="#urunler">ÜRÜNLER</a>
+        <a href="#magaza">ÜRÜNLER</a>
         <a href="#hesaplayici">TASARRUF HESAPLA</a>
         <a href="#projeler">PROJELERİMİZ</a>
         <a href="#referanslar">REFERANSLAR</a>
@@ -1920,7 +1961,7 @@ img, svg { max-width: 100%; }
       Yatırımınız ortalama 4-6 yılda kendini geri öder.</p>
       <div class="hero-actions">
         <a href="#iletisim" class="btn">Ücretsiz Keşif Talep Et</a>
-        <a href="#urunler" class="btn btn-ghost">Ürünlerimizi İnceleyin</a>
+        <a href="#magaza" class="btn btn-ghost">Ürünlerimizi İnceleyin</a>
       </div>
       <div class="hero-facts">1.250'den fazla tamamlanmış proje &nbsp;•&nbsp; 18 MW kurulu güç &nbsp;•&nbsp; 12 yıllık sektör tecrübesi</div>
     </div>
@@ -1972,16 +2013,15 @@ img, svg { max-width: 100%; }
     </div>
   </section>
 
-  <!-- ÜRÜNLER / MAĞAZA -->
+  <!-- EN ÇOK SATANLAR -->
   <section class="section section-alt" id="urunler">
     <div class="container">
       <div class="section-head">
-        <h2>Ürünlerimiz</h2>
-        <p>Tüm ürünler orijinal, faturalı ve garantilidir. Stoktaki ürünler aynı gün kargoya verilir. Toplu alım ve kurulumlu fiyat için teklif isteyin.</p>
+        <h2>En Çok Satan Ürünler</h2>
+        <p>Müşterilerimizin en çok tercih ettiği ürünler. Tüm ürünlerimiz orijinal, faturalı ve garantilidir; stoktaki ürünler aynı gün kargoya verilir.</p>
       </div>
-      <div class="shop-filters" id="shopFilters"></div>
-      <div class="shop-grid" id="shopGrid"></div>
-      <p class="shop-note">Aradığınız ürünü bulamadınız mı? <a href="#iletisim">Bize yazın</a>, tedarik edelim. Fiyatlar KDV dahildir; kur ve stok durumuna göre güncellenebilir.</p>
+      <div class="shop-grid" id="shopGrid" data-mode="featured"></div>
+      <p class="shop-more"><a href="#magaza" class="btn">Tüm Ürünleri İncele →</a></p>
     </div>
   </section>
 
@@ -2331,7 +2371,137 @@ img, svg { max-width: 100%; }
       <div>
         <h4>Hızlı Erişim</h4>
         <a href="#hizmetler">Hizmetler</a>
-        <a href="#urunler">Mağaza</a>
+        <a href="#magaza">Mağaza</a>
+        <a href="#hesaplayici">Tasarruf Hesapla</a>
+        <a href="#sss">S.S.S.</a>
+      </div>
+      <div>
+        <h4>Hizmetler</h4>
+        <a href="#hizmetler">Çatı GES</a>
+        <a href="#hizmetler">Endüstriyel GES</a>
+        <a href="#hizmetler">Tarımsal Sulama</a>
+        <a href="#hizmetler">Bakım &amp; Onarım</a>
+      </div>
+      <div>
+        <h4>İletişim</h4>
+        <a href="tel:08500000000">0850 000 00 00</a>
+        <a href="mailto:info@quantorasolar.com.tr">info@quantorasolar.com.tr</a>
+        <p>Örnek Mah. Enerji Cad. No:1, Ankara</p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="container">
+        © 2026 Quantora Solar Enerji — Bu site örnek/demo amaçlıdır.
+      </div>
+    </div>
+  </footer>
+</div>
+
+<div id="page-urunler" class="single-page" style="display:none">
+<!-- ÜST BİLGİ ÇUBUĞU -->
+  <div class="topbar">
+    <div class="container topbar-inner">
+      <span>Tel: 0850 000 00 00</span>
+      <span>E-posta: info@quantorasolar.com.tr</span>
+      <span class="topbar-right">Türkiye geneli keşif ve kurulum hizmeti</span>
+    </div>
+  </div>
+
+  <!-- BAŞLIK -->
+  <header class="siteheader">
+    <div class="container header-row">
+      <a href="#" class="logo">
+        <svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <circle cx="12" cy="12" r="4"/>
+          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+        </svg>
+        <span class="logo-text">Quantora<span>Solar</span> <small>Enerji Sistemleri San. Tic. Ltd. Şti.</small></span>
+      </a>
+      <div class="header-contact">
+        <strong>0850 000 00 00</strong>
+        <span>Ücretsiz keşif için hemen arayın</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ANA MENÜ -->
+  <nav class="mainmenu">
+    <div class="container mainmenu-inner">
+      <button class="hamburger" id="hamburger" aria-label="Menüyü aç">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="nav-links" id="navLinks">
+        <a href="#">ANA SAYFA</a>
+        <a href="#hizmetler">HİZMETLERİMİZ</a>
+        <a href="#magaza">ÜRÜNLER</a>
+        <a href="#hesaplayici">TASARRUF HESAPLA</a>
+        <a href="#projeler">PROJELERİMİZ</a>
+        <a href="#referanslar">REFERANSLAR</a>
+        <a href="#iletisim">İLETİŞİM</a>
+        <span class="nav-account" id="navAccount"></span>
+      </div>
+      <button class="cart-btn" id="cartBtn" aria-label="Sepeti aç">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="9" cy="21" r="1.6"/>
+          <circle cx="19" cy="21" r="1.6"/>
+          <path d="M2.5 3h3l2.6 12.5a2 2 0 0 0 2 1.5h8.7a2 2 0 0 0 2-1.6L22.5 8H6.2"/>
+        </svg>
+        SEPET
+        <span class="cart-count" id="cartCount" hidden>0</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- SAYFA BAŞLIĞI -->
+  <section class="page-band">
+    <div class="container">
+      <h1>Ürünlerimiz</h1>
+      <p>Güneş panelleri, invertörler, aküler, hazır paketler ve aksesuarlar — tümü orijinal, faturalı ve garantili.</p>
+    </div>
+  </section>
+
+  <!-- MAĞAZA -->
+  <section class="section" id="magaza">
+    <div class="container">
+      <div class="shop-filters" id="shopFilters"></div>
+      <div class="shop-grid" id="shopGrid"></div>
+      <p class="shop-note">Aradığınız ürünü bulamadınız mı? <a href="#iletisim">Bize yazın</a>, tedarik edelim. Fiyatlar KDV dahildir; kur ve stok durumuna göre güncellenebilir. Stoktaki ürünler aynı gün kargoya verilir; toplu alım ve kurulumlu fiyat için teklif isteyin.</p>
+    </div>
+  </section>
+
+  <!-- SEPET -->
+  <div class="cart-overlay" id="cartOverlay"></div>
+  <aside class="cart-drawer" id="cartDrawer" aria-label="Sepet">
+    <div class="cart-head">
+      <h3>Sepetim</h3>
+      <button class="cart-close" id="cartClose" aria-label="Sepeti kapat">×</button>
+    </div>
+    <div class="cart-items" id="cartItems"></div>
+    <div class="cart-foot">
+      <div class="cart-total-row"><span>Ara Toplam</span><strong id="cartTotal">₺0</strong></div>
+      <p class="cart-note">Fiyatlara KDV dahildir. Kargo ücreti sipariş onayında bildirilir.</p>
+      <a class="btn btn-block" id="waOrder" href="#" target="_blank" rel="noopener">WhatsApp ile Sipariş Ver</a>
+      <button class="btn btn-outline btn-block" id="clearCart" type="button">Sepeti Temizle</button>
+    </div>
+  </aside>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div>
+        <a href="#" class="logo logo-light">
+          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <circle cx="12" cy="12" r="4"/>
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+          </svg>
+          Quantora<span>Solar</span>
+        </a>
+        <p>Temiz enerjiyle daha aydınlık bir gelecek için 12 yıldır çalışıyoruz.</p>
+      </div>
+      <div>
+        <h4>Hızlı Erişim</h4>
+        <a href="#hizmetler">Hizmetler</a>
+        <a href="#magaza">Mağaza</a>
         <a href="#hesaplayici">Tasarruf Hesapla</a>
         <a href="#sss">S.S.S.</a>
       </div>
@@ -2622,6 +2792,7 @@ img, svg { max-width: 100%; }
               <label for="upSpecs">Özellikler <small>(her satıra bir özellik)</small></label>
               <textarea id="upSpecs" rows="3" placeholder="120 hücre · %21,3 verim&#10;25 yıl performans garantisi"></textarea>
             </div>
+            <label class="check-label"><input type="checkbox" id="upHit"> Çok satan ürün — ana sayfadaki vitrinde göster</label>
             <button type="submit" class="btn btn-block">Ürünü Mağazaya Yükle</button>
             <p class="form-status" id="upStatus" role="status"></p>
           </form>
@@ -2763,6 +2934,7 @@ img, svg { max-width: 100%; }
           <label for="pfSpecs">Özellikler <small>(her satıra bir özellik)</small></label>
           <textarea id="pfSpecs" rows="3" placeholder="120 hücre · %21,3 verim&#10;25 yıl performans garantisi"></textarea>
         </div>
+        <label class="check-label"><input type="checkbox" id="pfHit"> Çok satan ürün — ana sayfadaki vitrinde göster</label>
         <button type="submit" class="btn btn-block">Kaydet</button>
       </form>
     </div>
@@ -2772,7 +2944,7 @@ img, svg { max-width: 100%; }
 <script>
 
 // ---- TEK DOSYA SAYFA YÖNLENDİRİCİSİ ----
-const PAGE_IDS = { "#giris": "page-giris", "#hesap": "page-hesap", "#admin": "page-admin" };
+const PAGE_IDS = { "#magaza": "page-urunler", "#giris": "page-giris", "#hesap": "page-hesap", "#admin": "page-admin" };
 
 function route() {
   let target = PAGE_IDS[location.hash] || "page-index";
@@ -2820,13 +2992,13 @@ const Store = (() => {
   // ---------- ÜRÜNLER ----------
   const DEFAULT_PRODUCTS = [
     {
-      id: "pnl-460", cat: "panel", img: "panel",
+      id: "pnl-460", hit: true, cat: "panel", img: "panel",
       name: "460W Half-Cut Monokristal Güneş Paneli",
       specs: ["120 hücre · %21,3 verim", "Çerçeve: eloksallı alüminyum, IP68 bağlantı kutusu", "25 yıl performans garantisi"],
       price: 4850, stock: 25
     },
     {
-      id: "pnl-550", cat: "panel", img: "panel",
+      id: "pnl-550", hit: true, cat: "panel", img: "panel",
       name: "550W Monokristal Güneş Paneli",
       specs: ["144 hücre · %21,7 verim", "Çift cam (bifacial) teknoloji", "30 yıl performans garantisi"],
       price: 5950, stock: 18
@@ -2844,7 +3016,7 @@ const Store = (() => {
       price: 38500, stock: 9
     },
     {
-      id: "inv-6h", cat: "inverter", img: "inverter",
+      id: "inv-6h", hit: true, cat: "inverter", img: "inverter",
       name: "6 kW Hibrit İnvertör 48V",
       specs: ["120A MPPT şarj kontrollü", "Şebeke + akü + jeneratör girişi", "Paralellenebilir (9 adede kadar)"],
       price: 52900, stock: 7
@@ -2856,7 +3028,7 @@ const Store = (() => {
       price: 14750, stock: 14
     },
     {
-      id: "aku-lfp", cat: "aku", img: "battery",
+      id: "aku-lfp", hit: true, cat: "aku", img: "battery",
       name: "48V 100Ah LiFePO4 Lityum Akü",
       specs: ["5,12 kWh kapasite", "6.000+ çevrim ömrü", "Dahili BMS, Bluetooth takip"],
       price: 58900, stock: 6
@@ -2868,7 +3040,7 @@ const Store = (() => {
       price: 9850, stock: 22
     },
     {
-      id: "kit-krv", cat: "paket", img: "kit",
+      id: "kit-krv", hit: true, cat: "paket", img: "kit",
       name: "Karavan Solar Paketi 410W",
       specs: ["410W panel + 30A MPPT regülatör", "Kablolama ve montaj aparatları dahil", "Kurulum şeması ile birlikte"],
       price: 32500, stock: 3
@@ -2886,7 +3058,7 @@ const Store = (() => {
       price: 4250, stock: 16
     },
     {
-      id: "aks-lamba", cat: "aksesuar", img: "streetlight",
+      id: "aks-lamba", hit: true, cat: "aksesuar", img: "streetlight",
       name: "Solar Sokak / Bahçe Lambası 100W",
       specs: ["Dahili panel ve lityum batarya", "Alacakaranlık sensörü, kumandalı", "IP65 dış mekan koruması"],
       price: 3980, stock: 12
@@ -2940,7 +3112,7 @@ const Store = (() => {
 
   // Varsayılan ürün listesine yeni ürünler eklendiğinde bu sürümü artırın;
   // mevcut tarayıcılardaki listelere yalnızca eksik olanlar eklenir.
-  const SEED_VERSION = 2;
+  const SEED_VERSION = 3;
 
   function getProducts() {
     let list = read("gp-products", null);
@@ -2954,6 +3126,11 @@ const Store = (() => {
       const ids = new Set(list.map((p) => p.id));
       DEFAULT_PRODUCTS.forEach((p) => {
         if (!ids.has(p.id)) list.push(p);
+      });
+      // Eski depolardan gelen ürünlere varsayılan "çok satan" işaretlerini uygula
+      list.forEach((p) => {
+        const d = DEFAULT_PRODUCTS.find((x) => x.id === p.id);
+        if (d && d.hit && p.hit === undefined) p.hit = true;
       });
       write("gp-products", list);
       write("gp-seed", SEED_VERSION);
@@ -3220,325 +3397,370 @@ route();
 
 // ---- ANA SAYFA ----
 (() => {
-// ============ MOBİL MENÜ ============
-const hamburger = document.getElementById("hamburger");
-const navLinks = document.getElementById("navLinks");
+// ============================================================
+// SİTE SAYFALARI ORTAK KODU (ana sayfa + ürünler sayfası)
+// initSite(root): sayfadaki menü, mağaza, sepet, hesaplayıcı ve
+// iletişim formunu başlatır. Çok dosyalı sürümde root=document,
+// tek dosya sürümünde her sayfanın kapsayıcı div'idir.
+// ============================================================
 
-hamburger.addEventListener("click", () => {
-  hamburger.classList.toggle("open");
-  navLinks.classList.toggle("open");
-});
+function initSite(root) {
+  const $ = (sel) => root.querySelector(sel);
 
-// Menüde bir linke tıklanınca mobil menüyü kapat
-navLinks.querySelectorAll("a").forEach((link) => {
-  link.addEventListener("click", () => {
-    hamburger.classList.remove("open");
-    navLinks.classList.remove("open");
-  });
-});
+  const tlFmt = (n) => "₺" + Math.round(n).toLocaleString("tr-TR");
 
-// ============ HESAP / OTURUM ============
-const navAccount = document.getElementById("navAccount");
-const currentUser = Store.session();
+  // ============ MOBİL MENÜ ============
+  const hamburger = $("#hamburger");
+  const navLinks = $("#navLinks");
 
-if (currentUser) {
-  // Menü kalabalıklaşmasın diye admin için isim yerine panel linki gösterilir
-  navAccount.innerHTML =
-    (currentUser.role === "admin"
-      ? '<a href="#admin" class="admin-link">Yönetim Paneli</a>'
-      : '<a href="#hesap" class="admin-link">Hesabım (' + escHtml(currentUser.name.split(" ")[0]) + ")</a>") +
-    '<a href="#" id="logoutLink">Çıkış</a>';
-  document.getElementById("logoutLink").addEventListener("click", (e) => {
-    e.preventDefault();
-    Store.logout();
-    location.reload();
-  });
-} else {
-  navAccount.innerHTML = '<a href="#giris">Giriş Yap</a>';
-}
+  if (hamburger && navLinks) {
+    hamburger.addEventListener("click", () => {
+      hamburger.classList.toggle("open");
+      navLinks.classList.toggle("open");
+    });
 
-// ============ ÜRÜNLER ============
-// Ürün ve kategori listeleri veri katmanından gelir; admin panelinden yönetilir.
-const PRODUCTS = Store.getProducts();
-const CATEGORIES = Store.getCategories();
-
-function catName(id) {
-  const c = CATEGORIES.find((c) => c.id === id);
-  return c ? c.name : "Diğer";
-}
-
-// Sipariş mesajlarının gideceği WhatsApp numarası (admin panelindeki
-// Ayarlar bölümünden değiştirilebilir)
-const WHATSAPP_NUMBER = Store.getSettings().whatsapp;
-
-const tlFmt = (n) => "₺" + Math.round(n).toLocaleString("tr-TR");
-
-// ---- Mağaza render ----
-const shopGrid = document.getElementById("shopGrid");
-const shopFilters = document.getElementById("shopFilters");
-
-function productMedia(p) {
-  return p.photo
-    ? `<img src="${escHtml(p.photo)}" alt="${escHtml(p.name)}" loading="lazy">`
-    : (PRODUCT_ART[p.img] || PRODUCT_ART.panel);
-}
-
-function renderFilters() {
-  shopFilters.innerHTML =
-    '<button class="filter-btn active" data-cat="all">Tümü</button>' +
-    CATEGORIES.map(
-      (c) => `<button class="filter-btn" data-cat="${c.id}">${escHtml(c.name)}</button>`
-    ).join("");
-}
-
-function renderShop(cat) {
-  const list = cat === "all" ? PRODUCTS : PRODUCTS.filter((p) => p.cat === cat);
-  if (list.length === 0) {
-    shopGrid.innerHTML = '<p class="shop-empty">Bu kategoride henüz ürün bulunmuyor.</p>';
-    return;
+    // Menüde bir linke tıklanınca mobil menüyü kapat
+    navLinks.querySelectorAll("a").forEach((link) => {
+      link.addEventListener("click", () => {
+        hamburger.classList.remove("open");
+        navLinks.classList.remove("open");
+      });
+    });
   }
-  shopGrid.innerHTML = list
-    .map((p) => {
-      const low = p.stock <= 5;
-      return `
-      <article class="product">
-        <div class="product-img${p.photo ? " has-photo" : ""}">
-          <span class="stock-badge${low ? " low" : ""}">${low ? "Son " + p.stock + " adet" : "Stokta"}</span>
-          ${productMedia(p)}
-        </div>
-        <div class="product-body">
-          <span class="product-cat">${escHtml(catName(p.cat))}</span>
-          <h3>${escHtml(p.name)}</h3>
-          <ul class="product-specs">${p.specs.map((s) => `<li>${escHtml(s)}</li>`).join("")}</ul>
-          <div class="product-foot">
-            <div class="product-price">${tlFmt(p.price)}<span>KDV dahil</span></div>
-            <button class="add-btn" data-id="${p.id}">Sepete Ekle</button>
-          </div>
-        </div>
-      </article>`;
-    })
-    .join("");
-}
 
-shopFilters.addEventListener("click", (e) => {
-  const btn = e.target.closest(".filter-btn");
-  if (!btn) return;
-  shopFilters.querySelectorAll(".filter-btn").forEach((b) => b.classList.remove("active"));
-  btn.classList.add("active");
-  renderShop(btn.dataset.cat);
-});
+  // ============ HESAP / OTURUM ============
+  const navAccount = $("#navAccount");
+  const currentUser = Store.session();
 
-renderFilters();
-renderShop("all");
-
-// ---- Sepet ----
-const cartBtn = document.getElementById("cartBtn");
-const cartDrawer = document.getElementById("cartDrawer");
-const cartOverlay = document.getElementById("cartOverlay");
-const cartClose = document.getElementById("cartClose");
-const cartItemsEl = document.getElementById("cartItems");
-const cartTotalEl = document.getElementById("cartTotal");
-const cartCountEl = document.getElementById("cartCount");
-const waOrder = document.getElementById("waOrder");
-const clearCartBtn = document.getElementById("clearCart");
-
-let cart = {};
-try {
-  cart = JSON.parse(localStorage.getItem("gp-cart")) || {};
-} catch (_) {
-  cart = {};
-}
-
-function saveCart() {
-  localStorage.setItem("gp-cart", JSON.stringify(cart));
-}
-
-function cartEntries() {
-  return Object.entries(cart)
-    .map(([id, qty]) => ({ product: PRODUCTS.find((p) => p.id === id), qty }))
-    .filter((e) => e.product && e.qty > 0);
-}
-
-function renderCart() {
-  const entries = cartEntries();
-  const count = entries.reduce((s, e) => s + e.qty, 0);
-  const total = entries.reduce((s, e) => s + e.product.price * e.qty, 0);
-
-  cartCountEl.hidden = count === 0;
-  cartCountEl.textContent = count;
-  cartTotalEl.textContent = tlFmt(total);
-
-  if (entries.length === 0) {
-    cartItemsEl.innerHTML = '<p class="cart-empty">Sepetiniz boş.<br>Mağazadan ürün ekleyebilirsiniz.</p>';
-    waOrder.classList.add("disabled");
-    waOrder.removeAttribute("href");
-  } else {
-    cartItemsEl.innerHTML = entries
-      .map(
-        (e) => `
-      <div class="cart-item">
-        <div class="cart-thumb">${productMedia(e.product)}</div>
-        <div class="cart-item-info">
-          <strong>${escHtml(e.product.name)}</strong>
-          <span>${tlFmt(e.product.price)} × ${e.qty} = ${tlFmt(e.product.price * e.qty)}</span>
-        </div>
-        <div class="cart-qty">
-          <button data-id="${e.product.id}" data-act="dec" aria-label="Azalt">−</button>
-          <span class="qty-val">${e.qty}</span>
-          <button data-id="${e.product.id}" data-act="inc" aria-label="Artır">+</button>
-          <button class="del-btn" data-id="${e.product.id}" data-act="del" aria-label="Kaldır">×</button>
-        </div>
-      </div>`
-      )
-      .join("");
-
-    const lines = entries.map((e) => `• ${e.qty} × ${e.product.name} — ${tlFmt(e.product.price * e.qty)}`);
-    const msg =
-      "Merhaba, web sitenizden sipariş vermek istiyorum:\n\n" +
-      lines.join("\n") +
-      "\n\nToplam: " + tlFmt(total);
-    waOrder.href = "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodeURIComponent(msg);
-    waOrder.classList.remove("disabled");
-  }
-}
-
-function openCart() {
-  cartDrawer.classList.add("open");
-  cartOverlay.classList.add("open");
-}
-
-function closeCart() {
-  cartDrawer.classList.remove("open");
-  cartOverlay.classList.remove("open");
-}
-
-cartBtn.addEventListener("click", openCart);
-cartClose.addEventListener("click", closeCart);
-cartOverlay.addEventListener("click", closeCart);
-
-shopGrid.addEventListener("click", (e) => {
-  const btn = e.target.closest(".add-btn");
-  if (!btn) return;
-  const id = btn.dataset.id;
-  cart[id] = (cart[id] || 0) + 1;
-  saveCart();
-  renderCart();
-  btn.textContent = "Eklendi ✓";
-  btn.classList.add("added");
-  setTimeout(() => {
-    btn.textContent = "Sepete Ekle";
-    btn.classList.remove("added");
-  }, 1200);
-});
-
-cartItemsEl.addEventListener("click", (e) => {
-  const btn = e.target.closest("button[data-act]");
-  if (!btn) return;
-  const { id, act } = btn.dataset;
-  if (act === "inc") cart[id] = (cart[id] || 0) + 1;
-  if (act === "dec") cart[id] = Math.max(0, (cart[id] || 0) - 1);
-  if (act === "del" || cart[id] === 0) delete cart[id];
-  saveCart();
-  renderCart();
-});
-
-clearCartBtn.addEventListener("click", () => {
-  cart = {};
-  saveCart();
-  renderCart();
-});
-
-// WhatsApp'a yönlendirilen siparişi admin panelinde görünmesi için kaydet
-waOrder.addEventListener("click", () => {
-  const entries = cartEntries();
-  if (entries.length === 0) return;
-  Store.addOrder({
-    customer: currentUser ? currentUser.name : "Ziyaretçi",
-    email: currentUser ? currentUser.email : "",
-    items: entries.map((e) => ({ name: e.product.name, qty: e.qty, price: e.product.price })),
-    total: entries.reduce((s, e) => s + e.product.price * e.qty, 0)
-  });
-});
-
-renderCart();
-
-// ============ TASARRUF HESAPLAYICI ============
-// Varsayımlar (tahmini, Türkiye ortalamaları):
-const TL_PER_KWH = 3.2;          // ortalama birim elektrik fiyatı (TL/kWh)
-const KWH_PER_KW_MONTH = 130;    // 1 kW kurulu gücün aylık üretimi (kWh)
-const COST_PER_KW = 36000;       // 1 kW kurulu güç yatırım maliyeti (TL)
-const COVERAGE = 0.9;            // faturanın karşılanma oranı
-
-const billInput = document.getElementById("billInput");
-const billValue = document.getElementById("billValue");
-const resPower = document.getElementById("resPower");
-const resSaving = document.getElementById("resSaving");
-const resPayback = document.getElementById("resPayback");
-const resTotal = document.getElementById("resTotal");
-
-const tl = (n) =>
-  "₺" + Math.round(n).toLocaleString("tr-TR");
-
-function calculate() {
-  const bill = parseInt(billInput.value, 10);
-  billValue.textContent = tl(bill);
-
-  const monthlyKwh = bill / TL_PER_KWH;
-  const requiredKw = (monthlyKwh * COVERAGE) / KWH_PER_KW_MONTH;
-  const systemCost = requiredKw * COST_PER_KW;
-  const yearlySaving = bill * 12 * COVERAGE;
-  const paybackYears = systemCost / yearlySaving;
-  const totalGain = yearlySaving * 25 - systemCost;
-
-  resPower.textContent = requiredKw.toFixed(1).replace(".", ",") + " kW";
-  resSaving.textContent = tl(yearlySaving);
-  resPayback.textContent = paybackYears.toFixed(1).replace(".", ",") + " yıl";
-  resTotal.textContent = tl(totalGain);
-}
-
-billInput.addEventListener("input", calculate);
-calculate();
-
-// ============ İLETİŞİM FORMU ============
-const form = document.getElementById("contactForm");
-const formStatus = document.getElementById("formStatus");
-
-form.addEventListener("submit", (e) => {
-  e.preventDefault();
-
-  const name = form.name;
-  const phone = form.phone;
-  let valid = true;
-
-  [name, phone].forEach((field) => {
-    if (!field.value.trim()) {
-      field.classList.add("error");
-      valid = false;
+  if (navAccount) {
+    if (currentUser) {
+      // Menü kalabalıklaşmasın diye admin için isim yerine panel linki gösterilir
+      navAccount.innerHTML =
+        (currentUser.role === "admin"
+          ? '<a href="#admin" class="admin-link">Yönetim Paneli</a>'
+          : '<a href="#hesap" class="admin-link">Hesabım (' + escHtml(currentUser.name.split(" ")[0]) + ")</a>") +
+        '<a href="#" class="logout-link">Çıkış</a>';
+      navAccount.querySelector(".logout-link").addEventListener("click", (e) => {
+        e.preventDefault();
+        Store.logout();
+        location.reload();
+      });
     } else {
-      field.classList.remove("error");
+      navAccount.innerHTML = '<a href="#giris">Giriş Yap</a>';
     }
-  });
-
-  if (!valid) {
-    formStatus.textContent = "Lütfen zorunlu (*) alanları doldurun.";
-    formStatus.className = "form-status err";
-    return;
   }
 
-  // Talep, admin panelinin "Talepler" bölümünde listelenmek üzere kaydedilir.
-  Store.addLead({
-    name: name.value.trim(),
-    phone: phone.value.trim(),
-    city: form.city.value.trim(),
-    type: form.type.value,
-    message: form.message.value.trim()
-  });
+  // ============ ÜRÜN VE KATEGORİ VERİSİ ============
+  const PRODUCTS = Store.getProducts();
+  const CATEGORIES = Store.getCategories();
 
-  formStatus.textContent =
-    "Teşekkürler " + name.value.trim() + "! Talebiniz alındı, 24 saat içinde sizi arayacağız.";
-  formStatus.className = "form-status ok";
-  form.reset();
-});
+  function catName(id) {
+    const c = CATEGORIES.find((c) => c.id === id);
+    return c ? c.name : "Diğer";
+  }
+
+  // Sipariş mesajlarının gideceği WhatsApp numarası (admin panelindeki
+  // Ayarlar bölümünden değiştirilebilir)
+  const WHATSAPP_NUMBER = Store.getSettings().whatsapp;
+
+  function productMedia(p) {
+    return p.photo
+      ? `<img src="${escHtml(p.photo)}" alt="${escHtml(p.name)}" loading="lazy">`
+      : (PRODUCT_ART[p.img] || PRODUCT_ART.panel);
+  }
+
+  // ============ SEPET ============
+  const cartBtn = $("#cartBtn");
+  const cartDrawer = $("#cartDrawer");
+  const cartOverlay = $("#cartOverlay");
+  const cartClose = $("#cartClose");
+  const cartItemsEl = $("#cartItems");
+  const cartTotalEl = $("#cartTotal");
+  const cartCountEl = $("#cartCount");
+  const waOrder = $("#waOrder");
+  const clearCartBtn = $("#clearCart");
+
+  let addToCart = null;
+
+  if (cartDrawer && cartBtn) {
+    let cart = {};
+    try {
+      cart = JSON.parse(localStorage.getItem("gp-cart")) || {};
+    } catch (_) {
+      cart = {};
+    }
+
+    const saveCart = () => localStorage.setItem("gp-cart", JSON.stringify(cart));
+
+    const cartEntries = () =>
+      Object.entries(cart)
+        .map(([id, qty]) => ({ product: PRODUCTS.find((p) => p.id === id), qty }))
+        .filter((e) => e.product && e.qty > 0);
+
+    function renderCart() {
+      // Sepet başka sayfada değişmiş olabilir; en güncel halini oku
+      try {
+        cart = JSON.parse(localStorage.getItem("gp-cart")) || {};
+      } catch (_) { /* mevcut hali koru */ }
+
+      const entries = cartEntries();
+      const count = entries.reduce((s, e) => s + e.qty, 0);
+      const total = entries.reduce((s, e) => s + e.product.price * e.qty, 0);
+
+      cartCountEl.hidden = count === 0;
+      cartCountEl.textContent = count;
+      cartTotalEl.textContent = tlFmt(total);
+
+      if (entries.length === 0) {
+        cartItemsEl.innerHTML = '<p class="cart-empty">Sepetiniz boş.<br>Mağazadan ürün ekleyebilirsiniz.</p>';
+        waOrder.classList.add("disabled");
+        waOrder.removeAttribute("href");
+      } else {
+        cartItemsEl.innerHTML = entries
+          .map(
+            (e) => `
+          <div class="cart-item">
+            <div class="cart-thumb">${productMedia(e.product)}</div>
+            <div class="cart-item-info">
+              <strong>${escHtml(e.product.name)}</strong>
+              <span>${tlFmt(e.product.price)} × ${e.qty} = ${tlFmt(e.product.price * e.qty)}</span>
+            </div>
+            <div class="cart-qty">
+              <button data-id="${e.product.id}" data-act="dec" aria-label="Azalt">−</button>
+              <span class="qty-val">${e.qty}</span>
+              <button data-id="${e.product.id}" data-act="inc" aria-label="Artır">+</button>
+              <button class="del-btn" data-id="${e.product.id}" data-act="del" aria-label="Kaldır">×</button>
+            </div>
+          </div>`
+          )
+          .join("");
+
+        const lines = entries.map((e) => `• ${e.qty} × ${e.product.name} — ${tlFmt(e.product.price * e.qty)}`);
+        const msg =
+          "Merhaba, web sitenizden sipariş vermek istiyorum:\n\n" +
+          lines.join("\n") +
+          "\n\nToplam: " + tlFmt(total);
+        waOrder.href = "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodeURIComponent(msg);
+        waOrder.classList.remove("disabled");
+      }
+    }
+
+    addToCart = (id) => {
+      cart[id] = (cart[id] || 0) + 1;
+      saveCart();
+      renderCart();
+    };
+
+    const openCart = () => {
+      cartDrawer.classList.add("open");
+      cartOverlay.classList.add("open");
+    };
+
+    const closeCart = () => {
+      cartDrawer.classList.remove("open");
+      cartOverlay.classList.remove("open");
+    };
+
+    cartBtn.addEventListener("click", openCart);
+    cartClose.addEventListener("click", closeCart);
+    cartOverlay.addEventListener("click", closeCart);
+
+    cartItemsEl.addEventListener("click", (e) => {
+      const btn = e.target.closest("button[data-act]");
+      if (!btn) return;
+      const { id, act } = btn.dataset;
+      if (act === "inc") cart[id] = (cart[id] || 0) + 1;
+      if (act === "dec") cart[id] = Math.max(0, (cart[id] || 0) - 1);
+      if (act === "del" || cart[id] === 0) delete cart[id];
+      saveCart();
+      renderCart();
+    });
+
+    clearCartBtn.addEventListener("click", () => {
+      cart = {};
+      saveCart();
+      renderCart();
+    });
+
+    // WhatsApp'a yönlendirilen siparişi admin panelinde görünmesi için kaydet
+    waOrder.addEventListener("click", () => {
+      const entries = cartEntries();
+      if (entries.length === 0) return;
+      Store.addOrder({
+        customer: currentUser ? currentUser.name : "Ziyaretçi",
+        email: currentUser ? currentUser.email : "",
+        items: entries.map((e) => ({ name: e.product.name, qty: e.qty, price: e.product.price })),
+        total: entries.reduce((s, e) => s + e.product.price * e.qty, 0)
+      });
+    });
+
+    // Tek dosya sürümünde sayfalar arası geçişte sepet rozetini tazele
+    window.addEventListener("hashchange", renderCart);
+
+    renderCart();
+  }
+
+  // ============ MAĞAZA ============
+  const shopGrid = $("#shopGrid");
+  const shopFilters = $("#shopFilters");
+
+  if (shopGrid) {
+    // data-mode="featured": ana sayfadaki 'En Çok Satan Ürünler' vitrini
+    const featured = shopGrid.dataset.mode === "featured";
+
+    function renderShop(cat) {
+      let list;
+      if (featured) {
+        list = PRODUCTS.filter((p) => p.hit);
+        if (list.length === 0) list = PRODUCTS; // hiç işaret yoksa hepsinden göster
+        list = list.slice(0, 8);
+      } else {
+        list = cat === "all" ? PRODUCTS : PRODUCTS.filter((p) => p.cat === cat);
+      }
+
+      if (list.length === 0) {
+        shopGrid.innerHTML = '<p class="shop-empty">Bu kategoride henüz ürün bulunmuyor.</p>';
+        return;
+      }
+
+      shopGrid.innerHTML = list
+        .map((p) => {
+          const low = p.stock <= 5;
+          return `
+          <article class="product">
+            <div class="product-img${p.photo ? " has-photo" : ""}">
+              <span class="stock-badge${low ? " low" : ""}">${low ? "Son " + p.stock + " adet" : "Stokta"}</span>
+              ${productMedia(p)}
+            </div>
+            <div class="product-body">
+              <span class="product-cat">${escHtml(catName(p.cat))}</span>
+              <h3>${escHtml(p.name)}</h3>
+              <ul class="product-specs">${p.specs.map((s) => `<li>${escHtml(s)}</li>`).join("")}</ul>
+              <div class="product-foot">
+                <div class="product-price">${tlFmt(p.price)}<span>KDV dahil</span></div>
+                <button class="add-btn" data-id="${p.id}">Sepete Ekle</button>
+              </div>
+            </div>
+          </article>`;
+        })
+        .join("");
+    }
+
+    if (shopFilters) {
+      shopFilters.innerHTML =
+        '<button class="filter-btn active" data-cat="all">Tümü</button>' +
+        CATEGORIES.map(
+          (c) => `<button class="filter-btn" data-cat="${c.id}">${escHtml(c.name)}</button>`
+        ).join("");
+
+      shopFilters.addEventListener("click", (e) => {
+        const btn = e.target.closest(".filter-btn");
+        if (!btn) return;
+        shopFilters.querySelectorAll(".filter-btn").forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        renderShop(btn.dataset.cat);
+      });
+    }
+
+    shopGrid.addEventListener("click", (e) => {
+      const btn = e.target.closest(".add-btn");
+      if (!btn || !addToCart) return;
+      addToCart(btn.dataset.id);
+      btn.textContent = "Eklendi ✓";
+      btn.classList.add("added");
+      setTimeout(() => {
+        btn.textContent = "Sepete Ekle";
+        btn.classList.remove("added");
+      }, 1200);
+    });
+
+    renderShop("all");
+  }
+
+  // ============ TASARRUF HESAPLAYICI ============
+  // Varsayımlar (tahmini, Türkiye ortalamaları):
+  const billInput = $("#billInput");
+
+  if (billInput) {
+    const TL_PER_KWH = 3.2;          // ortalama birim elektrik fiyatı (TL/kWh)
+    const KWH_PER_KW_MONTH = 130;    // 1 kW kurulu gücün aylık üretimi (kWh)
+    const COST_PER_KW = 36000;       // 1 kW kurulu güç yatırım maliyeti (TL)
+    const COVERAGE = 0.9;            // faturanın karşılanma oranı
+
+    const billValue = $("#billValue");
+    const resPower = $("#resPower");
+    const resSaving = $("#resSaving");
+    const resPayback = $("#resPayback");
+    const resTotal = $("#resTotal");
+
+    function calculate() {
+      const bill = parseInt(billInput.value, 10);
+      billValue.textContent = tlFmt(bill);
+
+      const monthlyKwh = bill / TL_PER_KWH;
+      const requiredKw = (monthlyKwh * COVERAGE) / KWH_PER_KW_MONTH;
+      const systemCost = requiredKw * COST_PER_KW;
+      const yearlySaving = bill * 12 * COVERAGE;
+      const paybackYears = systemCost / yearlySaving;
+      const totalGain = yearlySaving * 25 - systemCost;
+
+      resPower.textContent = requiredKw.toFixed(1).replace(".", ",") + " kW";
+      resSaving.textContent = tlFmt(yearlySaving);
+      resPayback.textContent = paybackYears.toFixed(1).replace(".", ",") + " yıl";
+      resTotal.textContent = tlFmt(totalGain);
+    }
+
+    billInput.addEventListener("input", calculate);
+    calculate();
+  }
+
+  // ============ İLETİŞİM FORMU ============
+  const form = $("#contactForm");
+
+  if (form) {
+    const formStatus = $("#formStatus");
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      const name = form.name;
+      const phone = form.phone;
+      let valid = true;
+
+      [name, phone].forEach((field) => {
+        if (!field.value.trim()) {
+          field.classList.add("error");
+          valid = false;
+        } else {
+          field.classList.remove("error");
+        }
+      });
+
+      if (!valid) {
+        formStatus.textContent = "Lütfen zorunlu (*) alanları doldurun.";
+        formStatus.className = "form-status err";
+        return;
+      }
+
+      // Talep, admin panelinin "Talepler" bölümünde listelenmek üzere kaydedilir.
+      Store.addLead({
+        name: name.value.trim(),
+        phone: phone.value.trim(),
+        city: form.city.value.trim(),
+        type: form.type.value,
+        message: form.message.value.trim()
+      });
+
+      formStatus.textContent =
+        "Teşekkürler " + name.value.trim() + "! Talebiniz alındı, 24 saat içinde sizi arayacağız.";
+      formStatus.className = "form-status ok";
+      form.reset();
+    });
+  }
+}
+
+initSite(document.getElementById("page-index"));
+initSite(document.getElementById("page-urunler"));
 
 })();
 
@@ -3859,7 +4081,7 @@ function renderProducts() {
     products.map((p) => `
       <tr>
         <td>${thumbHtml(p)}</td>
-        <td class="cell-strong">${escHtml(p.name)}</td>
+        <td class="cell-strong">${p.hit ? '<span class="hit-star" title="Çok satan">★</span> ' : ""}${escHtml(p.name)}</td>
         <td>${escHtml(catName(p.cat))}</td>
         <td>${tlFmt(p.price)}</td>
         <td>${p.stock <= 5 ? `<span class="pill pill-warn">${p.stock} adet</span>` : p.stock + " adet"}</td>
@@ -3919,6 +4141,7 @@ function openProductModal(product) {
   document.getElementById("pfPrice").value = product ? product.price : "";
   document.getElementById("pfStock").value = product ? product.stock : "";
   document.getElementById("pfSpecs").value = product ? product.specs.join("\n") : "";
+  document.getElementById("pfHit").checked = !!(product && product.hit);
   photoFile.value = "";
   photoUrl.value = product && product.photo && !product.photo.startsWith("data:") ? product.photo : "";
   setPhoto(product ? product.photo : "");
@@ -3957,6 +4180,7 @@ productForm.addEventListener("submit", (e) => {
       cat: document.getElementById("pfCat").value,
       img: document.getElementById("pfImg").value,
       photo: currentPhoto,
+      hit: document.getElementById("pfHit").checked,
       price: parseInt(document.getElementById("pfPrice").value, 10) || 0,
       stock: parseInt(document.getElementById("pfStock").value, 10) || 0,
       specs: document.getElementById("pfSpecs").value
@@ -4091,6 +4315,7 @@ uploadForm.addEventListener("submit", (e) => {
       cat: document.getElementById("upCat").value,
       img: document.getElementById("upImg").value,
       photo: uploadPhoto,
+      hit: document.getElementById("upHit").checked,
       price,
       stock: parseInt(document.getElementById("upStock").value, 10) || 0,
       specs: document.getElementById("upSpecs").value

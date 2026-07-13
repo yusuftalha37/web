@@ -123,7 +123,7 @@ function renderProducts() {
     products.map((p) => `
       <tr>
         <td>${thumbHtml(p)}</td>
-        <td class="cell-strong">${escHtml(p.name)}</td>
+        <td class="cell-strong">${p.hit ? '<span class="hit-star" title="Çok satan">★</span> ' : ""}${escHtml(p.name)}</td>
         <td>${escHtml(catName(p.cat))}</td>
         <td>${tlFmt(p.price)}</td>
         <td>${p.stock <= 5 ? `<span class="pill pill-warn">${p.stock} adet</span>` : p.stock + " adet"}</td>
@@ -183,6 +183,7 @@ function openProductModal(product) {
   document.getElementById("pfPrice").value = product ? product.price : "";
   document.getElementById("pfStock").value = product ? product.stock : "";
   document.getElementById("pfSpecs").value = product ? product.specs.join("\n") : "";
+  document.getElementById("pfHit").checked = !!(product && product.hit);
   photoFile.value = "";
   photoUrl.value = product && product.photo && !product.photo.startsWith("data:") ? product.photo : "";
   setPhoto(product ? product.photo : "");
@@ -221,6 +222,7 @@ productForm.addEventListener("submit", (e) => {
       cat: document.getElementById("pfCat").value,
       img: document.getElementById("pfImg").value,
       photo: currentPhoto,
+      hit: document.getElementById("pfHit").checked,
       price: parseInt(document.getElementById("pfPrice").value, 10) || 0,
       stock: parseInt(document.getElementById("pfStock").value, 10) || 0,
       specs: document.getElementById("pfSpecs").value
@@ -355,6 +357,7 @@ uploadForm.addEventListener("submit", (e) => {
       cat: document.getElementById("upCat").value,
       img: document.getElementById("upImg").value,
       photo: uploadPhoto,
+      hit: document.getElementById("upHit").checked,
       price,
       stock: parseInt(document.getElementById("upStock").value, 10) || 0,
       specs: document.getElementById("upSpecs").value

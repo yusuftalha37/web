@@ -6,7 +6,7 @@ Tamamen statik olduğu için herhangi bir sunucu kurulumu gerektirmez.
 ## Özellikler
 
 - Mobil uyumlu (responsive) tek sayfa tasarım
-- **Ürün mağazası**: 14 örnek ürün, admin panelinden yönetilebilen kategoriler ve filtre butonları, stok rozetleri
+- **Ürünler sayfası** (`urunler.html`): filtreli tam mağaza; ana sayfada yalnızca 'çok satan' işaretli ürünler vitrini gösterilir (işaret admin panelindeki ürün formlarından yönetilir)
 - **Ürün fotoğrafları**: admin panelinden bilgisayardan yükleme (otomatik küçültülür) veya görsel bağlantısı; fotoğrafı olmayan ürünlerde kategoriye uygun çizim gösterilir
 - **Sepet**: localStorage ile kalıcı sepet, adet artır/azalt, WhatsApp üzerinden sipariş gönderme
 - Hizmetler: çatı GES, endüstriyel GES, tarımsal sulama, depolamalı sistemler
@@ -31,7 +31,8 @@ python3 -m http.server 8000
 ## Dosya Yapısı
 
 ```
-├── index.html      # Ana sayfa (mağaza, hesaplayıcı, iletişim)
+├── index.html      # Ana sayfa (çok satanlar vitrini, hesaplayıcı, iletişim)
+├── urunler.html    # Tüm ürünler sayfası (filtreli mağaza)
 ├── giris.html      # Kullanıcı girişi / kayıt
 ├── hesap.html      # Müşteri hesap sayfası (Hesabım)
 ├── admin.html      # Yönetim paneli

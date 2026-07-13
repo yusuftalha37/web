@@ -301,6 +301,29 @@ img, svg { max-width: 100%; }
   padding-top: 12px;
 }
 
+/* ============ SAYFA BANDI (iç sayfalar) ============ */
+.page-band {
+  background: var(--blue-dark) repeating-linear-gradient(
+    -45deg,
+    rgba(255, 255, 255, 0.025) 0 2px,
+    transparent 2px 14px
+  );
+  border-bottom: 3px solid var(--orange);
+  color: #fff;
+  padding: 26px 0;
+}
+
+.page-band h1 {
+  color: #fff;
+  font-size: 24px;
+  margin-bottom: 4px;
+}
+
+.page-band p {
+  color: #b9cddd;
+  font-size: 13px;
+}
+
 /* ============ AVANTAJ ŞERİDİ ============ */
 .features-strip {
   background: var(--bg-alt);
@@ -556,6 +579,11 @@ img, svg { max-width: 100%; }
   margin-top: 20px;
   color: var(--muted);
   font-size: 12px;
+}
+
+.shop-more {
+  text-align: center;
+  margin-top: 26px;
 }
 
 .shop-note a { color: var(--blue); }

@@ -19,13 +19,13 @@ const Store = (() => {
   // ---------- ÜRÜNLER ----------
   const DEFAULT_PRODUCTS = [
     {
-      id: "pnl-460", cat: "panel", img: "panel",
+      id: "pnl-460", hit: true, cat: "panel", img: "panel",
       name: "460W Half-Cut Monokristal Güneş Paneli",
       specs: ["120 hücre · %21,3 verim", "Çerçeve: eloksallı alüminyum, IP68 bağlantı kutusu", "25 yıl performans garantisi"],
       price: 4850, stock: 25
     },
     {
-      id: "pnl-550", cat: "panel", img: "panel",
+      id: "pnl-550", hit: true, cat: "panel", img: "panel",
       name: "550W Monokristal Güneş Paneli",
       specs: ["144 hücre · %21,7 verim", "Çift cam (bifacial) teknoloji", "30 yıl performans garantisi"],
       price: 5950, stock: 18
@@ -43,7 +43,7 @@ const Store = (() => {
       price: 38500, stock: 9
     },
     {
-      id: "inv-6h", cat: "inverter", img: "inverter",
+      id: "inv-6h", hit: true, cat: "inverter", img: "inverter",
       name: "6 kW Hibrit İnvertör 48V",
       specs: ["120A MPPT şarj kontrollü", "Şebeke + akü + jeneratör girişi", "Paralellenebilir (9 adede kadar)"],
       price: 52900, stock: 7
@@ -55,7 +55,7 @@ const Store = (() => {
       price: 14750, stock: 14
     },
     {
-      id: "aku-lfp", cat: "aku", img: "battery",
+      id: "aku-lfp", hit: true, cat: "aku", img: "battery",
       name: "48V 100Ah LiFePO4 Lityum Akü",
       specs: ["5,12 kWh kapasite", "6.000+ çevrim ömrü", "Dahili BMS, Bluetooth takip"],
       price: 58900, stock: 6
@@ -67,7 +67,7 @@ const Store = (() => {
       price: 9850, stock: 22
     },
     {
-      id: "kit-krv", cat: "paket", img: "kit",
+      id: "kit-krv", hit: true, cat: "paket", img: "kit",
       name: "Karavan Solar Paketi 410W",
       specs: ["410W panel + 30A MPPT regülatör", "Kablolama ve montaj aparatları dahil", "Kurulum şeması ile birlikte"],
       price: 32500, stock: 3
@@ -85,7 +85,7 @@ const Store = (() => {
       price: 4250, stock: 16
     },
     {
-      id: "aks-lamba", cat: "aksesuar", img: "streetlight",
+      id: "aks-lamba", hit: true, cat: "aksesuar", img: "streetlight",
       name: "Solar Sokak / Bahçe Lambası 100W",
       specs: ["Dahili panel ve lityum batarya", "Alacakaranlık sensörü, kumandalı", "IP65 dış mekan koruması"],
       price: 3980, stock: 12
@@ -139,7 +139,7 @@ const Store = (() => {
 
   // Varsayılan ürün listesine yeni ürünler eklendiğinde bu sürümü artırın;
   // mevcut tarayıcılardaki listelere yalnızca eksik olanlar eklenir.
-  const SEED_VERSION = 2;
+  const SEED_VERSION = 3;
 
   function getProducts() {
     let list = read("gp-products", null);
@@ -153,6 +153,11 @@ const Store = (() => {
       const ids = new Set(list.map((p) => p.id));
       DEFAULT_PRODUCTS.forEach((p) => {
         if (!ids.has(p.id)) list.push(p);
+      });
+      // Eski depolardan gelen ürünlere varsayılan "çok satan" işaretlerini uygula
+      list.forEach((p) => {
+        const d = DEFAULT_PRODUCTS.find((x) => x.id === p.id);
+        if (d && d.hit && p.hit === undefined) p.hit = true;
       });
       write("gp-products", list);
       write("gp-seed", SEED_VERSION);

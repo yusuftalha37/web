@@ -28,11 +28,13 @@ def rewrite_links(html):
     html = html.replace('href="giris.html"', 'href="#giris"')
     html = html.replace('href="hesap.html"', 'href="#hesap"')
     html = html.replace('href="admin.html"', 'href="#admin"')
+    html = html.replace('href="urunler.html"', 'href="#magaza"')
     return html
 
 
 # ---- sayfa gövdeleri ----
 index_body = rewrite_links(body_of("index.html"))
+urunler_body = rewrite_links(body_of("urunler.html"))
 giris_body = rewrite_links(body_of("giris.html"))
 hesap_body = rewrite_links(body_of("hesap.html"))
 admin_body = rewrite_links(body_of("admin.html"))
@@ -47,6 +49,10 @@ main_js = (ROOT / "js/main.js").read_text()
 main_js = main_js.replace('href="admin.html"', 'href="#admin"')
 main_js = main_js.replace('href="hesap.html"', 'href="#hesap"')
 main_js = main_js.replace('href="giris.html"', 'href="#giris"')
+main_js = main_js.replace(
+    '// BUILD:init — tek dosya derlemesi bu satırı sayfa kapsayıcılarıyla değiştirir\ninitSite(document);',
+    'initSite(document.getElementById("page-index"));\ninitSite(document.getElementById("page-urunler"));'
+)
 
 auth_js = (ROOT / "js/auth.js").read_text()
 auth_js = auth_js.replace(
@@ -80,7 +86,7 @@ admin_js = admin_js.replace('location.href = "giris.html";', 'goPage("#giris");'
 
 router_js = """
 // ---- TEK DOSYA SAYFA YÖNLENDİRİCİSİ ----
-const PAGE_IDS = { "#giris": "page-giris", "#hesap": "page-hesap", "#admin": "page-admin" };
+const PAGE_IDS = { "#magaza": "page-urunler", "#giris": "page-giris", "#hesap": "page-hesap", "#admin": "page-admin" };
 
 function route() {
   let target = PAGE_IDS[location.hash] || "page-index";
@@ -123,6 +129,10 @@ single = f"""<!DOCTYPE html>
 
 <div id="page-index" class="single-page">
 {index_body}
+</div>
+
+<div id="page-urunler" class="single-page" style="display:none">
+{urunler_body}
 </div>
 
 <div id="page-giris" class="single-page auth-body" style="display:none">

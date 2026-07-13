@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Quantora Solar Enerji ürünleri — güneş panelleri, invertörler, aküler, hazır paketler ve aksesuarlar.">
+  <title>Ürünlerimiz | Quantora Solar Enerji</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>☀️</text></svg>">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ÜST BİLGİ ÇUBUĞU -->
+  <div class="topbar">
+    <div class="container topbar-inner">
+      <span>Tel: 0850 000 00 00</span>
+      <span>E-posta: info@quantorasolar.com.tr</span>
+      <span class="topbar-right">Türkiye geneli keşif ve kurulum hizmeti</span>
+    </div>
+  </div>
+
+  <!-- BAŞLIK -->
+  <header class="siteheader">
+    <div class="container header-row">
+      <a href="index.html" class="logo">
+        <svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <circle cx="12" cy="12" r="4"/>
+          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+        </svg>
+        <span class="logo-text">Quantora<span>Solar</span> <small>Enerji Sistemleri San. Tic. Ltd. Şti.</small></span>
+      </a>
+      <div class="header-contact">
+        <strong>0850 000 00 00</strong>
+        <span>Ücretsiz keşif için hemen arayın</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ANA MENÜ -->
+  <nav class="mainmenu">
+    <div class="container mainmenu-inner">
+      <button class="hamburger" id="hamburger" aria-label="Menüyü aç">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="nav-links" id="navLinks">
+        <a href="index.html">ANA SAYFA</a>
+        <a href="index.html#hizmetler">HİZMETLERİMİZ</a>
+        <a href="urunler.html">ÜRÜNLER</a>
+        <a href="index.html#hesaplayici">TASARRUF HESAPLA</a>
+        <a href="index.html#projeler">PROJELERİMİZ</a>
+        <a href="index.html#referanslar">REFERANSLAR</a>
+        <a href="index.html#iletisim">İLETİŞİM</a>
+        <span class="nav-account" id="navAccount"></span>
+      </div>
+      <button class="cart-btn" id="cartBtn" aria-label="Sepeti aç">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="9" cy="21" r="1.6"/>
+          <circle cx="19" cy="21" r="1.6"/>
+          <path d="M2.5 3h3l2.6 12.5a2 2 0 0 0 2 1.5h8.7a2 2 0 0 0 2-1.6L22.5 8H6.2"/>
+        </svg>
+        SEPET
+        <span class="cart-count" id="cartCount" hidden>0</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- SAYFA BAŞLIĞI -->
+  <section class="page-band">
+    <div class="container">
+      <h1>Ürünlerimiz</h1>
+      <p>Güneş panelleri, invertörler, aküler, hazır paketler ve aksesuarlar — tümü orijinal, faturalı ve garantili.</p>
+    </div>
+  </section>
+
+  <!-- MAĞAZA -->
+  <section class="section" id="magaza">
+    <div class="container">
+      <div class="shop-filters" id="shopFilters"></div>
+      <div class="shop-grid" id="shopGrid"></div>
+      <p class="shop-note">Aradığınız ürünü bulamadınız mı? <a href="index.html#iletisim">Bize yazın</a>, tedarik edelim. Fiyatlar KDV dahildir; kur ve stok durumuna göre güncellenebilir. Stoktaki ürünler aynı gün kargoya verilir; toplu alım ve kurulumlu fiyat için teklif isteyin.</p>
+    </div>
+  </section>
+
+  <!-- SEPET -->
+  <div class="cart-overlay" id="cartOverlay"></div>
+  <aside class="cart-drawer" id="cartDrawer" aria-label="Sepet">
+    <div class="cart-head">
+      <h3>Sepetim</h3>
+      <button class="cart-close" id="cartClose" aria-label="Sepeti kapat">×</button>
+    </div>
+    <div class="cart-items" id="cartItems"></div>
+    <div class="cart-foot">
+      <div class="cart-total-row"><span>Ara Toplam</span><strong id="cartTotal">₺0</strong></div>
+      <p class="cart-note">Fiyatlara KDV dahildir. Kargo ücreti sipariş onayında bildirilir.</p>
+      <a class="btn btn-block" id="waOrder" href="#" target="_blank" rel="noopener">WhatsApp ile Sipariş Ver</a>
+      <button class="btn btn-outline btn-block" id="clearCart" type="button">Sepeti Temizle</button>
+    </div>
+  </aside>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div>
+        <a href="index.html" class="logo logo-light">
+          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <circle cx="12" cy="12" r="4"/>
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+          </svg>
+          Quantora<span>Solar</span>
+        </a>
+        <p>Temiz enerjiyle daha aydınlık bir gelecek için 12 yıldır çalışıyoruz.</p>
+      </div>
+      <div>
+        <h4>Hızlı Erişim</h4>
+        <a href="index.html#hizmetler">Hizmetler</a>
+        <a href="urunler.html">Mağaza</a>
+        <a href="index.html#hesaplayici">Tasarruf Hesapla</a>
+        <a href="index.html#sss">S.S.S.</a>
+      </div>
+      <div>
+        <h4>Hizmetler</h4>
+        <a href="index.html#hizmetler">Çatı GES</a>
+        <a href="index.html#hizmetler">Endüstriyel GES</a>
+        <a href="index.html#hizmetler">Tarımsal Sulama</a>
+        <a href="index.html#hizmetler">Bakım &amp; Onarım</a>
+      </div>
+      <div>
+        <h4>İletişim</h4>
+        <a href="tel:08500000000">0850 000 00 00</a>
+        <a href="mailto:info@quantorasolar.com.tr">info@quantorasolar.com.tr</a>
+        <p>Örnek Mah. Enerji Cad. No:1, Ankara</p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="container">
+        © 2026 Quantora Solar Enerji — Bu site örnek/demo amaçlıdır.
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/store.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
