@@ -24,7 +24,7 @@ if (currentUser) {
   navAccount.innerHTML =
     (currentUser.role === "admin"
       ? '<a href="admin.html" class="admin-link">Yönetim Paneli</a>'
-      : '<span class="account-name">' + escHtml(currentUser.name.split(" ")[0]) + "</span>") +
+      : '<a href="hesap.html" class="admin-link">Hesabım (' + escHtml(currentUser.name.split(" ")[0]) + ")</a>") +
     '<a href="#" id="logoutLink">Çıkış</a>';
   document.getElementById("logoutLink").addEventListener("click", (e) => {
     e.preventDefault();

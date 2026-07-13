@@ -14,6 +14,7 @@ Tamamen statik olduğu için herhangi bir sunucu kurulumu gerektirmez.
 - Müşteri referansları ve S.S.S. bölümü
 - Doğrulamalı iletişim/keşif talep formu — talepler admin paneline düşer
 - **Kullanıcı girişi & kayıt** (`giris.html`) — demo yönetici: `admin@quantorasolar.com.tr` / `admin123`
+- **Hesabım sayfası** (`hesap.html`) — profil güncelleme, şifre değiştirme, sipariş geçmişi
 - **Admin paneli** (`admin.html`) — ürün ekleme/düzenleme/silme, sipariş talepleri, keşif talepleri, WhatsApp numarası ayarı
 - Harici bağımlılık yok: saf HTML + CSS + JavaScript
 
@@ -32,6 +33,7 @@ python3 -m http.server 8000
 ```
 ├── index.html      # Ana sayfa (mağaza, hesaplayıcı, iletişim)
 ├── giris.html      # Kullanıcı girişi / kayıt
+├── hesap.html      # Müşteri hesap sayfası (Hesabım)
 ├── admin.html      # Yönetim paneli
 ├── css/
 │   ├── style.css   # Site tasarımı
@@ -40,6 +42,7 @@ python3 -m http.server 8000
     ├── store.js    # VERİ KATMANI (localStorage; sunucuya bağlarken burayı değiştirin)
     ├── main.js     # Mağaza, sepet, hesaplayıcı, form
     ├── auth.js     # Giriş/kayıt mantığı
+    ├── hesap.js    # Hesabım sayfası mantığı
     └── admin.js    # Admin paneli mantığı
 ```
 

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hesabım | Quantora Solar Enerji</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>☀️</text></svg>">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="account-body">
+
+  <!-- BAŞLIK -->
+  <header class="siteheader">
+    <div class="container header-row">
+      <a href="index.html" class="logo">
+        <svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <circle cx="12" cy="12" r="4"/>
+          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+        </svg>
+        <span class="logo-text">Quantora<span>Solar</span> <small>Enerji Sistemleri San. Tic. Ltd. Şti.</small></span>
+      </a>
+      <div class="account-header-links">
+        <a href="index.html">← Alışverişe Dön</a>
+        <a href="#" id="accountLogout">Çıkış Yap</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="container account-page">
+    <h1 class="account-title">Hesabım</h1>
+
+    <div class="account-wrap">
+      <div>
+        <!-- HESAP BİLGİLERİ -->
+        <form class="account-box" id="profileForm">
+          <div class="box-title">Hesap Bilgilerim</div>
+          <div class="box-body">
+            <div class="form-group">
+              <label for="accName">Ad Soyad</label>
+              <input type="text" id="accName" required>
+            </div>
+            <div class="form-group">
+              <label for="accEmail">E-posta <small>(değiştirilemez)</small></label>
+              <input type="email" id="accEmail" readonly>
+            </div>
+            <div class="form-group">
+              <label for="accPhone">Telefon</label>
+              <input type="tel" id="accPhone" placeholder="05__ ___ __ __">
+            </div>
+            <button type="submit" class="btn">Bilgilerimi Güncelle</button>
+            <p class="form-status" id="profileStatus" role="status"></p>
+          </div>
+        </form>
+
+        <!-- ŞİFRE DEĞİŞTİR -->
+        <form class="account-box" id="passwordForm">
+          <div class="box-title">Şifre Değiştir</div>
+          <div class="box-body">
+            <div class="form-group">
+              <label for="passOld">Mevcut şifre</label>
+              <input type="password" id="passOld" required autocomplete="current-password">
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="passNew">Yeni şifre</label>
+                <input type="password" id="passNew" required autocomplete="new-password">
+              </div>
+              <div class="form-group">
+                <label for="passNew2">Yeni şifre (tekrar)</label>
+                <input type="password" id="passNew2" required autocomplete="new-password">
+              </div>
+            </div>
+            <button type="submit" class="btn">Şifreyi Değiştir</button>
+            <p class="form-status" id="passwordStatus" role="status"></p>
+          </div>
+        </form>
+      </div>
+
+      <div>
+        <!-- SİPARİŞLERİM -->
+        <div class="account-box">
+          <div class="box-title">Siparişlerim</div>
+          <div class="box-body" id="myOrders"></div>
+        </div>
+        <p class="account-note">
+          Siparişleriniz WhatsApp üzerinden tarafımıza iletilir; buradaki liste
+          gönderdiğiniz sipariş taleplerinin kaydıdır. Sorularınız için
+          <a href="index.html#iletisim">bize ulaşın</a>.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/store.js"></script>
+  <script src="js/hesap.js"></script>
+</body>
+</html>

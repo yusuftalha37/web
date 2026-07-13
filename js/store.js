@@ -188,6 +188,35 @@ const Store = (() => {
     return read("gp-session", null);
   }
 
+  function getUser(email) {
+    const u = getUsers().find((x) => x.email === email);
+    return u ? { name: u.name, email: u.email, phone: u.phone || "" } : null;
+  }
+
+  function updateProfile(email, data) {
+    const users = getUsers();
+    const u = users.find((x) => x.email === email);
+    if (!u) return { ok: false, error: "Kullanıcı bulunamadı." };
+    if (data.name && data.name.trim()) u.name = data.name.trim();
+    u.phone = (data.phone || "").trim();
+    write("gp-users", users);
+    const s = session();
+    if (s && s.email === email) {
+      s.name = u.name;
+      write("gp-session", s);
+    }
+    return { ok: true };
+  }
+
+  function changePassword(email, oldPass, newPass) {
+    const users = getUsers();
+    const u = users.find((x) => x.email === email && x.pass === hash(oldPass));
+    if (!u) return { ok: false, error: "Mevcut şifreniz hatalı." };
+    u.pass = hash(newPass);
+    write("gp-users", users);
+    return { ok: true };
+  }
+
   // ---------- KEŞİF TALEPLERİ (İLETİŞİM FORMU) ----------
   function addLead(lead) {
     const leads = read("gp-leads", []);
@@ -216,6 +245,10 @@ const Store = (() => {
     return read("gp-orders", []);
   }
 
+  function getOrdersByEmail(email) {
+    return getOrders().filter((o) => o.email === email);
+  }
+
   // ---------- AYARLAR ----------
   function getSettings() {
     return read("gp-settings", { whatsapp: "908500000000" });
@@ -228,8 +261,9 @@ const Store = (() => {
   return {
     getProducts, saveProduct, deleteProduct,
     register, login, logout, session,
+    getUser, updateProfile, changePassword,
     addLead, getLeads, deleteLead,
-    addOrder, getOrders,
+    addOrder, getOrders, getOrdersByEmail,
     getSettings, saveSettings
   };
 })();
