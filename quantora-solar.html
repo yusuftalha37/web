@@ -1,0 +1,4258 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Quantora Solar Enerji — güneş enerjisi sistemleri satış ve kurulum. Tek dosyalık sürüm.">
+  <title>Quantora Solar Enerji | Güneş Paneli Satış &amp; Kurulum</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>☀️</text></svg>">
+  <style>
+/* ============================================================
+   GüneşPark Enerji — klasik kurumsal tema
+   ============================================================ */
+:root {
+  --blue: #0f4c81;
+  --blue-dark: #0a3a63;
+  --blue-darker: #072c4c;
+  --orange: #e8720c;
+  --orange-dark: #c96208;
+  --text: #333333;
+  --muted: #666666;
+  --border: #d9d9d9;
+  --bg-alt: #f4f4f4;
+  --radius: 3px;
+  /* admin.css'in kullandığı eski değişken adları */
+  --navy: #0f4c81;
+  --navy-2: #0a3a63;
+  --primary: #e8720c;
+  --primary-dark: #c96208;
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: Verdana, Geneva, Tahoma, Arial, sans-serif;
+  font-size: 14px;
+  color: var(--text);
+  background: #ffffff;
+  line-height: 1.7;
+}
+
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 15px;
+}
+
+.narrow { max-width: 780px; }
+
+h1, h2, h3, h4 { line-height: 1.35; color: var(--blue); }
+
+img, svg { max-width: 100%; }
+
+/* ============ BUTONLAR ============ */
+.btn {
+  display: inline-block;
+  background: linear-gradient(#f5893a, var(--orange));
+  border: 1px solid var(--orange-dark);
+  color: #fff;
+  padding: 9px 20px;
+  border-radius: var(--radius);
+  font-family: inherit;
+  font-weight: bold;
+  font-size: 13px;
+  text-decoration: none;
+  cursor: pointer;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+}
+
+.btn:hover { background: var(--orange-dark); }
+
+.btn-outline {
+  background: #fff;
+  border: 1px solid var(--blue);
+  color: var(--blue);
+  text-shadow: none;
+}
+
+.btn-outline:hover { background: #eef4f9; }
+
+.btn-ghost {
+  background: transparent;
+  border: 1px solid #ffffff;
+  color: #fff;
+  text-shadow: none;
+}
+
+.btn-ghost:hover { background: rgba(255, 255, 255, 0.12); }
+
+.btn-light {
+  background: #fff;
+  border: 1px solid #fff;
+  color: var(--orange-dark);
+  text-shadow: none;
+}
+
+.btn-light:hover { background: #ffe9d2; }
+
+.btn-small { padding: 7px 14px; font-size: 12px; }
+
+.btn-block { display: block; width: 100%; text-align: center; }
+
+/* ============ ÜST BAR ============ */
+.topbar {
+  background: var(--blue-darker);
+  color: #b9cbdc;
+  font-size: 12px;
+  padding: 6px 0;
+  border-bottom: 1px solid #061f36;
+}
+
+.topbar-inner {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+}
+
+.topbar-right { margin-left: auto; }
+
+/* ============ BAŞLIK ============ */
+.siteheader {
+  background: #ffffff;
+  border-bottom: 1px solid var(--border);
+}
+
+.header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 16px;
+  padding-bottom: 16px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--blue);
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.logo svg { color: var(--orange); }
+
+.logo-text span { color: var(--orange); }
+
+.logo-text small {
+  display: block;
+  font-size: 10px;
+  font-weight: normal;
+  color: var(--muted);
+  letter-spacing: 0.03em;
+}
+
+.header-contact { text-align: right; }
+
+.header-contact strong {
+  display: block;
+  font-size: 22px;
+  color: var(--orange-dark);
+}
+
+.header-contact span {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+/* ============ ANA MENÜ ============ */
+.mainmenu {
+  background: linear-gradient(#155a91, var(--blue));
+  border-top: 1px solid #1c67a5;
+  border-bottom: 3px solid var(--orange);
+}
+
+.mainmenu-inner {
+  display: flex;
+  align-items: stretch;
+}
+
+.nav-links {
+  display: flex;
+  align-items: stretch;
+  flex: 1;
+}
+
+.nav-links a {
+  display: flex;
+  align-items: center;
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 12px 14px;
+  border-right: 1px solid rgba(255, 255, 255, 0.15);
+  white-space: nowrap;
+}
+
+.nav-links a:first-child { border-left: 1px solid rgba(255, 255, 255, 0.15); }
+
+.nav-links a:hover { background: var(--blue-dark); }
+
+.nav-account {
+  display: flex;
+  align-items: stretch;
+  margin-left: auto;
+}
+
+.nav-account a {
+  border-right: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.nav-account .admin-link { color: #ffd9b0; }
+
+.account-name {
+  display: flex;
+  align-items: center;
+  color: #ffd9b0;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 0 12px;
+}
+
+.cart-btn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--orange);
+  border: none;
+  border-left: 1px solid var(--orange-dark);
+  color: #fff;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 0 18px;
+  cursor: pointer;
+  position: relative;
+}
+
+.cart-btn:hover { background: var(--orange-dark); }
+
+.cart-count {
+  background: #fff;
+  color: var(--orange-dark);
+  font-size: 11px;
+  font-weight: bold;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+}
+
+.hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 10px 14px;
+}
+
+.hamburger span {
+  width: 24px;
+  height: 3px;
+  background: #ffffff;
+}
+
+/* ============ BANNER ============ */
+.hero {
+  background: var(--blue-dark) repeating-linear-gradient(
+    -45deg,
+    rgba(255, 255, 255, 0.025) 0 2px,
+    transparent 2px 14px
+  );
+  border-bottom: 1px solid var(--blue-darker);
+  color: #fff;
+  padding: 44px 0 40px;
+}
+
+.hero h1 {
+  color: #ffffff;
+  font-size: 30px;
+  margin-bottom: 14px;
+}
+
+.hero p {
+  color: #d4e2ef;
+  font-size: 14px;
+  max-width: 680px;
+  margin-bottom: 22px;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+.hero-facts {
+  font-size: 12px;
+  color: #9fc0da;
+  border-top: 1px dotted rgba(255, 255, 255, 0.25);
+  padding-top: 12px;
+}
+
+/* ============ AVANTAJ ŞERİDİ ============ */
+.features-strip {
+  background: var(--bg-alt);
+  border-bottom: 1px solid var(--border);
+  padding: 11px 0;
+}
+
+.strip-inner {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px 24px;
+  font-size: 12px;
+  font-weight: bold;
+  color: #444;
+}
+
+.tick {
+  color: var(--orange);
+  margin-right: 5px;
+}
+
+/* ============ BÖLÜMLER ============ */
+.section { padding: 42px 0; }
+
+.section-alt {
+  background: var(--bg-alt);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.section-head { margin-bottom: 26px; }
+
+.section-head h2 {
+  display: inline-block;
+  font-size: 21px;
+  border-bottom: 3px solid var(--orange);
+  padding-bottom: 6px;
+  margin-bottom: 10px;
+}
+
+.section-head p {
+  color: var(--muted);
+  font-size: 13px;
+  max-width: 720px;
+}
+
+/* ============ HİZMET KUTULARI ============ */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+.card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+}
+
+.card h3 {
+  font-size: 14px;
+  margin-bottom: 7px;
+}
+
+.card h3::before {
+  content: "» ";
+  color: var(--orange);
+}
+
+.card p {
+  color: var(--muted);
+  font-size: 12.5px;
+}
+
+/* ============ MAĞAZA ============ */
+.shop-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 20px;
+}
+
+.filter-btn {
+  background: linear-gradient(#ffffff, #ececec);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 7px 14px;
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+.filter-btn:hover { border-color: var(--blue); color: var(--blue); }
+
+.filter-btn.active {
+  background: var(--blue);
+  border-color: var(--blue-dark);
+  color: #fff;
+}
+
+.shop-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+
+.product {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.product:hover { border-color: #b8b8b8; }
+
+.product-img {
+  position: relative;
+  height: 140px;
+  background: #fafafa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.product-img svg { height: 100%; width: auto; }
+
+.product-img.has-photo { padding: 0; }
+
+.product-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.stock-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  font-size: 10px;
+  font-weight: bold;
+  padding: 2px 8px;
+  border-radius: var(--radius);
+  background: #e6f4e6;
+  color: #1e7a1e;
+  border: 1px solid #bfdebf;
+}
+
+.stock-badge.low {
+  background: #fdf0d7;
+  color: #a3660a;
+  border-color: #ead196;
+}
+
+.product-body {
+  padding: 12px 14px 14px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.product-cat {
+  font-size: 10px;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: var(--muted);
+  letter-spacing: 0.05em;
+}
+
+.product h3 {
+  font-size: 13px;
+  margin: 4px 0 7px;
+  min-height: 2.6em;
+}
+
+.product-specs {
+  list-style: none;
+  color: var(--muted);
+  font-size: 11.5px;
+  margin-bottom: 12px;
+  flex: 1;
+}
+
+.product-specs li {
+  padding: 1px 0 1px 12px;
+  position: relative;
+}
+
+.product-specs li::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: var(--orange);
+}
+
+.product-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border-top: 1px dotted var(--border);
+  padding-top: 10px;
+}
+
+.product-price {
+  font-weight: bold;
+  font-size: 15px;
+  color: #c0392b;
+  line-height: 1.2;
+}
+
+.product-price span {
+  display: block;
+  font-size: 10px;
+  font-weight: normal;
+  color: var(--muted);
+}
+
+.add-btn {
+  background: linear-gradient(#f5893a, var(--orange));
+  border: 1px solid var(--orange-dark);
+  color: #fff;
+  font-family: inherit;
+  font-weight: bold;
+  font-size: 11px;
+  padding: 7px 12px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  white-space: nowrap;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+}
+
+.add-btn:hover { background: var(--orange-dark); }
+
+.add-btn.added { background: #2e8b2e; border-color: #226b22; }
+
+.shop-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: var(--muted);
+  font-size: 13px;
+  padding: 24px 0;
+}
+
+.shop-note {
+  margin-top: 20px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.shop-note a { color: var(--blue); }
+
+/* ============ KUTU BAŞLIĞI (klasik modül) ============ */
+.box-title {
+  background: linear-gradient(#155a91, var(--blue));
+  color: #fff;
+  font-size: 13px;
+  font-weight: bold;
+  padding: 9px 14px;
+  border-bottom: 2px solid var(--orange);
+}
+
+.box-body { padding: 16px; }
+
+/* ============ HESAPLAYICI ============ */
+.calc-wrap {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  align-items: start;
+}
+
+.calc-info h2 {
+  display: inline-block;
+  font-size: 21px;
+  border-bottom: 3px solid var(--orange);
+  padding-bottom: 6px;
+  margin-bottom: 10px;
+}
+
+.calc-info p {
+  color: var(--muted);
+  font-size: 13px;
+  margin-bottom: 14px;
+}
+
+.calc-notes { list-style: none; }
+
+.calc-notes li {
+  font-size: 12.5px;
+  padding: 4px 0 4px 14px;
+  position: relative;
+}
+
+.calc-notes li::before {
+  content: "»";
+  position: absolute;
+  left: 0;
+  color: var(--orange);
+  font-weight: bold;
+}
+
+.calc-box {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.calc-box label {
+  display: block;
+  font-weight: bold;
+  font-size: 13px;
+  margin-bottom: 10px;
+}
+
+.calc-input-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.calc-input-row input[type="range"] {
+  flex: 1;
+  accent-color: var(--orange);
+  cursor: pointer;
+}
+
+.calc-input-row output {
+  min-width: 84px;
+  text-align: right;
+  font-size: 16px;
+  font-weight: bold;
+  color: var(--orange-dark);
+}
+
+.calc-results {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.calc-result {
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 9px 11px;
+}
+
+.calc-label {
+  display: block;
+  font-size: 10.5px;
+  color: var(--muted);
+  margin-bottom: 2px;
+}
+
+.calc-result strong { font-size: 14px; color: var(--blue); }
+
+.calc-disclaimer {
+  margin-top: 10px;
+  font-size: 10.5px;
+  color: var(--muted);
+}
+
+/* ============ SÜREÇ ============ */
+.steps {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+
+.step {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  text-align: center;
+}
+
+.step-num {
+  width: 34px;
+  height: 34px;
+  margin: 0 auto 10px;
+  background: var(--orange);
+  color: #fff;
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.step h3 { font-size: 13px; margin-bottom: 5px; }
+
+.step p { color: var(--muted); font-size: 12px; }
+
+/* ============ PROJE GALERİSİ ============ */
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+
+.gallery-item {
+  margin: 0;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.gallery-item svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.gallery-item:hover { border-color: #b8b8b8; }
+
+.gallery-caption {
+  font-size: 11.5px;
+  color: var(--muted);
+  text-align: center;
+  padding: 8px 10px;
+  border-top: 1px solid var(--border);
+  background: #fafafa;
+}
+
+/* ============ REFERANSLAR ============ */
+.testimonials {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+.testimonial {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+}
+
+.stars {
+  color: var(--orange);
+  letter-spacing: 2px;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+.testimonial p {
+  font-style: italic;
+  font-size: 12.5px;
+  margin-bottom: 10px;
+}
+
+.testimonial footer {
+  font-size: 11.5px;
+  color: var(--muted);
+  border-top: 1px dotted var(--border);
+  padding-top: 8px;
+}
+
+/* ============ SSS ============ */
+.faq {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 8px;
+}
+
+.faq summary {
+  cursor: pointer;
+  padding: 12px 40px 12px 14px;
+  font-weight: bold;
+  font-size: 13px;
+  color: var(--blue);
+  list-style: none;
+  position: relative;
+}
+
+.faq summary::-webkit-details-marker { display: none; }
+
+.faq summary::after {
+  content: "+";
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 18px;
+  color: var(--orange);
+}
+
+.faq[open] summary::after { content: "−"; }
+
+.faq p {
+  padding: 0 14px 12px;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+/* ============ CTA ============ */
+.cta {
+  background: var(--orange);
+  border-top: 1px solid var(--orange-dark);
+  border-bottom: 1px solid var(--orange-dark);
+  color: #fff;
+  padding: 34px 0;
+  text-align: center;
+}
+
+.cta h2 { color: #fff; font-size: 22px; margin-bottom: 8px; }
+
+.cta p { font-size: 13px; margin-bottom: 18px; }
+
+/* ============ İLETİŞİM ============ */
+.contact-wrap {
+  display: grid;
+  grid-template-columns: 1fr 1.25fr;
+  gap: 30px;
+  align-items: start;
+}
+
+.contact-info h2 {
+  display: inline-block;
+  font-size: 21px;
+  border-bottom: 3px solid var(--orange);
+  padding-bottom: 6px;
+  margin-bottom: 10px;
+}
+
+.contact-info > p {
+  color: var(--muted);
+  font-size: 13px;
+  margin-bottom: 14px;
+}
+
+.contact-list { list-style: none; }
+
+.contact-list li {
+  font-size: 12.5px;
+  padding: 6px 0;
+  border-bottom: 1px dotted var(--border);
+}
+
+.contact-list strong { color: var(--blue); }
+
+.contact-form {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.form-group { margin-bottom: 12px; }
+
+.form-group label {
+  display: block;
+  font-weight: bold;
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #bbbbbb;
+  border-radius: 2px;
+  font-size: 13px;
+  font-family: inherit;
+  background: #fff;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--blue);
+}
+
+.form-group input.error { border-color: #c0392b; background: #fdf3f2; }
+
+.form-status {
+  margin-top: 10px;
+  font-weight: bold;
+  font-size: 12.5px;
+  text-align: center;
+  min-height: 1.4em;
+}
+
+.form-status.ok { color: #1e7a1e; }
+.form-status.err { color: #c0392b; }
+
+/* ============ FOOTER ============ */
+.footer {
+  background: var(--blue-darker);
+  color: #a9bfd2;
+  font-size: 12.5px;
+  padding-top: 34px;
+  border-top: 3px solid var(--orange);
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr 1.2fr;
+  gap: 26px;
+  padding-bottom: 26px;
+}
+
+.footer h4 {
+  color: #fff;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid #1a4a75;
+  padding-bottom: 7px;
+  margin-bottom: 10px;
+}
+
+.footer a {
+  display: block;
+  color: #a9bfd2;
+  text-decoration: none;
+  padding: 3px 0;
+}
+
+.footer a::before {
+  content: "» ";
+  color: var(--orange);
+}
+
+.footer a:hover { color: #fff; text-decoration: underline; }
+
+.logo-light {
+  color: #fff;
+  font-size: 19px;
+  margin-bottom: 10px;
+}
+
+.logo-light span { color: var(--orange); }
+
+.logo-light::before { content: none; }
+
+.footer p { font-size: 12px; }
+
+.footer-bottom {
+  border-top: 1px solid #113d63;
+  padding: 12px 0;
+  font-size: 11px;
+  text-align: center;
+  color: #7f9cb7;
+}
+
+/* ============ SEPET ============ */
+.cart-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s;
+  z-index: 200;
+}
+
+.cart-overlay.open { opacity: 1; visibility: visible; }
+
+.cart-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 380px;
+  max-width: 100vw;
+  background: #fff;
+  border-left: 1px solid var(--border);
+  z-index: 201;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.25s ease;
+}
+
+.cart-drawer.open { transform: translateX(0); }
+
+.cart-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(#155a91, var(--blue));
+  border-bottom: 2px solid var(--orange);
+  padding: 12px 16px;
+}
+
+.cart-head h3 { color: #fff; font-size: 14px; }
+
+.cart-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  line-height: 1;
+  color: #cfe0ee;
+  cursor: pointer;
+}
+
+.cart-close:hover { color: #fff; }
+
+.cart-items {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 16px;
+}
+
+.cart-empty {
+  text-align: center;
+  color: var(--muted);
+  font-size: 12.5px;
+  padding: 34px 0;
+}
+
+.cart-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px dotted var(--border);
+}
+
+.cart-thumb {
+  width: 46px;
+  height: 46px;
+  flex-shrink: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: #fafafa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px;
+}
+
+.cart-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cart-thumb svg { height: 100%; width: auto; }
+
+.cart-item-info { flex: 1; min-width: 0; }
+
+.cart-item-info strong {
+  display: block;
+  font-size: 12px;
+  color: var(--blue);
+}
+
+.cart-item-info span { font-size: 11.5px; color: var(--muted); }
+
+.cart-qty {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.cart-qty button {
+  width: 24px;
+  height: 24px;
+  border: 1px solid #bbbbbb;
+  background: linear-gradient(#ffffff, #ececec);
+  border-radius: 2px;
+  font-size: 13px;
+  cursor: pointer;
+  color: var(--text);
+  line-height: 1;
+}
+
+.cart-qty button:hover { border-color: var(--blue); color: var(--blue); }
+
+.cart-qty .qty-val {
+  min-width: 20px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 12px;
+}
+
+.cart-qty .del-btn { color: #c0392b; border-color: #dcb0ab; }
+
+.cart-foot {
+  padding: 14px 16px;
+  border-top: 1px solid var(--border);
+  background: var(--bg-alt);
+}
+
+.cart-total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.cart-total-row strong { font-size: 17px; color: #c0392b; }
+
+.cart-note {
+  font-size: 10.5px;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+.cart-foot .btn { margin-bottom: 8px; }
+
+.cart-foot .btn.disabled { opacity: 0.5; pointer-events: none; }
+
+/* ============ HESABIM SAYFASI ============ */
+.account-body { background: var(--bg-alt); min-height: 100vh; }
+
+.account-header-links {
+  display: flex;
+  gap: 20px;
+}
+
+.account-header-links a {
+  color: var(--blue);
+  font-size: 12.5px;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.account-header-links a:hover { text-decoration: underline; }
+
+.account-page { padding: 28px 15px 44px; }
+
+.account-title {
+  display: inline-block;
+  font-size: 21px;
+  border-bottom: 3px solid var(--orange);
+  padding-bottom: 6px;
+  margin-bottom: 20px;
+}
+
+.account-wrap {
+  display: grid;
+  grid-template-columns: 1fr 1.15fr;
+  gap: 22px;
+  align-items: start;
+}
+
+.account-box {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 18px;
+}
+
+.account-box .form-status { text-align: left; }
+
+.account-note {
+  font-size: 11.5px;
+  color: var(--muted);
+}
+
+.account-note a { color: var(--blue); }
+
+.account-empty {
+  text-align: center;
+  color: var(--muted);
+  font-size: 12.5px;
+  padding: 22px 0;
+}
+
+.account-empty a { color: var(--blue); font-weight: bold; }
+
+.order-entry {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  margin-bottom: 10px;
+  font-size: 12.5px;
+}
+
+.order-entry-head {
+  display: flex;
+  justify-content: space-between;
+  font-weight: bold;
+  color: var(--blue);
+  border-bottom: 1px dotted var(--border);
+  padding-bottom: 6px;
+  margin-bottom: 6px;
+}
+
+.order-entry-head span:last-child {
+  font-weight: normal;
+  color: var(--muted);
+  font-size: 11.5px;
+}
+
+.order-entry-items { list-style: none; margin-bottom: 6px; }
+
+.order-entry-items li {
+  display: flex;
+  justify-content: space-between;
+  padding: 2px 0;
+}
+
+.order-entry-items li span { color: var(--muted); }
+
+.order-entry-total { text-align: right; }
+
+.order-entry-total strong { color: #c0392b; }
+
+@media (max-width: 860px) {
+  .account-wrap { grid-template-columns: 1fr; }
+}
+
+/* ============ GİRİŞ / KAYIT ============ */
+.auth-body {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-alt);
+  padding: 30px 15px;
+}
+
+.auth-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  width: 400px;
+  max-width: 100%;
+  padding: 26px 26px 20px;
+}
+
+.auth-logo {
+  justify-content: center;
+  margin-bottom: 18px;
+}
+
+.auth-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin-bottom: 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.auth-tab {
+  border: none;
+  background: linear-gradient(#ffffff, #ececec);
+  font-family: inherit;
+  font-weight: bold;
+  font-size: 13px;
+  color: var(--muted);
+  padding: 10px;
+  cursor: pointer;
+}
+
+.auth-tab + .auth-tab { border-left: 1px solid var(--border); }
+
+.auth-tab.active {
+  background: var(--blue);
+  color: #fff;
+}
+
+.auth-form label small { color: var(--muted); font-weight: normal; }
+
+.auth-demo {
+  margin-top: 16px;
+  background: #fdf6e7;
+  border: 1px dashed #e0c893;
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  font-size: 11.5px;
+  color: #8a6410;
+  text-align: center;
+  line-height: 1.7;
+}
+
+.auth-back {
+  display: block;
+  text-align: center;
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.auth-back:hover { color: var(--blue); }
+
+/* ============ RESPONSIVE ============ */
+@media (max-width: 960px) {
+  .cards, .testimonials { grid-template-columns: 1fr 1fr; }
+  .shop-grid, .gallery { grid-template-columns: repeat(2, 1fr); }
+  .steps { grid-template-columns: repeat(2, 1fr); }
+  .calc-wrap, .contact-wrap { grid-template-columns: 1fr; }
+  .footer-grid { grid-template-columns: 1fr 1fr; }
+  .hero h1 { font-size: 24px; }
+}
+
+@media (max-width: 680px) {
+  .topbar-inner { justify-content: center; }
+  .topbar-right { display: none; }
+
+  .header-row { flex-direction: column; gap: 8px; text-align: center; }
+  .header-contact { text-align: center; }
+
+  .hamburger { display: flex; }
+
+  .mainmenu-inner { flex-wrap: wrap; }
+
+  .nav-links {
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    order: 3;
+    background: var(--blue-dark);
+  }
+
+  .nav-links.open { display: flex; }
+
+  .nav-links a,
+  .nav-links a:first-child {
+    border: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 11px 16px;
+  }
+
+  .nav-account {
+    margin-left: 0;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .nav-account a { border-right: none; }
+
+  .account-name { padding: 10px 16px; }
+
+  .cart-btn { margin-left: auto; }
+
+  .cards, .testimonials, .steps { grid-template-columns: 1fr; }
+  .shop-grid, .gallery { grid-template-columns: 1fr; }
+  .form-row { grid-template-columns: 1fr; }
+  .calc-results { grid-template-columns: 1fr; }
+  .footer-grid { grid-template-columns: 1fr; }
+  .section { padding: 30px 0; }
+}
+
+/* ============ YÖNETİM PANELİ ============ */
+.admin-body {
+  display: flex;
+  min-height: 100vh;
+  background: #f1f5f9;
+}
+
+/* ---- Kenar menü ---- */
+.admin-sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  background: var(--navy);
+  color: #cbd8e4;
+  display: flex;
+  flex-direction: column;
+  padding: 22px 16px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+
+.admin-logo { margin-bottom: 30px; font-size: 1.25rem; }
+
+.admin-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.admin-nav-btn {
+  background: none;
+  border: none;
+  text-align: left;
+  color: #cbd8e4;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: 11px 14px;
+  border-radius: 9px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.admin-nav-btn:hover { background: var(--navy-2); color: #fff; }
+
+.admin-nav-btn.active {
+  background: var(--primary);
+  color: #fff;
+}
+
+.admin-sidebar-foot {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border-top: 1px solid #24405c;
+  padding-top: 14px;
+}
+
+.admin-sidebar-foot a {
+  color: #9fb3c8;
+  text-decoration: none;
+  font-size: 0.88rem;
+  padding: 4px 14px;
+}
+
+.admin-sidebar-foot a:hover { color: #fff; }
+
+/* ---- Ana içerik ---- */
+.admin-main {
+  flex: 1;
+  padding: 26px 32px 48px;
+  min-width: 0;
+}
+
+.admin-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.admin-topbar h1 { font-size: 1.5rem; }
+
+.admin-user {
+  font-weight: 700;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.view-actions { margin-bottom: 18px; }
+
+.admin-panel {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px 24px;
+  margin-bottom: 22px;
+}
+
+.admin-panel h2 { font-size: 1.1rem; margin-bottom: 14px; }
+
+.panel-hint {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin-bottom: 16px;
+}
+
+.panel-hint code {
+  background: #f1f5f9;
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-size: 0.85em;
+}
+
+/* ---- İstatistik kartları ---- */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+.stat-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+}
+
+.stat-card span {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--muted);
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.stat-card strong {
+  font-size: 1.5rem;
+  color: var(--navy);
+}
+
+/* ---- Tablolar ---- */
+.table-wrap { overflow-x: auto; }
+
+.admin-panel table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.admin-panel th {
+  text-align: left;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  padding: 10px 12px;
+  border-bottom: 2px solid var(--border);
+  white-space: nowrap;
+}
+
+.admin-panel td {
+  padding: 12px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+
+.cell-strong { font-weight: 700; color: var(--navy); }
+
+.cell-msg { max-width: 260px; color: var(--muted); }
+
+.cell-actions { white-space: nowrap; text-align: right; }
+
+.empty-row {
+  text-align: center;
+  color: var(--muted);
+  padding: 28px 12px !important;
+}
+
+.row-btn {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--navy);
+  padding: 6px 12px;
+  cursor: pointer;
+  margin-left: 6px;
+}
+
+.row-btn:hover { border-color: var(--primary); color: var(--primary-dark); }
+
+.row-btn-danger { color: #dc2626; border-color: #fecaca; }
+
+.row-btn-danger:hover { border-color: #dc2626; color: #b91c1c; }
+
+.pill {
+  display: inline-block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+
+.pill-warn { background: #fef3c7; color: #b45309; }
+
+.table-thumb {
+  width: 46px;
+  height: 46px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 1px solid var(--border);
+  display: block;
+}
+
+.table-thumb-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f1f5f9;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+/* ---- Fotoğraf yükleme ---- */
+.photo-row {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.photo-preview {
+  width: 92px;
+  height: 92px;
+  flex-shrink: 0;
+  border: 1px dashed var(--border);
+  border-radius: 10px;
+  background: #f8fafc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.75rem;
+  overflow: hidden;
+}
+
+.photo-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.photo-inputs {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.photo-inputs input[type="file"] { font-size: 0.85rem; }
+
+.photo-inputs input[type="text"] {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-family: inherit;
+}
+
+.photo-inputs .row-btn { align-self: flex-start; margin-left: 0; }
+
+.photo-hint {
+  display: block;
+  color: var(--muted);
+  font-size: 0.78rem;
+  margin-top: 8px;
+}
+
+/* ---- Siparişler ---- */
+.order-card {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px 18px;
+  margin-bottom: 14px;
+}
+
+.order-head {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.order-head span { color: var(--muted); font-size: 0.85rem; }
+
+.order-items {
+  list-style: none;
+  margin-bottom: 10px;
+}
+
+.order-items li {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+  font-size: 0.9rem;
+  border-bottom: 1px dashed var(--border);
+}
+
+.order-items li span { color: var(--muted); }
+
+.order-total {
+  text-align: right;
+  font-size: 0.95rem;
+}
+
+.order-total strong { color: var(--navy); font-size: 1.1rem; }
+
+/* ---- Ayarlar ---- */
+.settings-panel { max-width: 560px; }
+
+.settings-panel small {
+  display: block;
+  color: var(--muted);
+  margin-top: 6px;
+  font-size: 0.8rem;
+}
+
+.settings-panel .form-status { text-align: left; }
+
+/* ---- Ürün yükleme ekranı ---- */
+.upload-grid {
+  display: grid;
+  grid-template-columns: 1.25fr 1fr;
+  gap: 22px;
+  align-items: start;
+}
+
+.drop-zone {
+  border: 2px dashed #b8c4cf;
+  border-radius: var(--radius);
+  background: #fafbfc;
+  padding: 22px 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.drop-zone:hover { border-color: var(--primary); }
+
+.drop-zone.drag {
+  border-color: var(--primary);
+  background: #fdf3e7;
+}
+
+.drop-zone.has-photo { padding: 12px; }
+
+.drop-zone-inner strong {
+  display: block;
+  color: var(--navy);
+  font-size: 0.95rem;
+  margin-bottom: 4px;
+}
+
+.drop-zone-inner span {
+  display: block;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.drop-zone-inner img {
+  max-height: 150px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+}
+
+.up-url {
+  width: 100%;
+  margin-top: 8px;
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 0.85rem;
+  font-family: inherit;
+}
+
+#upPhotoRemove { margin-top: 8px; margin-left: 0; }
+
+.upload-preview .product {
+  max-width: 270px;
+  margin: 0 auto;
+}
+
+.upload-preview .add-btn { pointer-events: none; }
+
+#upStatus { text-align: left; }
+
+/* ---- Modal ---- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 28, 42, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 300;
+}
+
+.modal-overlay[hidden] { display: none; }
+
+.modal {
+  background: #fff;
+  border-radius: var(--radius);
+  width: 520px;
+  max-width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 24px 26px 26px;
+}
+
+.modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.modal-head h2 { font-size: 1.2rem; }
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  line-height: 1;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.modal-close:hover { color: var(--navy); }
+
+/* ---- Responsive ---- */
+@media (max-width: 860px) {
+  .admin-body { flex-direction: column; }
+
+  .admin-sidebar {
+    width: 100%;
+    height: auto;
+    position: static;
+    padding: 16px;
+  }
+
+  .admin-nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .admin-sidebar-foot {
+    flex-direction: row;
+    gap: 18px;
+  }
+
+  .admin-main { padding: 20px 16px 40px; }
+
+  .stat-grid { grid-template-columns: repeat(2, 1fr); }
+  .upload-grid { grid-template-columns: 1fr; }
+}
+
+  </style>
+</head>
+<body>
+
+<div id="page-index" class="single-page">
+<!-- ÜST BİLGİ ÇUBUĞU -->
+  <div class="topbar">
+    <div class="container topbar-inner">
+      <span>Tel: 0850 000 00 00</span>
+      <span>E-posta: info@quantorasolar.com.tr</span>
+      <span class="topbar-right">Türkiye geneli keşif ve kurulum hizmeti</span>
+    </div>
+  </div>
+
+  <!-- BAŞLIK -->
+  <header class="siteheader">
+    <div class="container header-row">
+      <a href="#" class="logo">
+        <svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <circle cx="12" cy="12" r="4"/>
+          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+        </svg>
+        <span class="logo-text">Quantora<span>Solar</span> <small>Enerji Sistemleri San. Tic. Ltd. Şti.</small></span>
+      </a>
+      <div class="header-contact">
+        <strong>0850 000 00 00</strong>
+        <span>Ücretsiz keşif için hemen arayın</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ANA MENÜ -->
+  <nav class="mainmenu">
+    <div class="container mainmenu-inner">
+      <button class="hamburger" id="hamburger" aria-label="Menüyü aç">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="nav-links" id="navLinks">
+        <a href="#anasayfa">ANA SAYFA</a>
+        <a href="#hizmetler">HİZMETLERİMİZ</a>
+        <a href="#urunler">ÜRÜNLER</a>
+        <a href="#hesaplayici">TASARRUF HESAPLA</a>
+        <a href="#projeler">PROJELERİMİZ</a>
+        <a href="#referanslar">REFERANSLAR</a>
+        <a href="#iletisim">İLETİŞİM</a>
+        <span class="nav-account" id="navAccount"></span>
+      </div>
+      <button class="cart-btn" id="cartBtn" aria-label="Sepeti aç">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="9" cy="21" r="1.6"/>
+          <circle cx="19" cy="21" r="1.6"/>
+          <path d="M2.5 3h3l2.6 12.5a2 2 0 0 0 2 1.5h8.7a2 2 0 0 0 2-1.6L22.5 8H6.2"/>
+        </svg>
+        SEPET
+        <span class="cart-count" id="cartCount" hidden>0</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- BANNER -->
+  <section class="hero" id="anasayfa">
+    <div class="container">
+      <h1>Elektrik Faturanıza Son Verin,<br>Güneş Enerjisine Geçin</h1>
+      <p>Ev, işyeri ve tarım arazileri için anahtar teslim güneş enerjisi sistemleri kuruyoruz.
+      Keşif, projelendirme, resmi izin işlemleri ve montaj dahil tüm süreç firmamız güvencesi altındadır.
+      Yatırımınız ortalama 4-6 yılda kendini geri öder.</p>
+      <div class="hero-actions">
+        <a href="#iletisim" class="btn">Ücretsiz Keşif Talep Et</a>
+        <a href="#urunler" class="btn btn-ghost">Ürünlerimizi İnceleyin</a>
+      </div>
+      <div class="hero-facts">1.250'den fazla tamamlanmış proje &nbsp;•&nbsp; 18 MW kurulu güç &nbsp;•&nbsp; 12 yıllık sektör tecrübesi</div>
+    </div>
+  </section>
+
+  <!-- AVANTAJLAR ŞERİDİ -->
+  <section class="features-strip">
+    <div class="container strip-inner">
+      <div class="strip-item"><span class="tick">✓</span> 25 Yıl Panel Garantisi</div>
+      <div class="strip-item"><span class="tick">✓</span> 36 Aya Varan Taksit</div>
+      <div class="strip-item"><span class="tick">✓</span> Ücretsiz Keşif &amp; Projelendirme</div>
+      <div class="strip-item"><span class="tick">✓</span> Aynı Gün Kargo (Stok Ürünlerde)</div>
+    </div>
+  </section>
+
+  <!-- HİZMETLER -->
+  <section class="section" id="hizmetler">
+    <div class="container">
+      <div class="section-head">
+        <h2>Hizmetlerimiz</h2>
+        <p>Güneş enerjisine geçiş sandığınızdan kolay. Tüm süreci sizin adınıza biz yönetiyoruz.</p>
+      </div>
+      <div class="cards">
+        <article class="card">
+          <h3>Çatı GES (Konut)</h3>
+          <p>Müstakil evler ve apartmanlar için şebeke bağlantılı (on-grid) çatı sistemleri. Ürettiğiniz fazla elektriği şebekeye satın.</p>
+        </article>
+        <article class="card">
+          <h3>Ticari &amp; Endüstriyel GES</h3>
+          <p>Fabrika, depo ve ticari binalar için yüksek kapasiteli sistemler. Enerji maliyetlerinizi %90'a kadar düşürün.</p>
+        </article>
+        <article class="card">
+          <h3>Tarımsal Sulama</h3>
+          <p>Şebekeden bağımsız (off-grid) solar sulama çözümleri. Mazot ve elektrik masrafı olmadan tarlanızı sulayın.</p>
+        </article>
+        <article class="card">
+          <h3>Depolamalı Sistemler</h3>
+          <p>Lityum batarya destekli hibrit sistemlerle elektrik kesintilerinden etkilenmeyin, gece de güneş enerjisi kullanın.</p>
+        </article>
+        <article class="card">
+          <h3>Bakım &amp; Onarım</h3>
+          <p>Periyodik panel temizliği, invertör kontrolü ve uzaktan izleme ile sisteminiz her zaman maksimum verimde çalışsın.</p>
+        </article>
+        <article class="card">
+          <h3>Proje &amp; İzin Danışmanlığı</h3>
+          <p>Çağrı mektubu, proje onayı ve kabul işlemleri dahil tüm resmi süreçleri sizin adınıza yürütüyoruz.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ÜRÜNLER / MAĞAZA -->
+  <section class="section section-alt" id="urunler">
+    <div class="container">
+      <div class="section-head">
+        <h2>Ürünlerimiz</h2>
+        <p>Tüm ürünler orijinal, faturalı ve garantilidir. Stoktaki ürünler aynı gün kargoya verilir. Toplu alım ve kurulumlu fiyat için teklif isteyin.</p>
+      </div>
+      <div class="shop-filters" id="shopFilters"></div>
+      <div class="shop-grid" id="shopGrid"></div>
+      <p class="shop-note">Aradığınız ürünü bulamadınız mı? <a href="#iletisim">Bize yazın</a>, tedarik edelim. Fiyatlar KDV dahildir; kur ve stok durumuna göre güncellenebilir.</p>
+    </div>
+  </section>
+
+  <!-- TASARRUF HESAPLAYICI -->
+  <section class="section" id="hesaplayici">
+    <div class="container calc-wrap">
+      <div class="calc-info">
+        <h2>Güneş Size Ne Kazandırır?</h2>
+        <p>Aylık elektrik faturanızı girin, size uygun sistem gücünü ve yıllık tasarrufunuzu anında görün. Hesaplama Türkiye ortalama güneşlenme verilerine göre tahminidir.</p>
+        <ul class="calc-notes">
+          <li>Türkiye yıllık ortalama 2.740 saat güneşlenme süresine sahiptir</li>
+          <li>Elektrik faturanızda %90'a varan azalma sağlanır</li>
+          <li>Fazla üretiminizi şebekeye satabilirsiniz</li>
+        </ul>
+      </div>
+      <div class="calc-box">
+        <div class="box-title">Tasarruf Hesaplama</div>
+        <div class="box-body">
+        <label for="billInput">Aylık ortalama elektrik faturanız</label>
+        <div class="calc-input-row">
+          <input type="range" id="billInput" min="500" max="20000" step="100" value="2500">
+          <output id="billValue">₺2.500</output>
+        </div>
+        <div class="calc-results">
+          <div class="calc-result">
+            <span class="calc-label">Önerilen sistem gücü</span>
+            <strong id="resPower">— kW</strong>
+          </div>
+          <div class="calc-result">
+            <span class="calc-label">Tahmini yıllık tasarruf</span>
+            <strong id="resSaving">₺—</strong>
+          </div>
+          <div class="calc-result">
+            <span class="calc-label">Tahmini geri ödeme süresi</span>
+            <strong id="resPayback">— yıl</strong>
+          </div>
+          <div class="calc-result">
+            <span class="calc-label">25 yıllık toplam kazanç</span>
+            <strong id="resTotal">₺—</strong>
+          </div>
+        </div>
+        <a href="#iletisim" class="btn btn-block">Detaylı Teklif Al</a>
+        <p class="calc-disclaimer">* Değerler tahminidir, bağlayıcı değildir. Kesin rakamlar ücretsiz keşif sonrası sunulur.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SÜREÇ -->
+  <section class="section section-alt" id="surec">
+    <div class="container">
+      <div class="section-head">
+        <h2>4 Adımda Güneşe Geçin</h2>
+      </div>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <h3>Ücretsiz Keşif</h3>
+          <p>Uzman ekibimiz çatınızı inceler, tüketiminizi analiz eder.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <h3>Teklif &amp; Proje</h3>
+          <p>Size özel sistem tasarımı ve net fiyat teklifi sunarız.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <h3>İzin &amp; Kurulum</h3>
+          <p>Resmi izinleri alır, sistemi 2-5 iş gününde kurarız.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <h3>Üretim &amp; Tasarruf</h3>
+          <p>Sistem devreye girer, faturalarınız düşmeye başlar.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJE GALERİSİ -->
+  <section class="section" id="projeler">
+    <div class="container">
+      <div class="section-head">
+        <h2>Projelerimizden Kareler</h2>
+        <p>Türkiye'nin dört bir yanında tamamladığımız kurulumlardan örnekler.</p>
+      </div>
+      <div class="gallery">
+        <figure class="gallery-item">
+          <svg viewBox="0 0 320 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Konut çatı kurulumu">
+            <rect width="320" height="130" fill="#bcd7ec"/>
+            <circle cx="268" cy="38" r="20" fill="#f5c542"/>
+            <rect y="130" width="320" height="70" fill="#8fb37a"/>
+            <polygon points="55,130 160,68 265,130" fill="#7a4a2b"/>
+            <rect x="75" y="130" width="170" height="52" fill="#e8dcc8"/>
+            <rect x="145" y="148" width="30" height="34" fill="#6b4a2f"/>
+            <rect x="90" y="140" width="26" height="20" fill="#9cc3de"/>
+            <rect x="204" y="140" width="26" height="20" fill="#9cc3de"/>
+            <g transform="rotate(-30.5 160 99)">
+              <rect x="100" y="86" width="38" height="26" fill="#12314e" stroke="#0a2138" stroke-width="1.5"/>
+              <rect x="142" y="86" width="38" height="26" fill="#12314e" stroke="#0a2138" stroke-width="1.5"/>
+              <rect x="184" y="86" width="38" height="26" fill="#164066" stroke="#0a2138" stroke-width="1.5"/>
+            </g>
+          </svg>
+          <figcaption class="gallery-caption">Antalya — 8 kW konut çatı GES</figcaption>
+        </figure>
+        <figure class="gallery-item">
+          <svg viewBox="0 0 320 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Fabrika çatısı kurulumu">
+            <rect width="320" height="130" fill="#c3d9e9"/>
+            <circle cx="52" cy="36" r="17" fill="#f5c542"/>
+            <rect y="130" width="320" height="70" fill="#a9a9a3"/>
+            <rect x="30" y="86" width="260" height="60" fill="#d8d8d2" stroke="#b5b5ae" stroke-width="2"/>
+            <rect x="30" y="146" width="260" height="10" fill="#8f8f88"/>
+            <rect x="120" y="108" width="42" height="38" fill="#7c8894"/>
+            <g>
+              <rect x="42" y="66" width="44" height="22" fill="#12314e" stroke="#0a2138" stroke-width="1.5" transform="skewX(-14)"/>
+              <rect x="104" y="66" width="44" height="22" fill="#164066" stroke="#0a2138" stroke-width="1.5" transform="skewX(-14)"/>
+              <rect x="166" y="66" width="44" height="22" fill="#12314e" stroke="#0a2138" stroke-width="1.5" transform="skewX(-14)"/>
+              <rect x="228" y="66" width="44" height="22" fill="#164066" stroke="#0a2138" stroke-width="1.5" transform="skewX(-14)"/>
+            </g>
+          </svg>
+          <figcaption class="gallery-caption">İzmir — 120 kW endüstriyel çatı GES</figcaption>
+        </figure>
+        <figure class="gallery-item">
+          <svg viewBox="0 0 320 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Tarımsal sulama sistemi">
+            <rect width="320" height="120" fill="#c8e0ef"/>
+            <circle cx="270" cy="34" r="18" fill="#f5c542"/>
+            <rect y="120" width="320" height="80" fill="#96b565"/>
+            <g stroke="#7d9b4e" stroke-width="6">
+              <line x1="0" y1="140" x2="320" y2="136"/>
+              <line x1="0" y1="160" x2="320" y2="154"/>
+              <line x1="0" y1="180" x2="320" y2="172"/>
+            </g>
+            <rect x="52" y="92" width="16" height="52" fill="#5b6770"/>
+            <g transform="rotate(-26 88 84)">
+              <rect x="56" y="70" width="64" height="30" fill="#12314e" stroke="#0a2138" stroke-width="2"/>
+              <line x1="88" y1="70" x2="88" y2="100" stroke="#3d719c" stroke-width="1.5"/>
+            </g>
+            <rect x="140" y="122" width="26" height="20" fill="#3b4a56"/>
+            <path d="M166 130 h96" stroke="#4a5a66" stroke-width="5"/>
+            <g stroke="#7fb3d6" stroke-width="2" fill="none">
+              <path d="M200 128 q6 -16 12 0"/>
+              <path d="M226 128 q6 -16 12 0"/>
+              <path d="M252 128 q6 -16 12 0"/>
+            </g>
+          </svg>
+          <figcaption class="gallery-caption">Konya — şebekeden bağımsız sulama sistemi</figcaption>
+        </figure>
+        <figure class="gallery-item">
+          <svg viewBox="0 0 320 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Arazi tipi güneş santrali">
+            <rect width="320" height="120" fill="#cfe2ee"/>
+            <circle cx="48" cy="40" r="18" fill="#f5c542"/>
+            <path d="M0 120 Q90 92 180 116 T320 108 V200 H0 Z" fill="#9cb87e"/>
+            <g>
+              <rect x="26" y="120" width="70" height="26" fill="#12314e" stroke="#0a2138" stroke-width="2" transform="skewX(-16)"/>
+              <rect x="116" y="120" width="70" height="26" fill="#164066" stroke="#0a2138" stroke-width="2" transform="skewX(-16)"/>
+              <rect x="206" y="120" width="70" height="26" fill="#12314e" stroke="#0a2138" stroke-width="2" transform="skewX(-16)"/>
+              <rect x="64" y="156" width="70" height="26" fill="#164066" stroke="#0a2138" stroke-width="2" transform="skewX(-16)"/>
+              <rect x="154" y="156" width="70" height="26" fill="#12314e" stroke="#0a2138" stroke-width="2" transform="skewX(-16)"/>
+              <rect x="244" y="156" width="70" height="26" fill="#164066" stroke="#0a2138" stroke-width="2" transform="skewX(-16)"/>
+            </g>
+          </svg>
+          <figcaption class="gallery-caption">Ankara — 1,2 MW arazi tipi GES</figcaption>
+        </figure>
+        <figure class="gallery-item">
+          <svg viewBox="0 0 320 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Solar otopark kurulumu">
+            <rect width="320" height="140" fill="#c9deee"/>
+            <circle cx="270" cy="36" r="18" fill="#f5c542"/>
+            <rect y="140" width="320" height="60" fill="#9a9a94"/>
+            <rect y="140" width="320" height="6" fill="#83837d"/>
+            <g stroke="#fff" stroke-width="3" stroke-dasharray="14 12">
+              <line x1="0" y1="172" x2="320" y2="172"/>
+            </g>
+            <!-- carport direkleri -->
+            <rect x="66" y="92" width="9" height="52" fill="#5b6770"/>
+            <rect x="240" y="92" width="9" height="52" fill="#5b6770"/>
+            <!-- eğimli panel çatısı -->
+            <g transform="rotate(-7 160 84)">
+              <rect x="34" y="74" width="250" height="8" fill="#8395a5"/>
+              <rect x="40" y="50" width="56" height="24" fill="#12314e" stroke="#0a2138" stroke-width="1.5"/>
+              <rect x="100" y="50" width="56" height="24" fill="#164066" stroke="#0a2138" stroke-width="1.5"/>
+              <rect x="160" y="50" width="56" height="24" fill="#12314e" stroke="#0a2138" stroke-width="1.5"/>
+              <rect x="220" y="50" width="56" height="24" fill="#164066" stroke="#0a2138" stroke-width="1.5"/>
+            </g>
+            <!-- park halindeki araç -->
+            <g>
+              <rect x="108" y="118" width="104" height="24" rx="8" fill="#b03a2e"/>
+              <path d="M124 118 q14 -16 38 -16 h20 q20 0 30 16 Z" fill="#c0453a"/>
+              <rect x="138" y="106" width="28" height="12" rx="3" fill="#d9e8f2"/>
+              <circle cx="132" cy="142" r="10" fill="#2c3640"/>
+              <circle cx="188" cy="142" r="10" fill="#2c3640"/>
+              <circle cx="132" cy="142" r="4" fill="#8395a5"/>
+              <circle cx="188" cy="142" r="4" fill="#8395a5"/>
+            </g>
+          </svg>
+          <figcaption class="gallery-caption">Bursa — solar otopark (carport) sistemi</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- REFERANSLAR -->
+  <section class="section section-alt" id="referanslar">
+    <div class="container">
+      <div class="section-head">
+        <h2>Müşterilerimiz Ne Diyor?</h2>
+      </div>
+      <div class="testimonials">
+        <blockquote class="testimonial">
+          <div class="stars">★★★★★</div>
+          <p>"Aylık 3.500 TL gelen faturamız 250 TL'ye düştü. Kurulum ekibi çok profesyoneldi, iki günde her şey bitti."</p>
+          <footer><strong>Mehmet K.</strong> — Antalya, 8 kW Konut GES</footer>
+        </blockquote>
+        <blockquote class="testimonial">
+          <div class="stars">★★★★★</div>
+          <p>"Fabrikamızın enerji maliyeti %85 azaldı. Yatırımın kendini 4 yılda amorti edeceğini raporla gösterdiler, şu ana kadar hedefin önündeyiz."</p>
+          <footer><strong>Ayşe T.</strong> — İzmir, 120 kW Endüstriyel GES</footer>
+        </blockquote>
+        <blockquote class="testimonial">
+          <div class="stars">★★★★★</div>
+          <p>"Sulama için mazota servet ödüyorduk. Off-grid sistemle artık masrafımız sıfır. Tarla komşularım da sıraya girdi."</p>
+          <footer><strong>Hüseyin D.</strong> — Konya, Tarımsal Sulama Sistemi</footer>
+        </blockquote>
+      </div>
+    </div>
+  </section>
+
+  <!-- SSS -->
+  <section class="section" id="sss">
+    <div class="container narrow">
+      <div class="section-head">
+        <h2>Sık Sorulan Sorular</h2>
+      </div>
+      <details class="faq">
+        <summary>Güneş paneli sistemi kendini ne kadar sürede amorti eder?</summary>
+        <p>Tüketiminize ve bulunduğunuz bölgeye göre değişmekle birlikte, konut sistemleri ortalama 4-6 yılda, ticari sistemler 3-5 yılda kendini amorti eder. Paneller 25+ yıl üretim yaptığı için kalan yıllar net kazançtır.</p>
+      </details>
+      <details class="faq">
+        <summary>Elektrik kesildiğinde sistemim çalışır mı?</summary>
+        <p>Standart on-grid sistemler güvenlik gereği kesintide durur. Batarya destekli hibrit sistem tercih ederseniz kesintilerde de elektriğiniz olur.</p>
+      </details>
+      <details class="faq">
+        <summary>Ürettiğim fazla elektriği satabilir miyim?</summary>
+        <p>Evet. Aylık mahsuplaşma modeliyle tükettiğinizden fazla ürettiğiniz elektrik şebekeye verilir ve dağıtım şirketi tarafından size ödeme yapılır.</p>
+      </details>
+      <details class="faq">
+        <summary>Çatım güneş enerjisi için uygun mu?</summary>
+        <p>Güney, güneydoğu veya güneybatı cepheli, gölgelenmesi az çatılar idealdir; ancak doğu-batı yönlü çatılarda da verimli sistemler kuruyoruz. Ücretsiz keşifte netleştiriyoruz.</p>
+      </details>
+      <details class="faq">
+        <summary>Bakım masrafı var mı?</summary>
+        <p>Güneş panellerinin hareketli parçası olmadığı için bakım ihtiyacı minimumdur. Yılda 1-2 kez panel temizliği ve periyodik kontrol yeterlidir.</p>
+      </details>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta">
+    <div class="container cta-inner">
+      <h2>Güneşten Kazanmaya Bugün Başlayın</h2>
+      <p>Ücretsiz keşif için formu doldurun, 24 saat içinde sizi arayalım.</p>
+      <a href="#iletisim" class="btn btn-light">Hemen Teklif Al</a>
+    </div>
+  </section>
+
+  <!-- İLETİŞİM -->
+  <section class="section" id="iletisim">
+    <div class="container contact-wrap">
+      <div class="contact-info">
+        <h2>Ücretsiz Keşif Talep Edin</h2>
+        <p>Formu doldurun, enerji danışmanımız 24 saat içinde size ulaşsın.</p>
+        <ul class="contact-list">
+          <li><strong>Adres:</strong> Örnek Mah. Enerji Cad. No:1, Ankara</li>
+          <li><strong>Telefon:</strong> 0850 000 00 00</li>
+          <li><strong>E-posta:</strong> info@quantorasolar.com.tr</li>
+          <li><strong>Çalışma Saatleri:</strong> Hafta içi 09:00 - 18:00, Cumartesi 10:00 - 15:00</li>
+        </ul>
+      </div>
+      <form class="contact-form" id="contactForm" novalidate>
+        <div class="box-title">Keşif Talep Formu</div>
+        <div class="box-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="name">Ad Soyad *</label>
+            <input type="text" id="name" name="name" required placeholder="Adınız Soyadınız">
+          </div>
+          <div class="form-group">
+            <label for="phone">Telefon *</label>
+            <input type="tel" id="phone" name="phone" required placeholder="05__ ___ __ __">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="city">Şehir</label>
+            <input type="text" id="city" name="city" placeholder="Örn. Ankara">
+          </div>
+          <div class="form-group">
+            <label for="type">Sistem Türü</label>
+            <select id="type" name="type">
+              <option>Konut (Çatı GES)</option>
+              <option>Ticari / Endüstriyel</option>
+              <option>Tarımsal Sulama</option>
+              <option>Depolamalı / Hibrit</option>
+              <option>Emin değilim</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="message">Mesajınız</label>
+          <textarea id="message" name="message" rows="4" placeholder="Aylık fatura tutarınız, çatı tipiniz vb."></textarea>
+        </div>
+        <button type="submit" class="btn btn-block">Keşif Talebi Gönder</button>
+        <p class="form-status" id="formStatus" role="status"></p>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- SEPET -->
+  <div class="cart-overlay" id="cartOverlay"></div>
+  <aside class="cart-drawer" id="cartDrawer" aria-label="Sepet">
+    <div class="cart-head">
+      <h3>Sepetim</h3>
+      <button class="cart-close" id="cartClose" aria-label="Sepeti kapat">×</button>
+    </div>
+    <div class="cart-items" id="cartItems"></div>
+    <div class="cart-foot">
+      <div class="cart-total-row"><span>Ara Toplam</span><strong id="cartTotal">₺0</strong></div>
+      <p class="cart-note">Fiyatlara KDV dahildir. Kargo ücreti sipariş onayında bildirilir.</p>
+      <a class="btn btn-block" id="waOrder" href="#" target="_blank" rel="noopener">WhatsApp ile Sipariş Ver</a>
+      <button class="btn btn-outline btn-block" id="clearCart" type="button">Sepeti Temizle</button>
+    </div>
+  </aside>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div>
+        <a href="#" class="logo logo-light">
+          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <circle cx="12" cy="12" r="4"/>
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+          </svg>
+          Quantora<span>Solar</span>
+        </a>
+        <p>Temiz enerjiyle daha aydınlık bir gelecek için 12 yıldır çalışıyoruz.</p>
+      </div>
+      <div>
+        <h4>Hızlı Erişim</h4>
+        <a href="#hizmetler">Hizmetler</a>
+        <a href="#urunler">Mağaza</a>
+        <a href="#hesaplayici">Tasarruf Hesapla</a>
+        <a href="#sss">S.S.S.</a>
+      </div>
+      <div>
+        <h4>Hizmetler</h4>
+        <a href="#hizmetler">Çatı GES</a>
+        <a href="#hizmetler">Endüstriyel GES</a>
+        <a href="#hizmetler">Tarımsal Sulama</a>
+        <a href="#hizmetler">Bakım &amp; Onarım</a>
+      </div>
+      <div>
+        <h4>İletişim</h4>
+        <a href="tel:08500000000">0850 000 00 00</a>
+        <a href="mailto:info@quantorasolar.com.tr">info@quantorasolar.com.tr</a>
+        <p>Örnek Mah. Enerji Cad. No:1, Ankara</p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="container">
+        © 2026 Quantora Solar Enerji — Bu site örnek/demo amaçlıdır.
+      </div>
+    </div>
+  </footer>
+</div>
+
+<div id="page-giris" class="single-page auth-body" style="display:none">
+<div class="auth-card">
+    <a href="#" class="logo auth-logo">
+      <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <circle cx="12" cy="12" r="4"/>
+        <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+      </svg>
+      Quantora<span>Solar</span>
+    </a>
+
+    <div class="auth-tabs">
+      <button class="auth-tab active" data-tab="login">Giriş Yap</button>
+      <button class="auth-tab" data-tab="register">Kayıt Ol</button>
+    </div>
+
+    <!-- GİRİŞ -->
+    <form id="loginForm" class="auth-form" novalidate>
+      <div class="form-group">
+        <label for="loginEmail">E-posta</label>
+        <input type="email" id="loginEmail" required placeholder="ornek@eposta.com" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label for="loginPass">Şifre</label>
+        <input type="password" id="loginPass" required placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <button type="submit" class="btn btn-block">Giriş Yap</button>
+      <p class="form-status" id="loginStatus" role="status"></p>
+    </form>
+
+    <!-- KAYIT -->
+    <form id="registerForm" class="auth-form" hidden novalidate>
+      <div class="form-group">
+        <label for="regName">Ad Soyad</label>
+        <input type="text" id="regName" required placeholder="Adınız Soyadınız" autocomplete="name">
+      </div>
+      <div class="form-group">
+        <label for="regEmail">E-posta</label>
+        <input type="email" id="regEmail" required placeholder="ornek@eposta.com" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label for="regPhone">Telefon</label>
+        <input type="tel" id="regPhone" placeholder="05__ ___ __ __" autocomplete="tel">
+      </div>
+      <div class="form-group">
+        <label for="regPass">Şifre <small>(en az 6 karakter)</small></label>
+        <input type="password" id="regPass" required placeholder="••••••••" autocomplete="new-password">
+      </div>
+      <div class="form-group">
+        <label for="regPass2">Şifre (tekrar)</label>
+        <input type="password" id="regPass2" required placeholder="••••••••" autocomplete="new-password">
+      </div>
+      <button type="submit" class="btn btn-block">Hesap Oluştur</button>
+      <p class="form-status" id="registerStatus" role="status"></p>
+    </form>
+
+    <div class="auth-demo">
+      <strong>Demo yönetici girişi:</strong><br>
+      admin@quantorasolar.com.tr &nbsp;/&nbsp; admin123
+    </div>
+
+    <a href="#" class="auth-back">← Siteye dön</a>
+  </div>
+</div>
+
+<div id="page-hesap" class="single-page account-body" style="display:none">
+<!-- BAŞLIK -->
+  <header class="siteheader">
+    <div class="container header-row">
+      <a href="#" class="logo">
+        <svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <circle cx="12" cy="12" r="4"/>
+          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+        </svg>
+        <span class="logo-text">Quantora<span>Solar</span> <small>Enerji Sistemleri San. Tic. Ltd. Şti.</small></span>
+      </a>
+      <div class="account-header-links">
+        <a href="#">← Alışverişe Dön</a>
+        <a href="#" id="accountLogout">Çıkış Yap</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="container account-page">
+    <h1 class="account-title">Hesabım</h1>
+
+    <div class="account-wrap">
+      <div>
+        <!-- HESAP BİLGİLERİ -->
+        <form class="account-box" id="profileForm">
+          <div class="box-title">Hesap Bilgilerim</div>
+          <div class="box-body">
+            <div class="form-group">
+              <label for="accName">Ad Soyad</label>
+              <input type="text" id="accName" required>
+            </div>
+            <div class="form-group">
+              <label for="accEmail">E-posta <small>(değiştirilemez)</small></label>
+              <input type="email" id="accEmail" readonly>
+            </div>
+            <div class="form-group">
+              <label for="accPhone">Telefon</label>
+              <input type="tel" id="accPhone" placeholder="05__ ___ __ __">
+            </div>
+            <button type="submit" class="btn">Bilgilerimi Güncelle</button>
+            <p class="form-status" id="profileStatus" role="status"></p>
+          </div>
+        </form>
+
+        <!-- ŞİFRE DEĞİŞTİR -->
+        <form class="account-box" id="passwordForm">
+          <div class="box-title">Şifre Değiştir</div>
+          <div class="box-body">
+            <div class="form-group">
+              <label for="passOld">Mevcut şifre</label>
+              <input type="password" id="passOld" required autocomplete="current-password">
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="passNew">Yeni şifre</label>
+                <input type="password" id="passNew" required autocomplete="new-password">
+              </div>
+              <div class="form-group">
+                <label for="passNew2">Yeni şifre (tekrar)</label>
+                <input type="password" id="passNew2" required autocomplete="new-password">
+              </div>
+            </div>
+            <button type="submit" class="btn">Şifreyi Değiştir</button>
+            <p class="form-status" id="passwordStatus" role="status"></p>
+          </div>
+        </form>
+      </div>
+
+      <div>
+        <!-- SİPARİŞLERİM -->
+        <div class="account-box">
+          <div class="box-title">Siparişlerim</div>
+          <div class="box-body" id="myOrders"></div>
+        </div>
+        <p class="account-note">
+          Siparişleriniz WhatsApp üzerinden tarafımıza iletilir; buradaki liste
+          gönderdiğiniz sipariş taleplerinin kaydıdır. Sorularınız için
+          <a href="#iletisim">bize ulaşın</a>.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="page-admin" class="single-page admin-body" style="display:none">
+<!-- KENAR MENÜ -->
+  <aside class="admin-sidebar">
+    <a href="#" class="logo logo-light admin-logo">
+      <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <circle cx="12" cy="12" r="4"/>
+        <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+      </svg>
+      Quantora<span>Solar</span>
+    </a>
+    <nav class="admin-nav">
+      <button class="admin-nav-btn active" data-view="dashboard">Genel Bakış</button>
+      <button class="admin-nav-btn" data-view="products">Ürünler</button>
+      <button class="admin-nav-btn" data-view="upload">Ürün Yükle</button>
+      <button class="admin-nav-btn" data-view="categories">Kategoriler</button>
+      <button class="admin-nav-btn" data-view="orders">Siparişler</button>
+      <button class="admin-nav-btn" data-view="leads">Keşif Talepleri</button>
+      <button class="admin-nav-btn" data-view="settings">Ayarlar</button>
+    </nav>
+    <div class="admin-sidebar-foot">
+      <a href="#">← Siteye Dön</a>
+      <a href="#" id="adminLogout">Çıkış Yap</a>
+    </div>
+  </aside>
+
+  <!-- ANA İÇERİK -->
+  <main class="admin-main">
+    <header class="admin-topbar">
+      <h1 id="viewTitle">Genel Bakış</h1>
+      <span class="admin-user" id="adminUser"></span>
+    </header>
+
+    <!-- GENEL BAKIŞ -->
+    <section class="admin-view" id="view-dashboard">
+      <div class="stat-grid" id="statGrid"></div>
+      <div class="admin-panel">
+        <h2>Son Keşif Talepleri</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Tarih</th><th>Ad Soyad</th><th>Telefon</th><th>Şehir</th><th>Sistem</th></tr></thead>
+            <tbody id="recentLeads"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ÜRÜNLER -->
+    <section class="admin-view" id="view-products" hidden>
+      <div class="view-actions">
+        <button class="btn btn-small" id="newProductBtn">+ Yeni Ürün Ekle</button>
+      </div>
+      <div class="admin-panel">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Görsel</th><th>Ürün</th><th>Kategori</th><th>Fiyat</th><th>Stok</th><th></th></tr></thead>
+            <tbody id="productRows"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ÜRÜN YÜKLE -->
+    <section class="admin-view" id="view-upload" hidden>
+      <div class="upload-grid">
+        <div class="admin-panel">
+          <h2>Yeni Ürün Yükle</h2>
+          <form id="uploadForm">
+            <div class="form-group">
+              <label for="upName">Ürün adı *</label>
+              <input type="text" id="upName" required placeholder="Örn. 460W Monokristal Güneş Paneli">
+            </div>
+            <div class="form-group">
+              <label>Ürün fotoğrafı</label>
+              <div class="drop-zone" id="dropZone">
+                <input type="file" id="upPhotoFile" accept="image/*" hidden>
+                <div class="drop-zone-inner" id="dropZoneInner">
+                  <strong>Fotoğrafı buraya sürükleyip bırakın</strong>
+                  <span>veya tıklayıp bilgisayarınızdan seçin — otomatik küçültülür</span>
+                </div>
+              </div>
+              <input type="text" id="upPhotoUrl" class="up-url" placeholder="veya görsel bağlantısı: https://...">
+              <button type="button" class="row-btn row-btn-danger" id="upPhotoRemove">Fotoğrafı Kaldır</button>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="upCat">Kategori</label>
+                <select id="upCat"></select>
+              </div>
+              <div class="form-group">
+                <label for="upImg">Yedek çizim <small>(fotoğraf yoksa)</small></label>
+                <select id="upImg">
+                  <option value="panel">Panel</option>
+                  <option value="flex">Esnek panel</option>
+                  <option value="inverter">İnvertör</option>
+                  <option value="battery">Akü</option>
+                  <option value="kit">Paket</option>
+                  <option value="controller">Şarj kontrol cihazı</option>
+                  <option value="streetlight">Solar lamba</option>
+                  <option value="mount">Montaj seti</option>
+                  <option value="cable">Kablo / konnektör</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="upPrice">Fiyat (₺, KDV dahil) *</label>
+                <input type="number" id="upPrice" required min="1" step="1" placeholder="4850">
+              </div>
+              <div class="form-group">
+                <label for="upStock">Stok adedi *</label>
+                <input type="number" id="upStock" required min="0" step="1" placeholder="10">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="upSpecs">Özellikler <small>(her satıra bir özellik)</small></label>
+              <textarea id="upSpecs" rows="3" placeholder="120 hücre · %21,3 verim&#10;25 yıl performans garantisi"></textarea>
+            </div>
+            <button type="submit" class="btn btn-block">Ürünü Mağazaya Yükle</button>
+            <p class="form-status" id="upStatus" role="status"></p>
+          </form>
+        </div>
+        <div class="admin-panel">
+          <h2>Mağaza Önizlemesi</h2>
+          <div class="upload-preview" id="uploadPreview"></div>
+          <p class="panel-hint">Ürününüz mağazada bu şekilde görünecek. Formu doldurdukça önizleme güncellenir.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- KATEGORİLER -->
+    <section class="admin-view" id="view-categories" hidden>
+      <div class="admin-panel settings-panel">
+        <h2>Yeni Kategori Ekle</h2>
+        <form id="catForm">
+          <div class="form-group">
+            <label for="catNameInput">Kategori adı</label>
+            <input type="text" id="catNameInput" required placeholder="Örn. Şarj Kontrol Cihazları">
+          </div>
+          <button type="submit" class="btn btn-small">Kategori Ekle</button>
+          <p class="form-status" id="catStatus" role="status"></p>
+        </form>
+      </div>
+      <div class="admin-panel">
+        <p class="panel-hint">Kategoriler mağazadaki filtre butonlarında ve ürün formlarında kullanılır. İçinde ürün bulunan kategori silinemez; önce ürünleri başka kategoriye taşıyın.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Kategori</th><th>Ürün Sayısı</th><th></th></tr></thead>
+            <tbody id="catRows"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- SİPARİŞLER -->
+    <section class="admin-view" id="view-orders" hidden>
+      <div class="admin-panel">
+        <p class="panel-hint">WhatsApp'a yönlendirilen sipariş talepleri burada listelenir.</p>
+        <div id="orderList"></div>
+      </div>
+    </section>
+
+    <!-- TALEPLER -->
+    <section class="admin-view" id="view-leads" hidden>
+      <div class="admin-panel">
+        <p class="panel-hint">Sitedeki iletişim formundan gelen keşif talepleri.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Tarih</th><th>Ad Soyad</th><th>Telefon</th><th>Şehir</th><th>Sistem</th><th>Mesaj</th><th></th></tr></thead>
+            <tbody id="leadRows"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- AYARLAR -->
+    <section class="admin-view" id="view-settings" hidden>
+      <div class="admin-panel settings-panel">
+        <h2>Sipariş Ayarları</h2>
+        <form id="settingsForm">
+          <div class="form-group">
+            <label for="waNumber">WhatsApp sipariş numarası</label>
+            <input type="text" id="waNumber" placeholder="905xxxxxxxxx">
+            <small>Uluslararası formatta, başında + olmadan yazın. Örn: 905321234567</small>
+          </div>
+          <button type="submit" class="btn btn-small">Kaydet</button>
+          <p class="form-status" id="settingsStatus" role="status"></p>
+        </form>
+      </div>
+      <div class="admin-panel settings-panel">
+        <h2>Sunucu Bağlantısı</h2>
+        <p class="panel-hint">
+          Şu an tüm veriler bu tarayıcıda (localStorage) saklanıyor. Sunucunuz hazır olduğunda
+          <code>js/store.js</code> dosyasındaki fonksiyonları API çağrılarıyla değiştirmeniz yeterlidir —
+          sitenin geri kalanında değişiklik gerekmez.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <!-- ÜRÜN EKLE/DÜZENLE PENCERESİ -->
+  <div class="modal-overlay" id="productModal" hidden>
+    <div class="modal">
+      <div class="modal-head">
+        <h2 id="productModalTitle">Yeni Ürün</h2>
+        <button class="modal-close" id="productModalClose" aria-label="Kapat">×</button>
+      </div>
+      <form id="productForm">
+        <input type="hidden" id="pfId">
+        <div class="form-group">
+          <label for="pfName">Ürün adı *</label>
+          <input type="text" id="pfName" required placeholder="Örn. 460W Monokristal Güneş Paneli">
+        </div>
+        <div class="form-group">
+          <label>Ürün fotoğrafı</label>
+          <div class="photo-row">
+            <div class="photo-preview" id="pfPreview"><span>Fotoğraf<br>yok</span></div>
+            <div class="photo-inputs">
+              <input type="file" id="pfPhotoFile" accept="image/*">
+              <input type="text" id="pfPhotoUrl" placeholder="veya görsel bağlantısı: https://...">
+              <button type="button" class="row-btn row-btn-danger" id="pfPhotoRemove">Fotoğrafı Kaldır</button>
+            </div>
+          </div>
+          <small class="photo-hint">Bilgisayarınızdan yükleyin (otomatik küçültülür) ya da internetten bir görsel bağlantısı yapıştırın. Fotoğraf yoksa kategoriye uygun çizim gösterilir.</small>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="pfCat">Kategori</label>
+            <select id="pfCat"></select>
+          </div>
+          <div class="form-group">
+            <label for="pfImg">Yedek çizim <small>(fotoğraf yoksa)</small></label>
+            <select id="pfImg">
+              <option value="panel">Panel</option>
+              <option value="flex">Esnek panel</option>
+              <option value="inverter">İnvertör</option>
+              <option value="battery">Akü</option>
+              <option value="kit">Paket</option>
+              <option value="controller">Şarj kontrol cihazı</option>
+              <option value="streetlight">Solar lamba</option>
+              <option value="mount">Montaj seti</option>
+              <option value="cable">Kablo / konnektör</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="pfPrice">Fiyat (₺, KDV dahil) *</label>
+            <input type="number" id="pfPrice" required min="1" step="1" placeholder="4850">
+          </div>
+          <div class="form-group">
+            <label for="pfStock">Stok adedi *</label>
+            <input type="number" id="pfStock" required min="0" step="1" placeholder="10">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="pfSpecs">Özellikler <small>(her satıra bir özellik)</small></label>
+          <textarea id="pfSpecs" rows="3" placeholder="120 hücre · %21,3 verim&#10;25 yıl performans garantisi"></textarea>
+        </div>
+        <button type="submit" class="btn btn-block">Kaydet</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+
+// ---- TEK DOSYA SAYFA YÖNLENDİRİCİSİ ----
+const PAGE_IDS = { "#giris": "page-giris", "#hesap": "page-hesap", "#admin": "page-admin" };
+
+function route() {
+  let target = PAGE_IDS[location.hash] || "page-index";
+  // Sayfa açıkken elle #admin yazılırsa da yetki kontrolü yap
+  if (target === "page-admin" && typeof Store !== "undefined") {
+    const s = Store.session();
+    if (!s || s.role !== "admin") {
+      location.hash = "#giris";
+      target = "page-giris";
+    }
+  }
+  document.querySelectorAll(".single-page").forEach((d) => {
+    d.style.display = d.id === target ? "" : "none";
+  });
+  if (PAGE_IDS[location.hash]) window.scrollTo(0, 0);
+}
+
+// Oturum durumu değiştiğinde sayfayı hedef rotayla yeniden yükler
+function goPage(hash) {
+  location.hash = hash === "#" ? "" : hash;
+  location.reload();
+}
+
+window.addEventListener("hashchange", route);
+
+
+// ============================================================
+// VERİ KATMANI
+// Şimdilik tüm veriler tarayıcıda (localStorage) tutulur.
+// Sunucuya bağlarken SADECE bu dosyadaki fonksiyonları
+// fetch() ile API çağrılarına çevirmeniz yeterlidir.
+// ============================================================
+
+const Store = (() => {
+  const read = (key, fallback) => {
+    try {
+      const v = JSON.parse(localStorage.getItem(key));
+      return v === null || v === undefined ? fallback : v;
+    } catch (_) {
+      return fallback;
+    }
+  };
+  const write = (key, val) => localStorage.setItem(key, JSON.stringify(val));
+
+  // ---------- ÜRÜNLER ----------
+  const DEFAULT_PRODUCTS = [
+    {
+      id: "pnl-460", cat: "panel", img: "panel",
+      name: "460W Half-Cut Monokristal Güneş Paneli",
+      specs: ["120 hücre · %21,3 verim", "Çerçeve: eloksallı alüminyum, IP68 bağlantı kutusu", "25 yıl performans garantisi"],
+      price: 4850, stock: 25
+    },
+    {
+      id: "pnl-550", cat: "panel", img: "panel",
+      name: "550W Monokristal Güneş Paneli",
+      specs: ["144 hücre · %21,7 verim", "Çift cam (bifacial) teknoloji", "30 yıl performans garantisi"],
+      price: 5950, stock: 18
+    },
+    {
+      id: "pnl-flx", cat: "panel", img: "flex",
+      name: "285W Esnek Güneş Paneli",
+      specs: ["Karavan, tekne ve tiny house için", "Yarı esnek ETFE yüzey", "Sadece 4,8 kg"],
+      price: 6750, stock: 4
+    },
+    {
+      id: "inv-5g", cat: "inverter", img: "inverter",
+      name: "5 kW On-Grid İnvertör (Monofaze)",
+      specs: ["2 MPPT girişi", "Wi-Fi izleme modülü dahil", "5 yıl garanti"],
+      price: 38500, stock: 9
+    },
+    {
+      id: "inv-6h", cat: "inverter", img: "inverter",
+      name: "6 kW Hibrit İnvertör 48V",
+      specs: ["120A MPPT şarj kontrollü", "Şebeke + akü + jeneratör girişi", "Paralellenebilir (9 adede kadar)"],
+      price: 52900, stock: 7
+    },
+    {
+      id: "inv-3s", cat: "inverter", img: "inverter",
+      name: "3 kW Tam Sinüs İnvertör 24V",
+      specs: ["Off-grid kullanım için", "LCD ekran, USB çıkış", "Düşük bekleme tüketimi"],
+      price: 14750, stock: 14
+    },
+    {
+      id: "aku-lfp", cat: "aku", img: "battery",
+      name: "48V 100Ah LiFePO4 Lityum Akü",
+      specs: ["5,12 kWh kapasite", "6.000+ çevrim ömrü", "Dahili BMS, Bluetooth takip"],
+      price: 58900, stock: 6
+    },
+    {
+      id: "aku-jel", cat: "aku", img: "battery",
+      name: "12V 150Ah Derin Döngü Jel Akü",
+      specs: ["Bakım gerektirmez", "Solar sistemler için optimize", "2 yıl garanti"],
+      price: 9850, stock: 22
+    },
+    {
+      id: "kit-krv", cat: "paket", img: "kit",
+      name: "Karavan Solar Paketi 410W",
+      specs: ["410W panel + 30A MPPT regülatör", "Kablolama ve montaj aparatları dahil", "Kurulum şeması ile birlikte"],
+      price: 32500, stock: 3
+    },
+    {
+      id: "kit-bag", cat: "paket", img: "kit",
+      name: "Bağ Evi Off-Grid Paketi 3 kW",
+      specs: ["4 × 460W panel + 3 kW invertör", "12V 150Ah × 2 jel akü", "Telefonla kurulum desteği"],
+      price: 94500, stock: 5
+    },
+    {
+      id: "aks-mppt", cat: "aksesuar", img: "controller",
+      name: "30A MPPT Şarj Kontrol Cihazı 12/24V",
+      specs: ["LCD ekran, otomatik voltaj seçimi", "Aşırı şarj ve kısa devre koruması", "2 yıl garanti"],
+      price: 4250, stock: 16
+    },
+    {
+      id: "aks-lamba", cat: "aksesuar", img: "streetlight",
+      name: "Solar Sokak / Bahçe Lambası 100W",
+      specs: ["Dahili panel ve lityum batarya", "Alacakaranlık sensörü, kumandalı", "IP65 dış mekan koruması"],
+      price: 3980, stock: 12
+    },
+    {
+      id: "aks-montaj", cat: "aksesuar", img: "mount",
+      name: "Çatı Montaj Konstrüksiyon Seti (10 Panel)",
+      specs: ["Eloksallı alüminyum ray ve kelepçeler", "Kiremit ve sac çatıya uygun", "Paslanmaz bağlantı elemanları"],
+      price: 7500, stock: 9
+    },
+    {
+      id: "aks-kablo", cat: "aksesuar", img: "cable",
+      name: "6mm² Solar Kablo 50m + MC4 Konnektör Seti",
+      specs: ["UV dayanımlı çift izolasyon", "2 çift MC4 konnektör dahil", "TSE belgeli"],
+      price: 2450, stock: 30
+    }
+  ];
+
+  // ---------- KATEGORİLER ----------
+  const DEFAULT_CATEGORIES = [
+    { id: "panel", name: "Güneş Panelleri" },
+    { id: "inverter", name: "İnvertörler" },
+    { id: "aku", name: "Aküler" },
+    { id: "paket", name: "Hazır Paketler" },
+    { id: "aksesuar", name: "Aksesuarlar" }
+  ];
+
+  function getCategories() {
+    let cats = read("gp-cats", null);
+    if (!cats) {
+      cats = DEFAULT_CATEGORIES;
+      write("gp-cats", cats);
+    }
+    return cats;
+  }
+
+  function saveCategory(cat) {
+    const cats = getCategories();
+    if (cat.id) {
+      const existing = cats.find((c) => c.id === cat.id);
+      if (existing) existing.name = cat.name.trim();
+    } else {
+      cats.push({ id: "c-" + Date.now(), name: cat.name.trim() });
+    }
+    write("gp-cats", cats);
+  }
+
+  function deleteCategory(id) {
+    write("gp-cats", getCategories().filter((c) => c.id !== id));
+  }
+
+  // Varsayılan ürün listesine yeni ürünler eklendiğinde bu sürümü artırın;
+  // mevcut tarayıcılardaki listelere yalnızca eksik olanlar eklenir.
+  const SEED_VERSION = 2;
+
+  function getProducts() {
+    let list = read("gp-products", null);
+    if (!list) {
+      list = DEFAULT_PRODUCTS;
+      write("gp-products", list);
+      write("gp-seed", SEED_VERSION);
+      return list;
+    }
+    if (read("gp-seed", 1) < SEED_VERSION) {
+      const ids = new Set(list.map((p) => p.id));
+      DEFAULT_PRODUCTS.forEach((p) => {
+        if (!ids.has(p.id)) list.push(p);
+      });
+      write("gp-products", list);
+      write("gp-seed", SEED_VERSION);
+    }
+    return list;
+  }
+
+  function saveProduct(product) {
+    const list = getProducts();
+    const i = list.findIndex((p) => p.id === product.id);
+    if (i >= 0) list[i] = product;
+    else list.unshift(product);
+    write("gp-products", list);
+  }
+
+  function deleteProduct(id) {
+    write("gp-products", getProducts().filter((p) => p.id !== id));
+  }
+
+  // ---------- KULLANICILAR & OTURUM ----------
+  // NOT: Şifreler demo amaçlı basitçe kodlanır. Gerçek sistemde şifre
+  // doğrulama sunucuda (bcrypt vb. ile) yapılmalıdır.
+  const hash = (s) => btoa(unescape(encodeURIComponent("gp$" + s)));
+
+  function getUsers() {
+    let users = read("gp-users", null);
+    if (!users) {
+      users = [{
+        name: "Site Yöneticisi",
+        email: "admin@quantorasolar.com.tr",
+        phone: "",
+        pass: hash("admin123"),
+        role: "admin",
+        created: Date.now()
+      }];
+      write("gp-users", users);
+    }
+    return users;
+  }
+
+  function register({ name, email, phone, pass }) {
+    const users = getUsers();
+    email = email.trim().toLowerCase();
+    if (users.some((u) => u.email === email)) {
+      return { ok: false, error: "Bu e-posta ile kayıtlı bir hesap zaten var." };
+    }
+    users.push({ name: name.trim(), email, phone: phone.trim(), pass: hash(pass), role: "user", created: Date.now() });
+    write("gp-users", users);
+    return { ok: true };
+  }
+
+  function login(email, pass) {
+    email = email.trim().toLowerCase();
+    const user = getUsers().find((u) => u.email === email && u.pass === hash(pass));
+    if (!user) return { ok: false, error: "E-posta veya şifre hatalı." };
+    const session = { name: user.name, email: user.email, role: user.role };
+    write("gp-session", session);
+    return { ok: true, session };
+  }
+
+  function logout() {
+    localStorage.removeItem("gp-session");
+  }
+
+  function session() {
+    return read("gp-session", null);
+  }
+
+  function getUser(email) {
+    const u = getUsers().find((x) => x.email === email);
+    return u ? { name: u.name, email: u.email, phone: u.phone || "" } : null;
+  }
+
+  function updateProfile(email, data) {
+    const users = getUsers();
+    const u = users.find((x) => x.email === email);
+    if (!u) return { ok: false, error: "Kullanıcı bulunamadı." };
+    if (data.name && data.name.trim()) u.name = data.name.trim();
+    u.phone = (data.phone || "").trim();
+    write("gp-users", users);
+    const s = session();
+    if (s && s.email === email) {
+      s.name = u.name;
+      write("gp-session", s);
+    }
+    return { ok: true };
+  }
+
+  function changePassword(email, oldPass, newPass) {
+    const users = getUsers();
+    const u = users.find((x) => x.email === email && x.pass === hash(oldPass));
+    if (!u) return { ok: false, error: "Mevcut şifreniz hatalı." };
+    u.pass = hash(newPass);
+    write("gp-users", users);
+    return { ok: true };
+  }
+
+  // ---------- KEŞİF TALEPLERİ (İLETİŞİM FORMU) ----------
+  function addLead(lead) {
+    const leads = read("gp-leads", []);
+    leads.unshift({ ...lead, date: Date.now() });
+    write("gp-leads", leads);
+  }
+
+  function getLeads() {
+    return read("gp-leads", []);
+  }
+
+  function deleteLead(index) {
+    const leads = getLeads();
+    leads.splice(index, 1);
+    write("gp-leads", leads);
+  }
+
+  // ---------- SİPARİŞLER ----------
+  function addOrder(order) {
+    const orders = read("gp-orders", []);
+    orders.unshift({ ...order, date: Date.now() });
+    write("gp-orders", orders);
+  }
+
+  function getOrders() {
+    return read("gp-orders", []);
+  }
+
+  function getOrdersByEmail(email) {
+    return getOrders().filter((o) => o.email === email);
+  }
+
+  // ---------- AYARLAR ----------
+  function getSettings() {
+    return read("gp-settings", { whatsapp: "908500000000" });
+  }
+
+  function saveSettings(settings) {
+    write("gp-settings", { ...getSettings(), ...settings });
+  }
+
+  return {
+    getProducts, saveProduct, deleteProduct,
+    getCategories, saveCategory, deleteCategory,
+    register, login, logout, session,
+    getUser, updateProfile, changePassword,
+    addLead, getLeads, deleteLead,
+    addOrder, getOrders, getOrdersByEmail,
+    getSettings, saveSettings
+  };
+})();
+
+// ---- Ürün görselleri (SVG) ----
+// Mağaza, sepet ve admin önizlemesi ortak kullanır.
+const PRODUCT_ART = {
+  panel: `
+    <svg viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg">
+      <rect x="18" y="10" width="124" height="86" rx="5" fill="#123f66" stroke="#0c2d4a" stroke-width="3"/>
+      <g stroke="#3d719c" stroke-width="2">
+        <line x1="18" y1="39" x2="142" y2="39"/><line x1="18" y1="68" x2="142" y2="68"/>
+        <line x1="49" y1="10" x2="49" y2="96"/><line x1="80" y1="10" x2="80" y2="96"/><line x1="111" y1="10" x2="111" y2="96"/>
+      </g>
+      <rect x="24" y="16" width="18" height="16" rx="2" fill="#ffffff" opacity="0.18"/>
+      <rect x="66" y="100" width="28" height="8" rx="2" fill="#8395a5"/>
+      <rect x="52" y="108" width="56" height="5" rx="2.5" fill="#aab8c4"/>
+    </svg>`,
+  flex: `
+    <svg viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg">
+      <path d="M20 78 Q80 48 140 78 L140 40 Q80 10 20 40 Z" fill="#1a5c8f" stroke="#0c2d4a" stroke-width="3"/>
+      <g stroke="#4e85ad" stroke-width="2" fill="none">
+        <path d="M50 30 L50 68"/><path d="M80 24 L80 62"/><path d="M110 30 L110 68"/>
+        <path d="M20 59 Q80 29 140 59"/>
+      </g>
+      <path d="M28 36 Q50 25 72 22 L72 30 Q52 33 32 42 Z" fill="#fff" opacity="0.15"/>
+      <ellipse cx="80" cy="98" rx="55" ry="7" fill="#0c2d4a" opacity="0.1"/>
+    </svg>`,
+  inverter: `
+    <svg viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg">
+      <rect x="38" y="8" width="84" height="96" rx="9" fill="#e8edf2" stroke="#b6c2cd" stroke-width="3"/>
+      <rect x="50" y="22" width="60" height="26" rx="4" fill="#12314e"/>
+      <text x="80" y="40" font-size="13" font-family="monospace" fill="#4ade80" text-anchor="middle">5.0 kW</text>
+      <circle cx="60" cy="64" r="6" fill="#f59e0b"/>
+      <circle cx="80" cy="64" r="6" fill="#22c55e"/>
+      <circle cx="100" cy="64" r="6" fill="#cbd5e1"/>
+      <g stroke="#b6c2cd" stroke-width="2.5"><line x1="52" y1="82" x2="108" y2="82"/><line x1="52" y1="89" x2="108" y2="89"/><line x1="52" y1="96" x2="108" y2="96"/></g>
+      <rect x="58" y="104" width="10" height="10" fill="#8395a5"/><rect x="92" y="104" width="10" height="10" fill="#8395a5"/>
+    </svg>`,
+  battery: `
+    <svg viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg">
+      <rect x="52" y="12" width="14" height="10" rx="2" fill="#dc2626"/>
+      <rect x="94" y="12" width="14" height="10" rx="2" fill="#12314e"/>
+      <rect x="30" y="22" width="100" height="84" rx="8" fill="#1c2b3a" stroke="#0f1c28" stroke-width="3"/>
+      <rect x="30" y="52" width="100" height="22" fill="#f59e0b"/>
+      <text x="80" y="68" font-size="12" font-weight="bold" font-family="sans-serif" fill="#1c2b3a" text-anchor="middle">100Ah</text>
+      <path d="M84 80 L72 96 L79 96 L76 106 L88 90 L81 90 Z" fill="#fbbf24"/>
+    </svg>`,
+  kit: `
+    <svg viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg">
+      <rect x="10" y="14" width="86" height="60" rx="4" fill="#123f66" stroke="#0c2d4a" stroke-width="2.5"/>
+      <g stroke="#3d719c" stroke-width="1.6">
+        <line x1="10" y1="34" x2="96" y2="34"/><line x1="10" y1="54" x2="96" y2="54"/>
+        <line x1="39" y1="14" x2="39" y2="74"/><line x1="67" y1="14" x2="67" y2="74"/>
+      </g>
+      <rect x="106" y="26" width="44" height="52" rx="6" fill="#e8edf2" stroke="#b6c2cd" stroke-width="2.5"/>
+      <rect x="113" y="34" width="30" height="12" rx="2" fill="#12314e"/>
+      <circle cx="120" cy="58" r="4" fill="#22c55e"/><circle cx="134" cy="58" r="4" fill="#f59e0b"/>
+      <rect x="30" y="84" width="70" height="26" rx="5" fill="#1c2b3a"/>
+      <rect x="30" y="92" width="70" height="9" fill="#f59e0b"/>
+      <rect x="40" y="79" width="9" height="6" rx="1.5" fill="#dc2626"/>
+      <rect x="80" y="79" width="9" height="6" rx="1.5" fill="#12314e"/>
+    </svg>`,
+  controller: `
+    <svg viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg">
+      <rect x="42" y="14" width="76" height="84" rx="7" fill="#1c2b3a" stroke="#0f1c28" stroke-width="3"/>
+      <rect x="52" y="24" width="56" height="24" rx="3" fill="#0a2138"/>
+      <text x="80" y="41" font-size="12" font-family="monospace" fill="#4ade80" text-anchor="middle">13.8V</text>
+      <circle cx="64" cy="64" r="7" fill="#f59e0b"/>
+      <circle cx="96" cy="64" r="7" fill="#22c55e"/>
+      <rect x="54" y="78" width="20" height="12" rx="2" fill="#33475a"/>
+      <rect x="86" y="78" width="20" height="12" rx="2" fill="#33475a"/>
+      <path d="M56 98 v12 M72 98 v12 M88 98 v12 M104 98 v12" stroke="#8395a5" stroke-width="4"/>
+    </svg>`,
+  streetlight: `
+    <svg viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg">
+      <rect x="76" y="30" width="8" height="84" fill="#5b6770"/>
+      <rect x="52" y="108" width="56" height="7" rx="3" fill="#8395a5"/>
+      <g transform="rotate(-24 96 24)">
+        <rect x="70" y="14" width="52" height="20" rx="2" fill="#12314e" stroke="#0a2138" stroke-width="2"/>
+        <line x1="96" y1="14" x2="96" y2="34" stroke="#3d719c" stroke-width="1.5"/>
+      </g>
+      <rect x="46" y="40" width="42" height="12" rx="6" fill="#33475a"/>
+      <ellipse cx="58" cy="52" rx="9" ry="4" fill="#ffe9a8"/>
+      <path d="M50 58 L44 78 M58 58 L58 80 M66 58 L72 78" stroke="#ffe9a8" stroke-width="2" opacity="0.7"/>
+    </svg>`,
+  mount: `
+    <svg viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg">
+      <rect x="16" y="88" width="128" height="8" rx="2" fill="#8395a5"/>
+      <polygon points="40,88 40,46 92,88" fill="none" stroke="#5b6770" stroke-width="6"/>
+      <polygon points="112,88 112,46 60,88" fill="none" stroke="#98a6b3" stroke-width="6"/>
+      <rect x="24" y="30" width="112" height="10" rx="2" fill="#c2ccd6" stroke="#98a6b3" stroke-width="2" transform="rotate(-14 80 35)"/>
+      <rect x="30" y="46" width="100" height="10" rx="2" fill="#c2ccd6" stroke="#98a6b3" stroke-width="2" transform="rotate(-14 80 51)"/>
+      <circle cx="40" cy="46" r="4" fill="#33475a"/>
+      <circle cx="112" cy="46" r="4" fill="#33475a"/>
+    </svg>`,
+  cable: `
+    <svg viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg">
+      <g fill="none" stroke="#1c2b3a" stroke-width="9">
+        <circle cx="72" cy="62" r="34"/>
+        <circle cx="88" cy="62" r="34" opacity="0.75"/>
+      </g>
+      <path d="M104 36 q26 -14 38 -4" fill="none" stroke="#1c2b3a" stroke-width="9" stroke-linecap="round"/>
+      <rect x="134" y="22" width="22" height="12" rx="6" fill="#dc2626"/>
+      <path d="M52 92 q-20 12 -36 6" fill="none" stroke="#1c2b3a" stroke-width="9" stroke-linecap="round"/>
+      <rect x="4" y="90" width="22" height="12" rx="6" fill="#12314e"/>
+    </svg>`
+};
+
+// HTML içine yazılacak metinleri güvenli hale getirir (XSS önlemi)
+function escHtml(s) {
+  return String(s).replace(/[&<>"']/g, (c) => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  }[c]));
+}
+
+
+route();
+
+// ---- ANA SAYFA ----
+(() => {
+// ============ MOBİL MENÜ ============
+const hamburger = document.getElementById("hamburger");
+const navLinks = document.getElementById("navLinks");
+
+hamburger.addEventListener("click", () => {
+  hamburger.classList.toggle("open");
+  navLinks.classList.toggle("open");
+});
+
+// Menüde bir linke tıklanınca mobil menüyü kapat
+navLinks.querySelectorAll("a").forEach((link) => {
+  link.addEventListener("click", () => {
+    hamburger.classList.remove("open");
+    navLinks.classList.remove("open");
+  });
+});
+
+// ============ HESAP / OTURUM ============
+const navAccount = document.getElementById("navAccount");
+const currentUser = Store.session();
+
+if (currentUser) {
+  // Menü kalabalıklaşmasın diye admin için isim yerine panel linki gösterilir
+  navAccount.innerHTML =
+    (currentUser.role === "admin"
+      ? '<a href="#admin" class="admin-link">Yönetim Paneli</a>'
+      : '<a href="#hesap" class="admin-link">Hesabım (' + escHtml(currentUser.name.split(" ")[0]) + ")</a>") +
+    '<a href="#" id="logoutLink">Çıkış</a>';
+  document.getElementById("logoutLink").addEventListener("click", (e) => {
+    e.preventDefault();
+    Store.logout();
+    location.reload();
+  });
+} else {
+  navAccount.innerHTML = '<a href="#giris">Giriş Yap</a>';
+}
+
+// ============ ÜRÜNLER ============
+// Ürün ve kategori listeleri veri katmanından gelir; admin panelinden yönetilir.
+const PRODUCTS = Store.getProducts();
+const CATEGORIES = Store.getCategories();
+
+function catName(id) {
+  const c = CATEGORIES.find((c) => c.id === id);
+  return c ? c.name : "Diğer";
+}
+
+// Sipariş mesajlarının gideceği WhatsApp numarası (admin panelindeki
+// Ayarlar bölümünden değiştirilebilir)
+const WHATSAPP_NUMBER = Store.getSettings().whatsapp;
+
+const tlFmt = (n) => "₺" + Math.round(n).toLocaleString("tr-TR");
+
+// ---- Mağaza render ----
+const shopGrid = document.getElementById("shopGrid");
+const shopFilters = document.getElementById("shopFilters");
+
+function productMedia(p) {
+  return p.photo
+    ? `<img src="${escHtml(p.photo)}" alt="${escHtml(p.name)}" loading="lazy">`
+    : (PRODUCT_ART[p.img] || PRODUCT_ART.panel);
+}
+
+function renderFilters() {
+  shopFilters.innerHTML =
+    '<button class="filter-btn active" data-cat="all">Tümü</button>' +
+    CATEGORIES.map(
+      (c) => `<button class="filter-btn" data-cat="${c.id}">${escHtml(c.name)}</button>`
+    ).join("");
+}
+
+function renderShop(cat) {
+  const list = cat === "all" ? PRODUCTS : PRODUCTS.filter((p) => p.cat === cat);
+  if (list.length === 0) {
+    shopGrid.innerHTML = '<p class="shop-empty">Bu kategoride henüz ürün bulunmuyor.</p>';
+    return;
+  }
+  shopGrid.innerHTML = list
+    .map((p) => {
+      const low = p.stock <= 5;
+      return `
+      <article class="product">
+        <div class="product-img${p.photo ? " has-photo" : ""}">
+          <span class="stock-badge${low ? " low" : ""}">${low ? "Son " + p.stock + " adet" : "Stokta"}</span>
+          ${productMedia(p)}
+        </div>
+        <div class="product-body">
+          <span class="product-cat">${escHtml(catName(p.cat))}</span>
+          <h3>${escHtml(p.name)}</h3>
+          <ul class="product-specs">${p.specs.map((s) => `<li>${escHtml(s)}</li>`).join("")}</ul>
+          <div class="product-foot">
+            <div class="product-price">${tlFmt(p.price)}<span>KDV dahil</span></div>
+            <button class="add-btn" data-id="${p.id}">Sepete Ekle</button>
+          </div>
+        </div>
+      </article>`;
+    })
+    .join("");
+}
+
+shopFilters.addEventListener("click", (e) => {
+  const btn = e.target.closest(".filter-btn");
+  if (!btn) return;
+  shopFilters.querySelectorAll(".filter-btn").forEach((b) => b.classList.remove("active"));
+  btn.classList.add("active");
+  renderShop(btn.dataset.cat);
+});
+
+renderFilters();
+renderShop("all");
+
+// ---- Sepet ----
+const cartBtn = document.getElementById("cartBtn");
+const cartDrawer = document.getElementById("cartDrawer");
+const cartOverlay = document.getElementById("cartOverlay");
+const cartClose = document.getElementById("cartClose");
+const cartItemsEl = document.getElementById("cartItems");
+const cartTotalEl = document.getElementById("cartTotal");
+const cartCountEl = document.getElementById("cartCount");
+const waOrder = document.getElementById("waOrder");
+const clearCartBtn = document.getElementById("clearCart");
+
+let cart = {};
+try {
+  cart = JSON.parse(localStorage.getItem("gp-cart")) || {};
+} catch (_) {
+  cart = {};
+}
+
+function saveCart() {
+  localStorage.setItem("gp-cart", JSON.stringify(cart));
+}
+
+function cartEntries() {
+  return Object.entries(cart)
+    .map(([id, qty]) => ({ product: PRODUCTS.find((p) => p.id === id), qty }))
+    .filter((e) => e.product && e.qty > 0);
+}
+
+function renderCart() {
+  const entries = cartEntries();
+  const count = entries.reduce((s, e) => s + e.qty, 0);
+  const total = entries.reduce((s, e) => s + e.product.price * e.qty, 0);
+
+  cartCountEl.hidden = count === 0;
+  cartCountEl.textContent = count;
+  cartTotalEl.textContent = tlFmt(total);
+
+  if (entries.length === 0) {
+    cartItemsEl.innerHTML = '<p class="cart-empty">Sepetiniz boş.<br>Mağazadan ürün ekleyebilirsiniz.</p>';
+    waOrder.classList.add("disabled");
+    waOrder.removeAttribute("href");
+  } else {
+    cartItemsEl.innerHTML = entries
+      .map(
+        (e) => `
+      <div class="cart-item">
+        <div class="cart-thumb">${productMedia(e.product)}</div>
+        <div class="cart-item-info">
+          <strong>${escHtml(e.product.name)}</strong>
+          <span>${tlFmt(e.product.price)} × ${e.qty} = ${tlFmt(e.product.price * e.qty)}</span>
+        </div>
+        <div class="cart-qty">
+          <button data-id="${e.product.id}" data-act="dec" aria-label="Azalt">−</button>
+          <span class="qty-val">${e.qty}</span>
+          <button data-id="${e.product.id}" data-act="inc" aria-label="Artır">+</button>
+          <button class="del-btn" data-id="${e.product.id}" data-act="del" aria-label="Kaldır">×</button>
+        </div>
+      </div>`
+      )
+      .join("");
+
+    const lines = entries.map((e) => `• ${e.qty} × ${e.product.name} — ${tlFmt(e.product.price * e.qty)}`);
+    const msg =
+      "Merhaba, web sitenizden sipariş vermek istiyorum:\n\n" +
+      lines.join("\n") +
+      "\n\nToplam: " + tlFmt(total);
+    waOrder.href = "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodeURIComponent(msg);
+    waOrder.classList.remove("disabled");
+  }
+}
+
+function openCart() {
+  cartDrawer.classList.add("open");
+  cartOverlay.classList.add("open");
+}
+
+function closeCart() {
+  cartDrawer.classList.remove("open");
+  cartOverlay.classList.remove("open");
+}
+
+cartBtn.addEventListener("click", openCart);
+cartClose.addEventListener("click", closeCart);
+cartOverlay.addEventListener("click", closeCart);
+
+shopGrid.addEventListener("click", (e) => {
+  const btn = e.target.closest(".add-btn");
+  if (!btn) return;
+  const id = btn.dataset.id;
+  cart[id] = (cart[id] || 0) + 1;
+  saveCart();
+  renderCart();
+  btn.textContent = "Eklendi ✓";
+  btn.classList.add("added");
+  setTimeout(() => {
+    btn.textContent = "Sepete Ekle";
+    btn.classList.remove("added");
+  }, 1200);
+});
+
+cartItemsEl.addEventListener("click", (e) => {
+  const btn = e.target.closest("button[data-act]");
+  if (!btn) return;
+  const { id, act } = btn.dataset;
+  if (act === "inc") cart[id] = (cart[id] || 0) + 1;
+  if (act === "dec") cart[id] = Math.max(0, (cart[id] || 0) - 1);
+  if (act === "del" || cart[id] === 0) delete cart[id];
+  saveCart();
+  renderCart();
+});
+
+clearCartBtn.addEventListener("click", () => {
+  cart = {};
+  saveCart();
+  renderCart();
+});
+
+// WhatsApp'a yönlendirilen siparişi admin panelinde görünmesi için kaydet
+waOrder.addEventListener("click", () => {
+  const entries = cartEntries();
+  if (entries.length === 0) return;
+  Store.addOrder({
+    customer: currentUser ? currentUser.name : "Ziyaretçi",
+    email: currentUser ? currentUser.email : "",
+    items: entries.map((e) => ({ name: e.product.name, qty: e.qty, price: e.product.price })),
+    total: entries.reduce((s, e) => s + e.product.price * e.qty, 0)
+  });
+});
+
+renderCart();
+
+// ============ TASARRUF HESAPLAYICI ============
+// Varsayımlar (tahmini, Türkiye ortalamaları):
+const TL_PER_KWH = 3.2;          // ortalama birim elektrik fiyatı (TL/kWh)
+const KWH_PER_KW_MONTH = 130;    // 1 kW kurulu gücün aylık üretimi (kWh)
+const COST_PER_KW = 36000;       // 1 kW kurulu güç yatırım maliyeti (TL)
+const COVERAGE = 0.9;            // faturanın karşılanma oranı
+
+const billInput = document.getElementById("billInput");
+const billValue = document.getElementById("billValue");
+const resPower = document.getElementById("resPower");
+const resSaving = document.getElementById("resSaving");
+const resPayback = document.getElementById("resPayback");
+const resTotal = document.getElementById("resTotal");
+
+const tl = (n) =>
+  "₺" + Math.round(n).toLocaleString("tr-TR");
+
+function calculate() {
+  const bill = parseInt(billInput.value, 10);
+  billValue.textContent = tl(bill);
+
+  const monthlyKwh = bill / TL_PER_KWH;
+  const requiredKw = (monthlyKwh * COVERAGE) / KWH_PER_KW_MONTH;
+  const systemCost = requiredKw * COST_PER_KW;
+  const yearlySaving = bill * 12 * COVERAGE;
+  const paybackYears = systemCost / yearlySaving;
+  const totalGain = yearlySaving * 25 - systemCost;
+
+  resPower.textContent = requiredKw.toFixed(1).replace(".", ",") + " kW";
+  resSaving.textContent = tl(yearlySaving);
+  resPayback.textContent = paybackYears.toFixed(1).replace(".", ",") + " yıl";
+  resTotal.textContent = tl(totalGain);
+}
+
+billInput.addEventListener("input", calculate);
+calculate();
+
+// ============ İLETİŞİM FORMU ============
+const form = document.getElementById("contactForm");
+const formStatus = document.getElementById("formStatus");
+
+form.addEventListener("submit", (e) => {
+  e.preventDefault();
+
+  const name = form.name;
+  const phone = form.phone;
+  let valid = true;
+
+  [name, phone].forEach((field) => {
+    if (!field.value.trim()) {
+      field.classList.add("error");
+      valid = false;
+    } else {
+      field.classList.remove("error");
+    }
+  });
+
+  if (!valid) {
+    formStatus.textContent = "Lütfen zorunlu (*) alanları doldurun.";
+    formStatus.className = "form-status err";
+    return;
+  }
+
+  // Talep, admin panelinin "Talepler" bölümünde listelenmek üzere kaydedilir.
+  Store.addLead({
+    name: name.value.trim(),
+    phone: phone.value.trim(),
+    city: form.city.value.trim(),
+    type: form.type.value,
+    message: form.message.value.trim()
+  });
+
+  formStatus.textContent =
+    "Teşekkürler " + name.value.trim() + "! Talebiniz alındı, 24 saat içinde sizi arayacağız.";
+  formStatus.className = "form-status ok";
+  form.reset();
+});
+
+})();
+
+// ---- GİRİŞ / KAYIT ----
+(() => {
+// ============ GİRİŞ / KAYIT SAYFASI ============
+
+// Zaten giriş yapılmışsa doğru sayfaya yönlendir
+const existing = Store.session();
+if (existing && location.hash === "#giris") {
+  goPage(existing.role === "admin" ? "#admin" : "#");
+}
+
+// Sekme geçişi
+const loginForm = document.getElementById("loginForm");
+const registerForm = document.getElementById("registerForm");
+
+document.querySelectorAll(".auth-tab").forEach((tab) => {
+  tab.addEventListener("click", () => {
+    document.querySelectorAll(".auth-tab").forEach((t) => t.classList.remove("active"));
+    tab.classList.add("active");
+    const isLogin = tab.dataset.tab === "login";
+    loginForm.hidden = !isLogin;
+    registerForm.hidden = isLogin;
+  });
+});
+
+function setStatus(el, msg, ok) {
+  el.textContent = msg;
+  el.className = "form-status " + (ok ? "ok" : "err");
+}
+
+// Giriş
+loginForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const status = document.getElementById("loginStatus");
+  const email = document.getElementById("loginEmail").value.trim();
+  const pass = document.getElementById("loginPass").value;
+
+  if (!email || !pass) {
+    setStatus(status, "Lütfen e-posta ve şifrenizi girin.", false);
+    return;
+  }
+
+  const result = Store.login(email, pass);
+  if (!result.ok) {
+    setStatus(status, result.error, false);
+    return;
+  }
+
+  setStatus(status, "Giriş başarılı, yönlendiriliyorsunuz…", true);
+  setTimeout(() => {
+    goPage(result.session.role === "admin" ? "#admin" : "#");
+  }, 600);
+});
+
+// Kayıt
+registerForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const status = document.getElementById("registerStatus");
+  const name = document.getElementById("regName").value.trim();
+  const email = document.getElementById("regEmail").value.trim();
+  const phone = document.getElementById("regPhone").value;
+  const pass = document.getElementById("regPass").value;
+  const pass2 = document.getElementById("regPass2").value;
+
+  if (!name || !email || !pass) {
+    setStatus(status, "Lütfen zorunlu alanları doldurun.", false);
+    return;
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    setStatus(status, "Geçerli bir e-posta adresi girin.", false);
+    return;
+  }
+  if (pass.length < 6) {
+    setStatus(status, "Şifre en az 6 karakter olmalıdır.", false);
+    return;
+  }
+  if (pass !== pass2) {
+    setStatus(status, "Şifreler birbiriyle uyuşmuyor.", false);
+    return;
+  }
+
+  const result = Store.register({ name, email, phone, pass });
+  if (!result.ok) {
+    setStatus(status, result.error, false);
+    return;
+  }
+
+  Store.login(email, pass);
+  setStatus(status, "Hesabınız oluşturuldu, yönlendiriliyorsunuz…", true);
+  setTimeout(() => goPage("#"), 700);
+});
+
+})();
+
+// ---- HESABIM ----
+(() => {
+// ============ HESABIM SAYFASI ============
+
+// Giriş yapılmamışsa giriş sayfasına yönlendir
+const me = Store.session();
+if (!me && location.hash === "#hesap") goPage("#giris");
+
+const tlFmt = (n) => "₺" + Math.round(n).toLocaleString("tr-TR");
+const dateFmt = (ts) =>
+  new Date(ts).toLocaleDateString("tr-TR", { day: "2-digit", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" });
+
+function setStatus(el, msg, ok) {
+  el.textContent = msg;
+  el.className = "form-status " + (ok ? "ok" : "err");
+}
+
+// Çıkış
+document.getElementById("accountLogout").addEventListener("click", (e) => {
+  e.preventDefault();
+  Store.logout();
+  goPage("#");
+});
+
+// ---- Hesap bilgileri ----
+const accName = document.getElementById("accName");
+const accEmail = document.getElementById("accEmail");
+const accPhone = document.getElementById("accPhone");
+
+const userInfo = me ? Store.getUser(me.email) : null;
+if (userInfo) {
+  accName.value = userInfo.name;
+  accEmail.value = userInfo.email;
+  accPhone.value = userInfo.phone;
+}
+
+document.getElementById("profileForm").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const status = document.getElementById("profileStatus");
+  if (!accName.value.trim()) {
+    setStatus(status, "Ad Soyad boş bırakılamaz.", false);
+    return;
+  }
+  const result = Store.updateProfile(me.email, {
+    name: accName.value,
+    phone: accPhone.value
+  });
+  setStatus(status, result.ok ? "Bilgileriniz güncellendi." : result.error, result.ok);
+});
+
+// ---- Şifre değiştirme ----
+document.getElementById("passwordForm").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const status = document.getElementById("passwordStatus");
+  const oldPass = document.getElementById("passOld").value;
+  const newPass = document.getElementById("passNew").value;
+  const newPass2 = document.getElementById("passNew2").value;
+
+  if (newPass.length < 6) {
+    setStatus(status, "Yeni şifre en az 6 karakter olmalıdır.", false);
+    return;
+  }
+  if (newPass !== newPass2) {
+    setStatus(status, "Yeni şifreler birbiriyle uyuşmuyor.", false);
+    return;
+  }
+  const result = Store.changePassword(me.email, oldPass, newPass);
+  if (result.ok) {
+    setStatus(status, "Şifreniz değiştirildi.", true);
+    e.target.reset();
+  } else {
+    setStatus(status, result.error, false);
+  }
+});
+
+// ---- Siparişlerim ----
+function renderMyOrders() {
+  const orders = me ? Store.getOrdersByEmail(me.email) : [];
+  document.getElementById("myOrders").innerHTML =
+    orders.map((o) => `
+      <div class="order-entry">
+        <div class="order-entry-head">
+          <span>Sipariş Talebi</span>
+          <span>${dateFmt(o.date)}</span>
+        </div>
+        <ul class="order-entry-items">
+          ${o.items.map((i) => `<li>${i.qty} × ${escHtml(i.name)} <span>${tlFmt(i.price * i.qty)}</span></li>`).join("")}
+        </ul>
+        <div class="order-entry-total">Toplam: <strong>${tlFmt(o.total)}</strong></div>
+      </div>`).join("") ||
+    '<p class="account-empty">Henüz bir sipariş talebiniz bulunmuyor.<br><a href="#urunler">Mağazamıza göz atın →</a></p>';
+}
+
+renderMyOrders();
+
+})();
+
+// ---- YÖNETİM PANELİ ----
+(() => {
+// ============ YÖNETİM PANELİ ============
+
+// Erişim koruması: yalnızca admin rolü girebilir.
+// NOT: Bu istemci tarafı bir korumadır; sunucuya bağlanınca
+// yetki kontrolü mutlaka sunucuda da yapılmalıdır.
+const adminSession = Store.session();
+if (location.hash === "#admin" && (!adminSession || adminSession.role !== "admin")) {
+  goPage("#giris");
+}
+
+function catName(id) {
+  const c = Store.getCategories().find((c) => c.id === id);
+  return c ? c.name : "Diğer";
+}
+
+// Ürün formlarındaki kategori listelerini doldurur (seçim korunur)
+function populateCatSelects() {
+  const options = Store.getCategories()
+    .map((c) => `<option value="${c.id}">${escHtml(c.name)}</option>`)
+    .join("");
+  ["pfCat", "upCat"].forEach((id) => {
+    const sel = document.getElementById(id);
+    const current = sel.value;
+    sel.innerHTML = options;
+    if (current && [...sel.options].some((o) => o.value === current)) sel.value = current;
+  });
+}
+
+const tlFmt = (n) => "₺" + Math.round(n).toLocaleString("tr-TR");
+const dateFmt = (ts) =>
+  new Date(ts).toLocaleDateString("tr-TR", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
+
+document.getElementById("adminUser").textContent = adminSession ? adminSession.name : "";
+
+document.getElementById("adminLogout").addEventListener("click", (e) => {
+  e.preventDefault();
+  Store.logout();
+  goPage("#giris");
+});
+
+// ---------- GÖRÜNÜM GEÇİŞLERİ ----------
+const VIEW_TITLES = {
+  dashboard: "Genel Bakış",
+  products: "Ürünler",
+  upload: "Ürün Yükle",
+  categories: "Kategoriler",
+  orders: "Siparişler",
+  leads: "Keşif Talepleri",
+  settings: "Ayarlar"
+};
+
+// Görsel dosyasını en fazla 900px olacak şekilde küçültüp JPEG'e çevirir;
+// hem düzenleme penceresi hem ürün yükleme ekranı kullanır.
+function readImageFile(file, cb) {
+  const img = new Image();
+  img.onload = () => {
+    const MAX = 900;
+    const scale = Math.min(1, MAX / Math.max(img.width, img.height));
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.round(img.width * scale);
+    canvas.height = Math.round(img.height * scale);
+    canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
+    URL.revokeObjectURL(img.src);
+    cb(canvas.toDataURL("image/jpeg", 0.82));
+  };
+  img.onerror = () => alert("Bu dosya bir görsel olarak okunamadı.");
+  img.src = URL.createObjectURL(file);
+}
+
+document.querySelectorAll(".admin-nav-btn").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".admin-nav-btn").forEach((b) => b.classList.remove("active"));
+    btn.classList.add("active");
+    const view = btn.dataset.view;
+    document.querySelectorAll(".admin-view").forEach((v) => (v.hidden = true));
+    document.getElementById("view-" + view).hidden = false;
+    document.getElementById("viewTitle").textContent = VIEW_TITLES[view];
+    renderAll();
+  });
+});
+
+// ---------- GENEL BAKIŞ ----------
+function renderDashboard() {
+  const products = Store.getProducts();
+  const leads = Store.getLeads();
+  const orders = Store.getOrders();
+  const totalStock = products.reduce((s, p) => s + (p.stock || 0), 0);
+  const orderTotal = orders.reduce((s, o) => s + (o.total || 0), 0);
+
+  document.getElementById("statGrid").innerHTML = `
+    <div class="stat-card"><span>Ürün Çeşidi</span><strong>${products.length}</strong></div>
+    <div class="stat-card"><span>Toplam Stok</span><strong>${totalStock}</strong></div>
+    <div class="stat-card"><span>Sipariş Talebi</span><strong>${orders.length}</strong></div>
+    <div class="stat-card"><span>Sipariş Hacmi</span><strong>${tlFmt(orderTotal)}</strong></div>
+    <div class="stat-card"><span>Keşif Talebi</span><strong>${leads.length}</strong></div>
+  `;
+
+  document.getElementById("recentLeads").innerHTML =
+    leads.slice(0, 5).map((l) => `
+      <tr>
+        <td>${dateFmt(l.date)}</td>
+        <td>${escHtml(l.name)}</td>
+        <td>${escHtml(l.phone)}</td>
+        <td>${escHtml(l.city || "—")}</td>
+        <td>${escHtml(l.type || "—")}</td>
+      </tr>`).join("") ||
+    '<tr><td colspan="5" class="empty-row">Henüz keşif talebi yok.</td></tr>';
+}
+
+// ---------- ÜRÜNLER ----------
+const productModal = document.getElementById("productModal");
+const productForm = document.getElementById("productForm");
+
+function thumbHtml(p) {
+  return p.photo
+    ? `<img class="table-thumb" src="${escHtml(p.photo)}" alt="">`
+    : '<span class="table-thumb table-thumb-empty">—</span>';
+}
+
+function renderProducts() {
+  const products = Store.getProducts();
+  document.getElementById("productRows").innerHTML =
+    products.map((p) => `
+      <tr>
+        <td>${thumbHtml(p)}</td>
+        <td class="cell-strong">${escHtml(p.name)}</td>
+        <td>${escHtml(catName(p.cat))}</td>
+        <td>${tlFmt(p.price)}</td>
+        <td>${p.stock <= 5 ? `<span class="pill pill-warn">${p.stock} adet</span>` : p.stock + " adet"}</td>
+        <td class="cell-actions">
+          <button class="row-btn" data-act="edit" data-id="${p.id}">Düzenle</button>
+          <button class="row-btn row-btn-danger" data-act="del" data-id="${p.id}">Sil</button>
+        </td>
+      </tr>`).join("") ||
+    '<tr><td colspan="6" class="empty-row">Ürün yok. "Yeni Ürün Ekle" ile başlayın.</td></tr>';
+}
+
+// --- Fotoğraf yükleme ---
+const photoPreview = document.getElementById("pfPreview");
+const photoFile = document.getElementById("pfPhotoFile");
+const photoUrl = document.getElementById("pfPhotoUrl");
+let currentPhoto = "";
+
+function setPhoto(src) {
+  currentPhoto = src || "";
+  photoPreview.innerHTML = currentPhoto
+    ? `<img src="${escHtml(currentPhoto)}" alt="Önizleme">`
+    : "<span>Fotoğraf<br>yok</span>";
+}
+
+photoFile.addEventListener("change", () => {
+  const file = photoFile.files[0];
+  if (!file) return;
+  readImageFile(file, (dataUrl) => {
+    setPhoto(dataUrl);
+    photoUrl.value = "";
+  });
+});
+
+photoUrl.addEventListener("change", () => {
+  const url = photoUrl.value.trim();
+  if (!url) return;
+  if (!/^https?:\/\//.test(url)) {
+    alert("Görsel bağlantısı http:// veya https:// ile başlamalıdır.");
+    return;
+  }
+  setPhoto(url);
+  photoFile.value = "";
+});
+
+document.getElementById("pfPhotoRemove").addEventListener("click", () => {
+  setPhoto("");
+  photoFile.value = "";
+  photoUrl.value = "";
+});
+
+function openProductModal(product) {
+  document.getElementById("productModalTitle").textContent = product ? "Ürünü Düzenle" : "Yeni Ürün";
+  document.getElementById("pfId").value = product ? product.id : "";
+  document.getElementById("pfName").value = product ? product.name : "";
+  document.getElementById("pfCat").value = product ? product.cat : "panel";
+  document.getElementById("pfImg").value = product ? product.img : "panel";
+  document.getElementById("pfPrice").value = product ? product.price : "";
+  document.getElementById("pfStock").value = product ? product.stock : "";
+  document.getElementById("pfSpecs").value = product ? product.specs.join("\n") : "";
+  photoFile.value = "";
+  photoUrl.value = product && product.photo && !product.photo.startsWith("data:") ? product.photo : "";
+  setPhoto(product ? product.photo : "");
+  productModal.hidden = false;
+  document.getElementById("pfName").focus();
+}
+
+// "Yeni Ürün Ekle" butonu Ürün Yükle ekranına götürür
+document.getElementById("newProductBtn").addEventListener("click", () => {
+  document.querySelector('.admin-nav-btn[data-view="upload"]').click();
+});
+document.getElementById("productModalClose").addEventListener("click", () => (productModal.hidden = true));
+productModal.addEventListener("click", (e) => {
+  if (e.target === productModal) productModal.hidden = true;
+});
+
+document.getElementById("productRows").addEventListener("click", (e) => {
+  const btn = e.target.closest(".row-btn");
+  if (!btn) return;
+  const { id, act } = btn.dataset;
+  const product = Store.getProducts().find((p) => p.id === id);
+  if (act === "edit" && product) openProductModal(product);
+  if (act === "del" && product && confirm(`"${product.name}" silinsin mi?`)) {
+    Store.deleteProduct(id);
+    renderAll();
+  }
+});
+
+productForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const id = document.getElementById("pfId").value || "p-" + Date.now();
+  try {
+    Store.saveProduct({
+      id,
+      name: document.getElementById("pfName").value.trim(),
+      cat: document.getElementById("pfCat").value,
+      img: document.getElementById("pfImg").value,
+      photo: currentPhoto,
+      price: parseInt(document.getElementById("pfPrice").value, 10) || 0,
+      stock: parseInt(document.getElementById("pfStock").value, 10) || 0,
+      specs: document.getElementById("pfSpecs").value
+        .split("\n")
+        .map((s) => s.trim())
+        .filter(Boolean)
+    });
+  } catch (err) {
+    // localStorage kotası dolduysa (çok sayıda büyük fotoğraf)
+    alert("Kayıt başarısız: tarayıcı depolama alanı doldu. Daha az/küçük fotoğraf kullanın veya görsel bağlantısı tercih edin.");
+    return;
+  }
+  productModal.hidden = true;
+  renderAll();
+});
+
+// ---------- ÜRÜN YÜKLE EKRANI ----------
+const uploadForm = document.getElementById("uploadForm");
+const dropZone = document.getElementById("dropZone");
+const dropZoneInner = document.getElementById("dropZoneInner");
+const upPhotoFile = document.getElementById("upPhotoFile");
+const upPhotoUrl = document.getElementById("upPhotoUrl");
+const uploadPreview = document.getElementById("uploadPreview");
+const upStatus = document.getElementById("upStatus");
+let uploadPhoto = "";
+
+const DROP_ZONE_DEFAULT = dropZoneInner.innerHTML;
+
+function setUploadPhoto(src) {
+  uploadPhoto = src || "";
+  dropZoneInner.innerHTML = uploadPhoto
+    ? `<img src="${escHtml(uploadPhoto)}" alt="Önizleme"><span>Değiştirmek için tıklayın veya yeni fotoğraf sürükleyin</span>`
+    : DROP_ZONE_DEFAULT;
+  dropZone.classList.toggle("has-photo", !!uploadPhoto);
+  renderUploadPreview();
+}
+
+dropZone.addEventListener("click", () => upPhotoFile.click());
+
+dropZone.addEventListener("dragover", (e) => {
+  e.preventDefault();
+  dropZone.classList.add("drag");
+});
+
+dropZone.addEventListener("dragleave", () => dropZone.classList.remove("drag"));
+
+dropZone.addEventListener("drop", (e) => {
+  e.preventDefault();
+  dropZone.classList.remove("drag");
+  const file = e.dataTransfer.files[0];
+  if (!file) return;
+  readImageFile(file, (dataUrl) => {
+    setUploadPhoto(dataUrl);
+    upPhotoUrl.value = "";
+  });
+});
+
+upPhotoFile.addEventListener("change", () => {
+  const file = upPhotoFile.files[0];
+  if (!file) return;
+  readImageFile(file, (dataUrl) => {
+    setUploadPhoto(dataUrl);
+    upPhotoUrl.value = "";
+  });
+});
+
+upPhotoUrl.addEventListener("change", () => {
+  const url = upPhotoUrl.value.trim();
+  if (!url) return;
+  if (!/^https?:\/\//.test(url)) {
+    alert("Görsel bağlantısı http:// veya https:// ile başlamalıdır.");
+    return;
+  }
+  setUploadPhoto(url);
+  upPhotoFile.value = "";
+});
+
+document.getElementById("upPhotoRemove").addEventListener("click", () => {
+  setUploadPhoto("");
+  upPhotoFile.value = "";
+  upPhotoUrl.value = "";
+});
+
+// Mağazadaki ürün kartının birebir önizlemesi
+function renderUploadPreview() {
+  const name = document.getElementById("upName").value.trim() || "Ürün adı";
+  const cat = document.getElementById("upCat").value;
+  const img = document.getElementById("upImg").value;
+  const price = parseInt(document.getElementById("upPrice").value, 10) || 0;
+  const stock = parseInt(document.getElementById("upStock").value, 10);
+  const specs = document.getElementById("upSpecs").value
+    .split("\n").map((s) => s.trim()).filter(Boolean);
+  const low = !isNaN(stock) && stock <= 5;
+
+  uploadPreview.innerHTML = `
+    <article class="product">
+      <div class="product-img${uploadPhoto ? " has-photo" : ""}">
+        <span class="stock-badge${low ? " low" : ""}">${low ? "Son " + stock + " adet" : "Stokta"}</span>
+        ${uploadPhoto
+          ? `<img src="${escHtml(uploadPhoto)}" alt="">`
+          : (PRODUCT_ART[img] || PRODUCT_ART.panel)}
+      </div>
+      <div class="product-body">
+        <span class="product-cat">${escHtml(catName(cat))}</span>
+        <h3>${escHtml(name)}</h3>
+        <ul class="product-specs">${specs.map((s) => `<li>${escHtml(s)}</li>`).join("") || "<li>Ürün özellikleri</li>"}</ul>
+        <div class="product-foot">
+          <div class="product-price">${tlFmt(price)}<span>KDV dahil</span></div>
+          <button class="add-btn" type="button">Sepete Ekle</button>
+        </div>
+      </div>
+    </article>`;
+}
+
+["upName", "upCat", "upImg", "upPrice", "upStock", "upSpecs"].forEach((id) => {
+  document.getElementById(id).addEventListener("input", renderUploadPreview);
+});
+
+uploadForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const name = document.getElementById("upName").value.trim();
+  const price = parseInt(document.getElementById("upPrice").value, 10) || 0;
+  if (!name || price <= 0) {
+    upStatus.textContent = "Lütfen ürün adını ve geçerli bir fiyat girin.";
+    upStatus.className = "form-status err";
+    return;
+  }
+  try {
+    Store.saveProduct({
+      id: "p-" + Date.now(),
+      name,
+      cat: document.getElementById("upCat").value,
+      img: document.getElementById("upImg").value,
+      photo: uploadPhoto,
+      price,
+      stock: parseInt(document.getElementById("upStock").value, 10) || 0,
+      specs: document.getElementById("upSpecs").value
+        .split("\n").map((s) => s.trim()).filter(Boolean)
+    });
+  } catch (err) {
+    upStatus.textContent = "Kayıt başarısız: tarayıcı depolama alanı doldu. Daha küçük fotoğraf kullanın.";
+    upStatus.className = "form-status err";
+    return;
+  }
+  upStatus.textContent = '"' + name + '" mağazaya eklendi.';
+  upStatus.className = "form-status ok";
+  uploadForm.reset();
+  setUploadPhoto("");
+  renderAll();
+});
+
+renderUploadPreview();
+
+// ---------- KATEGORİLER ----------
+function renderCategories() {
+  const cats = Store.getCategories();
+  const products = Store.getProducts();
+  document.getElementById("catRows").innerHTML =
+    cats.map((c) => {
+      const count = products.filter((p) => p.cat === c.id).length;
+      return `
+      <tr>
+        <td class="cell-strong">${escHtml(c.name)}</td>
+        <td>${count} ürün</td>
+        <td class="cell-actions">
+          <button class="row-btn" data-act="rename" data-id="${c.id}">Yeniden Adlandır</button>
+          <button class="row-btn row-btn-danger" data-act="delcat" data-id="${c.id}">Sil</button>
+        </td>
+      </tr>`;
+    }).join("") ||
+    '<tr><td colspan="3" class="empty-row">Henüz kategori yok.</td></tr>';
+}
+
+document.getElementById("catForm").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const input = document.getElementById("catNameInput");
+  const status = document.getElementById("catStatus");
+  const name = input.value.trim();
+  if (!name) return;
+  if (Store.getCategories().some((c) => c.name.toLowerCase() === name.toLowerCase())) {
+    status.textContent = "Bu isimde bir kategori zaten var.";
+    status.className = "form-status err";
+    return;
+  }
+  Store.saveCategory({ name });
+  status.textContent = '"' + name + '" kategorisi eklendi.';
+  status.className = "form-status ok";
+  input.value = "";
+  renderAll();
+});
+
+document.getElementById("catRows").addEventListener("click", (e) => {
+  const btn = e.target.closest(".row-btn");
+  if (!btn) return;
+  const { id, act } = btn.dataset;
+  const cat = Store.getCategories().find((c) => c.id === id);
+  if (!cat) return;
+
+  if (act === "rename") {
+    const name = prompt("Kategorinin yeni adı:", cat.name);
+    if (name && name.trim()) {
+      Store.saveCategory({ id, name });
+      renderAll();
+    }
+  }
+
+  if (act === "delcat") {
+    const count = Store.getProducts().filter((p) => p.cat === id).length;
+    if (count > 0) {
+      alert('"' + cat.name + '" kategorisinde ' + count + " ürün var. Silmeden önce bu ürünleri başka bir kategoriye taşıyın veya silin.");
+      return;
+    }
+    if (confirm('"' + cat.name + '" kategorisi silinsin mi?')) {
+      Store.deleteCategory(id);
+      renderAll();
+    }
+  }
+});
+
+// ---------- SİPARİŞLER ----------
+function renderOrders() {
+  const orders = Store.getOrders();
+  document.getElementById("orderList").innerHTML =
+    orders.map((o) => `
+      <div class="order-card">
+        <div class="order-head">
+          <strong>${escHtml(o.customer || "Ziyaretçi")}</strong>
+          <span>${dateFmt(o.date)}</span>
+        </div>
+        <ul class="order-items">
+          ${o.items.map((i) => `<li>${i.qty} × ${escHtml(i.name)} <span>${tlFmt(i.price * i.qty)}</span></li>`).join("")}
+        </ul>
+        <div class="order-total">Toplam: <strong>${tlFmt(o.total)}</strong></div>
+      </div>`).join("") ||
+    '<p class="empty-row">Henüz sipariş talebi yok.</p>';
+}
+
+// ---------- KEŞİF TALEPLERİ ----------
+function renderLeads() {
+  const leads = Store.getLeads();
+  document.getElementById("leadRows").innerHTML =
+    leads.map((l, i) => `
+      <tr>
+        <td>${dateFmt(l.date)}</td>
+        <td class="cell-strong">${escHtml(l.name)}</td>
+        <td>${escHtml(l.phone)}</td>
+        <td>${escHtml(l.city || "—")}</td>
+        <td>${escHtml(l.type || "—")}</td>
+        <td class="cell-msg">${escHtml(l.message || "—")}</td>
+        <td class="cell-actions"><button class="row-btn row-btn-danger" data-i="${i}">Sil</button></td>
+      </tr>`).join("") ||
+    '<tr><td colspan="7" class="empty-row">Henüz keşif talebi yok.</td></tr>';
+}
+
+document.getElementById("leadRows").addEventListener("click", (e) => {
+  const btn = e.target.closest(".row-btn");
+  if (!btn) return;
+  if (confirm("Bu talep silinsin mi?")) {
+    Store.deleteLead(parseInt(btn.dataset.i, 10));
+    renderAll();
+  }
+});
+
+// ---------- AYARLAR ----------
+const waNumberInput = document.getElementById("waNumber");
+waNumberInput.value = Store.getSettings().whatsapp;
+
+document.getElementById("settingsForm").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const status = document.getElementById("settingsStatus");
+  const num = waNumberInput.value.replace(/\D/g, "");
+  if (num.length < 11) {
+    status.textContent = "Geçerli bir numara girin (örn. 905321234567).";
+    status.className = "form-status err";
+    return;
+  }
+  Store.saveSettings({ whatsapp: num });
+  waNumberInput.value = num;
+  status.textContent = "Kaydedildi.";
+  status.className = "form-status ok";
+});
+
+// ---------- TÜMÜNÜ ÇİZ ----------
+function renderAll() {
+  populateCatSelects();
+  renderDashboard();
+  renderProducts();
+  renderCategories();
+  renderOrders();
+  renderLeads();
+  renderUploadPreview();
+}
+
+renderAll();
+
+})();
+</script>
+</body>
+</html>
