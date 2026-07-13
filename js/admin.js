@@ -453,6 +453,12 @@ function renderOrders() {
           <strong>${escHtml(o.customer || "Ziyaretçi")}</strong>
           <span>${dateFmt(o.date)}</span>
         </div>
+        <div class="order-meta">
+          <span class="pill ${o.payment === "card" ? "pill-warn" : "pill-ok"}">${o.payment === "card" ? "Kredi Kartı — ödeme bekliyor (PayTR)" : "WhatsApp siparişi"}</span>
+          ${o.phone ? " · Tel: " + escHtml(o.phone) : ""}
+          ${o.city ? " · " + escHtml(o.city) : ""}
+        </div>
+        ${o.address ? `<div class="order-addr">Adres: ${escHtml(o.address)}</div>` : ""}
         <ul class="order-items">
           ${o.items.map((i) => `<li>${i.qty} × ${escHtml(i.name)} <span>${tlFmt(i.price * i.qty)}</span></li>`).join("")}
         </ul>

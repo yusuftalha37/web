@@ -311,6 +311,20 @@
 
 .order-head span { color: var(--muted); font-size: 0.85rem; }
 
+.order-meta {
+  font-size: 0.82rem;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.order-addr {
+  font-size: 0.82rem;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.pill-ok { background: #dcfce7; color: #15803d; }
+
 .order-items {
   list-style: none;
   margin-bottom: 10px;

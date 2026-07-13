@@ -29,12 +29,14 @@ def rewrite_links(html):
     html = html.replace('href="hesap.html"', 'href="#hesap"')
     html = html.replace('href="admin.html"', 'href="#admin"')
     html = html.replace('href="urunler.html"', 'href="#magaza"')
+    html = html.replace('href="sepet.html"', 'href="#sepet"')
     return html
 
 
 # ---- sayfa gövdeleri ----
 index_body = rewrite_links(body_of("index.html"))
 urunler_body = rewrite_links(body_of("urunler.html"))
+sepet_body = rewrite_links(body_of("sepet.html"))
 giris_body = rewrite_links(body_of("giris.html"))
 hesap_body = rewrite_links(body_of("hesap.html"))
 admin_body = rewrite_links(body_of("admin.html"))
@@ -51,7 +53,7 @@ main_js = main_js.replace('href="hesap.html"', 'href="#hesap"')
 main_js = main_js.replace('href="giris.html"', 'href="#giris"')
 main_js = main_js.replace(
     '// BUILD:init — tek dosya derlemesi bu satırı sayfa kapsayıcılarıyla değiştirir\ninitSite(document);',
-    'initSite(document.getElementById("page-index"));\ninitSite(document.getElementById("page-urunler"));'
+    'initSite(document.getElementById("page-index"));\ninitSite(document.getElementById("page-urunler"));\ninitSite(document.getElementById("page-sepet"));'
 )
 
 auth_js = (ROOT / "js/auth.js").read_text()
@@ -77,6 +79,9 @@ hesap_js = hesap_js.replace(
 hesap_js = hesap_js.replace('location.href = "index.html";', 'goPage("#");')
 hesap_js = hesap_js.replace('href="index.html#', 'href="#')
 
+sepet_js = (ROOT / "js/sepet.js").read_text()
+sepet_js = sepet_js.replace("href=\"urunler.html\"", "href=\"#magaza\"")
+
 admin_js = (ROOT / "js/admin.js").read_text()
 admin_js = admin_js.replace(
     'if (!adminSession || adminSession.role !== "admin") {\n  location.href = "giris.html";\n}',
@@ -86,7 +91,7 @@ admin_js = admin_js.replace('location.href = "giris.html";', 'goPage("#giris");'
 
 router_js = """
 // ---- TEK DOSYA SAYFA YÖNLENDİRİCİSİ ----
-const PAGE_IDS = { "#magaza": "page-urunler", "#giris": "page-giris", "#hesap": "page-hesap", "#admin": "page-admin" };
+const PAGE_IDS = { "#magaza": "page-urunler", "#sepet": "page-sepet", "#giris": "page-giris", "#hesap": "page-hesap", "#admin": "page-admin" };
 
 function route() {
   let target = PAGE_IDS[location.hash] || "page-index";
@@ -135,6 +140,10 @@ single = f"""<!DOCTYPE html>
 {urunler_body}
 </div>
 
+<div id="page-sepet" class="single-page" style="display:none">
+{sepet_body}
+</div>
+
 <div id="page-giris" class="single-page auth-body" style="display:none">
 {giris_body}
 </div>
@@ -157,6 +166,11 @@ route();
 // ---- ANA SAYFA ----
 (() => {{
 {main_js}
+}})();
+
+// ---- SEPET SAYFASI ----
+(() => {{
+{sepet_js}
 }})();
 
 // ---- GİRİŞ / KAYIT ----

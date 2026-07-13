@@ -79,7 +79,7 @@
         <a href="index.html#iletisim">İLETİŞİM</a>
         <span class="nav-account" id="navAccount"></span>
       </div>
-      <button class="cart-btn" id="cartBtn" aria-label="Sepeti aç">
+      <a class="cart-btn" id="cartBtn" href="sepet.html" aria-label="Sepete git">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="9" cy="21" r="1.6"/>
           <circle cx="19" cy="21" r="1.6"/>
@@ -87,7 +87,7 @@
         </svg>
         SEPET
         <span class="cart-count" id="cartCount" hidden>0</span>
-      </button>
+      </a>
     </div>
   </nav>
 
@@ -107,22 +107,6 @@
       <p class="shop-note">Aradığınız ürünü bulamadınız mı? <a href="index.html#iletisim">Bize yazın</a>, tedarik edelim. Fiyatlar KDV dahildir; kur ve stok durumuna göre güncellenebilir. Stoktaki ürünler aynı gün kargoya verilir; toplu alım için teklif isteyin.</p>
     </div>
   </section>
-
-  <!-- SEPET -->
-  <div class="cart-overlay" id="cartOverlay"></div>
-  <aside class="cart-drawer" id="cartDrawer" aria-label="Sepet">
-    <div class="cart-head">
-      <h3>Sepetim</h3>
-      <button class="cart-close" id="cartClose" aria-label="Sepeti kapat">×</button>
-    </div>
-    <div class="cart-items" id="cartItems"></div>
-    <div class="cart-foot">
-      <div class="cart-total-row"><span>Ara Toplam</span><strong id="cartTotal">₺0</strong></div>
-      <p class="cart-note">Fiyatlara KDV dahildir. Kargo ücreti sipariş onayında bildirilir.</p>
-      <a class="btn btn-block" id="waOrder" href="#" target="_blank" rel="noopener">WhatsApp ile Sipariş Ver</a>
-      <button class="btn btn-outline btn-block" id="clearCart" type="button">Sepeti Temizle</button>
-    </div>
-  </aside>
 
   <!-- FOOTER -->
   <footer class="footer">

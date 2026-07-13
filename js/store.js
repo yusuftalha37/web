@@ -287,6 +287,18 @@ const Store = (() => {
     return getOrders().filter((o) => o.email === email);
   }
 
+  // ---------- ÖDEME (PayTR) ----------
+  // PayTR entegrasyonu bağlandığında bu fonksiyon sunucunuzdan iframe
+  // token'ı isteyecek ve müşteriyi PayTR ödeme sayfasına yönlendirecek.
+  // Şimdilik simülasyon yanıtı döner; sipariş "ödeme bekliyor" olarak
+  // kaydedilir.
+  function startCardPayment(order) {
+    return {
+      ok: true,
+      message: "Kart ödeme sayfası PayTR entegrasyonu tamamlandığında burada açılacaktır."
+    };
+  }
+
   // ---------- AYARLAR ----------
   function getSettings() {
     return read("gp-settings", { whatsapp: "908500000000" });
@@ -303,6 +315,7 @@ const Store = (() => {
     getUser, updateProfile, changePassword,
     addLead, getLeads, deleteLead,
     addOrder, getOrders, getOrdersByEmail,
+    startCardPayment,
     getSettings, saveSettings
   };
 })();

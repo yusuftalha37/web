@@ -60,146 +60,44 @@ function initSite(root) {
     return c ? c.name : "Diğer";
   }
 
-  // Sipariş mesajlarının gideceği WhatsApp numarası (admin panelindeki
-  // Ayarlar bölümünden değiştirilebilir)
-  const WHATSAPP_NUMBER = Store.getSettings().whatsapp;
-
   function productMedia(p) {
     return p.photo
       ? `<img src="${escHtml(p.photo)}" alt="${escHtml(p.name)}" loading="lazy">`
       : (PRODUCT_ART[p.img] || PRODUCT_ART.panel);
   }
 
-  // ============ SEPET ============
-  const cartBtn = $("#cartBtn");
-  const cartDrawer = $("#cartDrawer");
-  const cartOverlay = $("#cartOverlay");
-  const cartClose = $("#cartClose");
-  const cartItemsEl = $("#cartItems");
-  const cartTotalEl = $("#cartTotal");
+  // ============ SEPET (rozet + sepete ekleme) ============
+  // Sepetin kendisi tam ekran sepet.html sayfasında yönetilir.
   const cartCountEl = $("#cartCount");
-  const waOrder = $("#waOrder");
-  const clearCartBtn = $("#clearCart");
 
-  let addToCart = null;
-
-  if (cartDrawer && cartBtn) {
-    let cart = {};
+  const readCart = () => {
     try {
-      cart = JSON.parse(localStorage.getItem("gp-cart")) || {};
+      return JSON.parse(localStorage.getItem("gp-cart")) || {};
     } catch (_) {
-      cart = {};
+      return {};
     }
+  };
 
-    const saveCart = () => localStorage.setItem("gp-cart", JSON.stringify(cart));
-
-    const cartEntries = () =>
-      Object.entries(cart)
-        .map(([id, qty]) => ({ product: PRODUCTS.find((p) => p.id === id), qty }))
-        .filter((e) => e.product && e.qty > 0);
-
-    function renderCart() {
-      // Sepet başka sayfada değişmiş olabilir; en güncel halini oku
-      try {
-        cart = JSON.parse(localStorage.getItem("gp-cart")) || {};
-      } catch (_) { /* mevcut hali koru */ }
-
-      const entries = cartEntries();
-      const count = entries.reduce((s, e) => s + e.qty, 0);
-      const total = entries.reduce((s, e) => s + e.product.price * e.qty, 0);
-
-      cartCountEl.hidden = count === 0;
-      cartCountEl.textContent = count;
-      cartTotalEl.textContent = tlFmt(total);
-
-      if (entries.length === 0) {
-        cartItemsEl.innerHTML = '<p class="cart-empty">Sepetiniz boş.<br>Mağazadan ürün ekleyebilirsiniz.</p>';
-        waOrder.classList.add("disabled");
-        waOrder.removeAttribute("href");
-      } else {
-        cartItemsEl.innerHTML = entries
-          .map(
-            (e) => `
-          <div class="cart-item">
-            <div class="cart-thumb">${productMedia(e.product)}</div>
-            <div class="cart-item-info">
-              <strong>${escHtml(e.product.name)}</strong>
-              <span>${tlFmt(e.product.price)} × ${e.qty} = ${tlFmt(e.product.price * e.qty)}</span>
-            </div>
-            <div class="cart-qty">
-              <button data-id="${e.product.id}" data-act="dec" aria-label="Azalt">−</button>
-              <span class="qty-val">${e.qty}</span>
-              <button data-id="${e.product.id}" data-act="inc" aria-label="Artır">+</button>
-              <button class="del-btn" data-id="${e.product.id}" data-act="del" aria-label="Kaldır">×</button>
-            </div>
-          </div>`
-          )
-          .join("");
-
-        const lines = entries.map((e) => `• ${e.qty} × ${e.product.name} — ${tlFmt(e.product.price * e.qty)}`);
-        const msg =
-          "Merhaba, web sitenizden sipariş vermek istiyorum:\n\n" +
-          lines.join("\n") +
-          "\n\nToplam: " + tlFmt(total);
-        waOrder.href = "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodeURIComponent(msg);
-        waOrder.classList.remove("disabled");
-      }
-    }
-
-    addToCart = (id) => {
-      cart[id] = (cart[id] || 0) + 1;
-      saveCart();
-      renderCart();
-    };
-
-    const openCart = () => {
-      cartDrawer.classList.add("open");
-      cartOverlay.classList.add("open");
-    };
-
-    const closeCart = () => {
-      cartDrawer.classList.remove("open");
-      cartOverlay.classList.remove("open");
-    };
-
-    cartBtn.addEventListener("click", openCart);
-    cartClose.addEventListener("click", closeCart);
-    cartOverlay.addEventListener("click", closeCart);
-
-    cartItemsEl.addEventListener("click", (e) => {
-      const btn = e.target.closest("button[data-act]");
-      if (!btn) return;
-      const { id, act } = btn.dataset;
-      if (act === "inc") cart[id] = (cart[id] || 0) + 1;
-      if (act === "dec") cart[id] = Math.max(0, (cart[id] || 0) - 1);
-      if (act === "del" || cart[id] === 0) delete cart[id];
-      saveCart();
-      renderCart();
-    });
-
-    clearCartBtn.addEventListener("click", () => {
-      cart = {};
-      saveCart();
-      renderCart();
-    });
-
-    // WhatsApp'a yönlendirilen siparişi admin panelinde görünmesi için kaydet
-    waOrder.addEventListener("click", () => {
-      const entries = cartEntries();
-      if (entries.length === 0) return;
-      Store.addOrder({
-        customer: currentUser ? currentUser.name : "Ziyaretçi",
-        email: currentUser ? currentUser.email : "",
-        items: entries.map((e) => ({ name: e.product.name, qty: e.qty, price: e.product.price })),
-        total: entries.reduce((s, e) => s + e.product.price * e.qty, 0)
-      });
-    });
-
-    // Tek dosya sürümünde sayfalar arası geçişte sepet rozetini tazele
-    window.addEventListener("hashchange", renderCart);
-
-    renderCart();
+  function updateCartBadge() {
+    if (!cartCountEl) return;
+    const cart = readCart();
+    const count = Object.entries(cart).reduce(
+      (s, [id, qty]) => (PRODUCTS.some((p) => p.id === id) ? s + qty : s), 0
+    );
+    cartCountEl.hidden = count === 0;
+    cartCountEl.textContent = count;
   }
+
+  const addToCart = (id) => {
+    const cart = readCart();
+    cart[id] = (cart[id] || 0) + 1;
+    localStorage.setItem("gp-cart", JSON.stringify(cart));
+    updateCartBadge();
+  };
+
+  // Tek dosya sürümünde sayfalar arası geçişte rozeti tazele
+  window.addEventListener("hashchange", updateCartBadge);
+  updateCartBadge();
 
   // ============ MAĞAZA ============
   const shopGrid = $("#shopGrid");
