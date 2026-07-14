@@ -1,0 +1,7 @@
+# Sunucu veritabanı (kalıcı veriler) — depoya girmemeli
+data.json
+data.json.tmp
+
+# Yerel/geçici
+*.log
+.DS_Store
