@@ -39,11 +39,9 @@ document.getElementById("profileForm").addEventListener("submit", (e) => {
     setStatus(status, "Ad Soyad boş bırakılamaz.", false);
     return;
   }
-  const result = Store.updateProfile(me.email, {
-    name: accName.value,
-    phone: accPhone.value
+  Store.updateProfile(me.email, { name: accName.value, phone: accPhone.value }).then((result) => {
+    setStatus(status, result.ok ? "Bilgileriniz güncellendi." : result.error, result.ok);
   });
-  setStatus(status, result.ok ? "Bilgileriniz güncellendi." : result.error, result.ok);
 });
 
 // ---- Şifre değiştirme ----
@@ -62,16 +60,17 @@ document.getElementById("passwordForm").addEventListener("submit", (e) => {
     setStatus(status, "Yeni şifreler birbiriyle uyuşmuyor.", false);
     return;
   }
-  const result = Store.changePassword(me.email, oldPass, newPass);
-  if (result.ok) {
-    setStatus(status, "Şifreniz değiştirildi.", true);
-    e.target.reset();
-  } else {
-    setStatus(status, result.error, false);
-  }
+  Store.changePassword(me.email, oldPass, newPass).then((result) => {
+    if (result.ok) {
+      setStatus(status, "Şifreniz değiştirildi.", true);
+      e.target.reset();
+    } else {
+      setStatus(status, result.error, false);
+    }
+  });
 });
 
-// ---- Siparişlerim ----
+// ---- Siparişlerim (veriler yüklendikten sonra) ----
 function renderMyOrders() {
   const orders = me ? Store.getOrdersByEmail(me.email) : [];
   document.getElementById("myOrders").innerHTML =
@@ -89,4 +88,4 @@ function renderMyOrders() {
     '<p class="account-empty">Henüz bir sipariş talebiniz bulunmuyor.<br><a href="index.html#urunler">Mağazamıza göz atın →</a></p>';
 }
 
-renderMyOrders();
+Store.ready(renderMyOrders);

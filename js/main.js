@@ -551,4 +551,4 @@ function initSite(root) {
 }
 
 // BUILD:init — tek dosya derlemesi bu satırı sayfa kapsayıcılarıyla değiştirir
-initSite(document);
+Store.ready(() => initSite(document));

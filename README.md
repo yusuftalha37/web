@@ -48,21 +48,31 @@ python3 -m http.server 8000
     └── admin.js    # Admin paneli mantığı
 ```
 
-## Sunucuya Bağlama
+## Canlıya Alma (Supabase + Vercel)
 
-Tüm veriler şimdilik tarayıcıda (localStorage) tutulur. Sunucunuz hazır olduğunda
-**yalnızca `js/store.js`** içindeki fonksiyonları (`getProducts`, `login`,
-`addLead` vb.) kendi API'nize `fetch()` çağrıları yapacak şekilde değiştirmeniz
-yeterlidir; sitenin geri kalanı bu fonksiyonları kullandığı için başka değişiklik
-gerekmez. Şifre doğrulama ve yetki kontrolü sunucu tarafında yapılmalıdır —
-istemcideki kontroller yalnızca arayüz içindir.
+Site iki modda çalışır:
 
-## Özelleştirme
+- **Demo modu (varsayılan):** `js/config.js` boşken veriler yalnızca
+  tarayıcıda tutulur. Kurulum gerektirmez.
+- **Canlı mod:** `js/config.js`'e Supabase anahtarları girilince site
+  gerçek veritabanına (Supabase/Postgres) bağlanır; admin panelinden
+  eklenen ürünleri tüm ziyaretçiler görür.
 
-- Firma adı/iletişim bilgileri: `index.html` içinde arayıp değiştirin.
-- Renkler: `css/style.css` başındaki `:root` değişkenleri.
-- **Ürünler**: `js/main.js` içindeki `PRODUCTS` dizisine ürün ekleyin/çıkarın (ad, özellikler, fiyat, stok).
-- **WhatsApp sipariş numarası**: `js/main.js` içindeki `WHATSAPP_NUMBER` sabitini kendi numaranızla değiştirin (örn. `905xxxxxxxxx`).
-- Hesaplayıcı varsayımları (birim fiyat, maliyet vb.): `js/main.js` başındaki sabitler.
+Adım adım kurulum: **`KURULUM.md`** dosyasına bakın. Özetle:
 
-> Not: Fiyatlar ve hesaplama değerleri örnektir; gerçek satış için güncelleyin.
+1. Supabase'de ücretsiz proje aç, `supabase/schema.sql`'i SQL Editor'de çalıştır.
+2. `js/config.js`'e Project URL + anon anahtarını yaz.
+3. Projeyi Vercel'e bağla (statik, derleme gerektirmez) ve deploy et.
+4. Kendine hesap açıp `profiles.role`'ü `admin` yaparak yönetici ol.
+
+Kod tarafında tüm veri işlemleri `js/store.js` üzerinden gider; backend
+değişse de arayüz kodu aynı kalır. Kart ödemesi (PayTR) için bir Supabase
+Edge Function gerekir — `KURULUM.md` içinde anlatılmıştır.
+
+## Dosya Notları
+
+- `js/config.js` — Supabase bağlantı ayarları (boşsa demo modu).
+- `supabase/schema.sql` — Supabase veritabanı kurulum betiği.
+- `vercel.json` — Vercel dağıtım ayarları.
+- `quantora-solar.html` — tek dosyalık demo (çift tıkla çalışır).
+- `build_tek_dosya.py` — tek dosyayı kaynaklardan yeniden üretir.

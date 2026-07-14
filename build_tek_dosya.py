@@ -52,8 +52,8 @@ main_js = main_js.replace('href="admin.html"', 'href="#admin"')
 main_js = main_js.replace('href="hesap.html"', 'href="#hesap"')
 main_js = main_js.replace('href="giris.html"', 'href="#giris"')
 main_js = main_js.replace(
-    '// BUILD:init — tek dosya derlemesi bu satırı sayfa kapsayıcılarıyla değiştirir\ninitSite(document);',
-    'initSite(document.getElementById("page-index"));\ninitSite(document.getElementById("page-urunler"));\ninitSite(document.getElementById("page-sepet"));'
+    '// BUILD:init — tek dosya derlemesi bu satırı sayfa kapsayıcılarıyla değiştirir\nStore.ready(() => initSite(document));',
+    'Store.ready(() => {\n  initSite(document.getElementById("page-index"));\n  initSite(document.getElementById("page-urunler"));\n  initSite(document.getElementById("page-sepet"));\n});'
 )
 
 auth_js = (ROOT / "js/auth.js").read_text()

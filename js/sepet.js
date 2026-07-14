@@ -176,4 +176,4 @@ function initCartPage() {
   render();
 }
 
-initCartPage();
+Store.ready(initCartPage);

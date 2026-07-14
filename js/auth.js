@@ -26,7 +26,7 @@ function setStatus(el, msg, ok) {
 }
 
 // Giriş
-loginForm.addEventListener("submit", (e) => {
+loginForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   const status = document.getElementById("loginStatus");
   const email = document.getElementById("loginEmail").value.trim();
@@ -37,7 +37,7 @@ loginForm.addEventListener("submit", (e) => {
     return;
   }
 
-  const result = Store.login(email, pass);
+  const result = await Store.login(email, pass);
   if (!result.ok) {
     setStatus(status, result.error, false);
     return;
@@ -50,7 +50,7 @@ loginForm.addEventListener("submit", (e) => {
 });
 
 // Kayıt
-registerForm.addEventListener("submit", (e) => {
+registerForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   const status = document.getElementById("registerStatus");
   const name = document.getElementById("regName").value.trim();
@@ -76,13 +76,13 @@ registerForm.addEventListener("submit", (e) => {
     return;
   }
 
-  const result = Store.register({ name, email, phone, pass });
+  const result = await Store.register({ name, email, phone, pass });
   if (!result.ok) {
     setStatus(status, result.error, false);
     return;
   }
 
-  Store.login(email, pass);
+  await Store.login(email, pass);
   setStatus(status, "Hesabınız oluşturuldu, yönlendiriliyorsunuz…", true);
   setTimeout(() => (location.href = "index.html"), 700);
 });

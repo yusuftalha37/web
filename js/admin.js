@@ -8,6 +8,8 @@ if (!adminSession || adminSession.role !== "admin") {
   location.href = "giris.html";
 }
 
+Store.ready(function () {
+
 function catName(id) {
   const c = Store.getCategories().find((c) => c.id === id);
   return c ? c.name : "Diğer";
@@ -699,3 +701,5 @@ function renderAll() {
 }
 
 renderAll();
+
+}); // Store.ready

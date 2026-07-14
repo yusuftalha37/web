@@ -1,110 +1,44 @@
 // ============================================================
-// VERİ KATMANI
-// Şimdilik tüm veriler tarayıcıda (localStorage) tutulur.
-// Sunucuya bağlarken SADECE bu dosyadaki fonksiyonları
-// fetch() ile API çağrılarına çevirmeniz yeterlidir.
+// VERİ KATMANI (iki modlu)
+//  - config.js'te SUPABASE_URL/ANON_KEY boşsa: yerel demo (localStorage)
+//  - doldurulmuşsa: Supabase (PostgREST + Auth) üzerinden gerçek backend
+// Sitenin geri kalanı yalnızca Store.* fonksiyonlarını kullanır;
+// backend değişse de arayüz kodu aynı kalır.
+// Not: Sayfa açılışında önce Store.ready(fn) ile veriler yüklenir.
 // ============================================================
 
 const Store = (() => {
+  // ---- Yapılandırma: config.js doldurulmuşsa Supabase, boşsa yerel (demo) ----
+  const CFG = (typeof window !== "undefined" && window.QS_CONFIG) || {};
+  const SB_URL = (CFG.SUPABASE_URL || "").replace(/\/+$/, "");
+  const SB_KEY = CFG.SUPABASE_ANON_KEY || "";
+  const MODE = SB_URL && SB_KEY ? "supabase" : "local";
+  const persist = MODE === "supabase";
+
   const read = (key, fallback) => {
-    try {
-      const v = JSON.parse(localStorage.getItem(key));
-      return v === null || v === undefined ? fallback : v;
-    } catch (_) {
-      return fallback;
-    }
+    try { const v = JSON.parse(localStorage.getItem(key)); return v == null ? fallback : v; }
+    catch (_) { return fallback; }
   };
   const write = (key, val) => localStorage.setItem(key, JSON.stringify(val));
+  const logErr = (e) => console.error("[Store]", e && e.message ? e.message : e);
 
-  // ---------- ÜRÜNLER ----------
+  // ===================== VARSAYILAN VERİLER =====================
   const DEFAULT_PRODUCTS = [
-    {
-      id: "pnl-460", hit: true, cat: "panel", img: "panel",
-      name: "460W Half-Cut Monokristal Güneş Paneli",
-      specs: ["120 hücre · %21,3 verim", "Çerçeve: eloksallı alüminyum, IP68 bağlantı kutusu", "25 yıl performans garantisi"],
-      price: 4850, stock: 25
-    },
-    {
-      id: "pnl-550", hit: true, cat: "panel", img: "panel",
-      name: "550W Monokristal Güneş Paneli",
-      specs: ["144 hücre · %21,7 verim", "Çift cam (bifacial) teknoloji", "30 yıl performans garantisi"],
-      price: 5950, stock: 18
-    },
-    {
-      id: "pnl-flx", cat: "panel", img: "flex",
-      name: "285W Esnek Güneş Paneli",
-      specs: ["Karavan, tekne ve tiny house için", "Yarı esnek ETFE yüzey", "Sadece 4,8 kg"],
-      price: 6750, stock: 4
-    },
-    {
-      id: "inv-5g", cat: "inverter", img: "inverter",
-      name: "5 kW On-Grid İnvertör (Monofaze)",
-      specs: ["2 MPPT girişi", "Wi-Fi izleme modülü dahil", "5 yıl garanti"],
-      price: 38500, stock: 9
-    },
-    {
-      id: "inv-6h", hit: true, cat: "inverter", img: "inverter",
-      name: "6 kW Hibrit İnvertör 48V",
-      specs: ["120A MPPT şarj kontrollü", "Şebeke + akü + jeneratör girişi", "Paralellenebilir (9 adede kadar)"],
-      price: 52900, stock: 7
-    },
-    {
-      id: "inv-3s", cat: "inverter", img: "inverter",
-      name: "3 kW Tam Sinüs İnvertör 24V",
-      specs: ["Off-grid kullanım için", "LCD ekran, USB çıkış", "Düşük bekleme tüketimi"],
-      price: 14750, stock: 14
-    },
-    {
-      id: "aku-lfp", hit: true, cat: "aku", img: "battery",
-      name: "48V 100Ah LiFePO4 Lityum Akü",
-      specs: ["5,12 kWh kapasite", "6.000+ çevrim ömrü", "Dahili BMS, Bluetooth takip"],
-      price: 58900, stock: 6
-    },
-    {
-      id: "aku-jel", cat: "aku", img: "battery",
-      name: "12V 150Ah Derin Döngü Jel Akü",
-      specs: ["Bakım gerektirmez", "Solar sistemler için optimize", "2 yıl garanti"],
-      price: 9850, stock: 22
-    },
-    {
-      id: "kit-krv", hit: true, cat: "paket", img: "kit",
-      name: "Karavan Solar Paketi 410W",
-      specs: ["410W panel + 30A MPPT regülatör", "Kablolama ve montaj aparatları dahil", "Kurulum şeması ile birlikte"],
-      price: 32500, stock: 3
-    },
-    {
-      id: "kit-bag", cat: "paket", img: "kit",
-      name: "Bağ Evi Off-Grid Paketi 3 kW",
-      specs: ["4 × 460W panel + 3 kW invertör", "12V 150Ah × 2 jel akü", "Telefonla kurulum desteği"],
-      price: 94500, stock: 5
-    },
-    {
-      id: "aks-mppt", cat: "aksesuar", img: "controller",
-      name: "30A MPPT Şarj Kontrol Cihazı 12/24V",
-      specs: ["LCD ekran, otomatik voltaj seçimi", "Aşırı şarj ve kısa devre koruması", "2 yıl garanti"],
-      price: 4250, stock: 16
-    },
-    {
-      id: "aks-lamba", hit: true, cat: "aksesuar", img: "streetlight",
-      name: "Solar Sokak / Bahçe Lambası 100W",
-      specs: ["Dahili panel ve lityum batarya", "Alacakaranlık sensörü, kumandalı", "IP65 dış mekan koruması"],
-      price: 3980, stock: 12
-    },
-    {
-      id: "aks-montaj", cat: "aksesuar", img: "mount",
-      name: "Çatı Montaj Konstrüksiyon Seti (10 Panel)",
-      specs: ["Eloksallı alüminyum ray ve kelepçeler", "Kiremit ve sac çatıya uygun", "Paslanmaz bağlantı elemanları"],
-      price: 7500, stock: 9
-    },
-    {
-      id: "aks-kablo", cat: "aksesuar", img: "cable",
-      name: "6mm² Solar Kablo 50m + MC4 Konnektör Seti",
-      specs: ["UV dayanımlı çift izolasyon", "2 çift MC4 konnektör dahil", "TSE belgeli"],
-      price: 2450, stock: 30
-    }
+    { id: "pnl-460", hit: true, cat: "panel", img: "panel", name: "460W Half-Cut Monokristal Güneş Paneli", specs: ["120 hücre · %21,3 verim", "Çerçeve: eloksallı alüminyum, IP68 bağlantı kutusu", "25 yıl performans garantisi"], price: 4850, stock: 25 },
+    { id: "pnl-550", hit: true, cat: "panel", img: "panel", name: "550W Monokristal Güneş Paneli", specs: ["144 hücre · %21,7 verim", "Çift cam (bifacial) teknoloji", "30 yıl performans garantisi"], price: 5950, stock: 18 },
+    { id: "pnl-flx", cat: "panel", img: "flex", name: "285W Esnek Güneş Paneli", specs: ["Karavan, tekne ve tiny house için", "Yarı esnek ETFE yüzey", "Sadece 4,8 kg"], price: 6750, stock: 4 },
+    { id: "inv-5g", cat: "inverter", img: "inverter", name: "5 kW On-Grid İnvertör (Monofaze)", specs: ["2 MPPT girişi", "Wi-Fi izleme modülü dahil", "5 yıl garanti"], price: 38500, stock: 9 },
+    { id: "inv-6h", hit: true, cat: "inverter", img: "inverter", name: "6 kW Hibrit İnvertör 48V", specs: ["120A MPPT şarj kontrollü", "Şebeke + akü + jeneratör girişi", "Paralellenebilir (9 adede kadar)"], price: 52900, stock: 7 },
+    { id: "inv-3s", cat: "inverter", img: "inverter", name: "3 kW Tam Sinüs İnvertör 24V", specs: ["Off-grid kullanım için", "LCD ekran, USB çıkış", "Düşük bekleme tüketimi"], price: 14750, stock: 14 },
+    { id: "aku-lfp", hit: true, cat: "aku", img: "battery", name: "48V 100Ah LiFePO4 Lityum Akü", specs: ["5,12 kWh kapasite", "6.000+ çevrim ömrü", "Dahili BMS, Bluetooth takip"], price: 58900, stock: 6 },
+    { id: "aku-jel", cat: "aku", img: "battery", name: "12V 150Ah Derin Döngü Jel Akü", specs: ["Bakım gerektirmez", "Solar sistemler için optimize", "2 yıl garanti"], price: 9850, stock: 22 },
+    { id: "kit-krv", hit: true, cat: "paket", img: "kit", name: "Karavan Solar Paketi 410W", specs: ["410W panel + 30A MPPT regülatör", "Kablolama ve montaj aparatları dahil", "Kurulum şeması ile birlikte"], price: 32500, stock: 3 },
+    { id: "kit-bag", cat: "paket", img: "kit", name: "Bağ Evi Off-Grid Paketi 3 kW", specs: ["4 × 460W panel + 3 kW invertör", "12V 150Ah × 2 jel akü", "Telefonla kurulum desteği"], price: 94500, stock: 5 },
+    { id: "aks-mppt", cat: "aksesuar", img: "controller", name: "30A MPPT Şarj Kontrol Cihazı 12/24V", specs: ["LCD ekran, otomatik voltaj seçimi", "Aşırı şarj ve kısa devre koruması", "2 yıl garanti"], price: 4250, stock: 16 },
+    { id: "aks-lamba", hit: true, cat: "aksesuar", img: "streetlight", name: "Solar Sokak / Bahçe Lambası 100W", specs: ["Dahili panel ve lityum batarya", "Alacakaranlık sensörü, kumandalı", "IP65 dış mekan koruması"], price: 3980, stock: 12 },
+    { id: "aks-montaj", cat: "aksesuar", img: "mount", name: "Çatı Montaj Konstrüksiyon Seti (10 Panel)", specs: ["Eloksallı alüminyum ray ve kelepçeler", "Kiremit ve sac çatıya uygun", "Paslanmaz bağlantı elemanları"], price: 7500, stock: 9 },
+    { id: "aks-kablo", cat: "aksesuar", img: "cable", name: "6mm² Solar Kablo 50m + MC4 Konnektör Seti", specs: ["UV dayanımlı çift izolasyon", "2 çift MC4 konnektör dahil", "TSE belgeli"], price: 2450, stock: 30 }
   ];
-
-  // ---------- KATEGORİLER ----------
   const DEFAULT_CATEGORIES = [
     { id: "panel", name: "Güneş Panelleri" },
     { id: "inverter", name: "İnvertörler" },
@@ -112,259 +46,11 @@ const Store = (() => {
     { id: "paket", name: "Hazır Paketler" },
     { id: "aksesuar", name: "Aksesuarlar" }
   ];
-
-  function getCategories() {
-    let cats = read("gp-cats", null);
-    if (!cats) {
-      cats = DEFAULT_CATEGORIES;
-      write("gp-cats", cats);
-    }
-    return cats;
-  }
-
-  function saveCategory(cat) {
-    const cats = getCategories();
-    if (cat.id) {
-      const existing = cats.find((c) => c.id === cat.id);
-      if (existing) existing.name = cat.name.trim();
-    } else {
-      cats.push({ id: "c-" + Date.now(), name: cat.name.trim() });
-    }
-    write("gp-cats", cats);
-  }
-
-  function deleteCategory(id) {
-    write("gp-cats", getCategories().filter((c) => c.id !== id));
-  }
-
-  // ---------- VİTRİN / SLİDER ----------
-  // Ana sayfadaki kayan showroom görselleri. Admin panelinden yönetilir.
   const DEFAULT_SLIDES = [
-    {
-      id: "sl1", image: "", art: "roof",
-      title: "Güneş Enerjisinde Türkiye'nin Her Yerine Gönderim",
-      subtitle: "Panel, invertör, akü ve hazır paketler stoktan — siparişiniz aynı gün kargoda.",
-      btnText: "Ürünleri İncele", btnLink: "urunler.html"
-    },
-    {
-      id: "sl2", image: "", art: "field",
-      title: "Yüksek Verimli Monokristal Paneller",
-      subtitle: "%21+ verim, 25 yıla varan garanti. Ev, işyeri ve tarım için uygun çözümler.",
-      btnText: "Panelleri Gör", btnLink: "urunler.html"
-    },
-    {
-      id: "sl3", image: "", art: "carport",
-      title: "Karavan ve Bağ Evi Solar Paketleri",
-      subtitle: "Şebekeden bağımsız, kur-kullan hazır sistemler. Montaj kılavuzu ve destek dahil.",
-      btnText: "Paketleri Gör", btnLink: "urunler.html"
-    }
+    { id: "sl1", image: "", art: "roof", title: "Güneş Enerjisinde Türkiye'nin Her Yerine Gönderim", subtitle: "Panel, invertör, akü ve hazır paketler stoktan — siparişiniz aynı gün kargoda.", btnText: "Ürünleri İncele", btnLink: "urunler.html" },
+    { id: "sl2", image: "", art: "field", title: "Yüksek Verimli Monokristal Paneller", subtitle: "%21+ verim, 25 yıla varan garanti. Ev, işyeri ve tarım için uygun çözümler.", btnText: "Panelleri Gör", btnLink: "urunler.html" },
+    { id: "sl3", image: "", art: "carport", title: "Karavan ve Bağ Evi Solar Paketleri", subtitle: "Şebekeden bağımsız, kur-kullan hazır sistemler. Montaj kılavuzu ve destek dahil.", btnText: "Paketleri Gör", btnLink: "urunler.html" }
   ];
-
-  function getSlides() {
-    let slides = read("gp-slides", null);
-    if (!slides) {
-      slides = DEFAULT_SLIDES;
-      write("gp-slides", slides);
-    }
-    return slides;
-  }
-
-  function saveSlide(slide) {
-    const slides = getSlides();
-    if (slide.id) {
-      const i = slides.findIndex((s) => s.id === slide.id);
-      if (i >= 0) { slides[i] = slide; write("gp-slides", slides); return; }
-    }
-    slide.id = "sl-" + Date.now();
-    slides.push(slide);
-    write("gp-slides", slides);
-  }
-
-  function deleteSlide(id) {
-    write("gp-slides", getSlides().filter((s) => s.id !== id));
-  }
-
-  function moveSlide(id, dir) {
-    const slides = getSlides();
-    const i = slides.findIndex((s) => s.id === id);
-    const j = i + dir;
-    if (i < 0 || j < 0 || j >= slides.length) return;
-    [slides[i], slides[j]] = [slides[j], slides[i]];
-    write("gp-slides", slides);
-  }
-
-  // Varsayılan ürün listesine yeni ürünler eklendiğinde bu sürümü artırın;
-  // mevcut tarayıcılardaki listelere yalnızca eksik olanlar eklenir.
-  const SEED_VERSION = 3;
-
-  function getProducts() {
-    let list = read("gp-products", null);
-    if (!list) {
-      list = DEFAULT_PRODUCTS;
-      write("gp-products", list);
-      write("gp-seed", SEED_VERSION);
-      return list;
-    }
-    if (read("gp-seed", 1) < SEED_VERSION) {
-      const ids = new Set(list.map((p) => p.id));
-      DEFAULT_PRODUCTS.forEach((p) => {
-        if (!ids.has(p.id)) list.push(p);
-      });
-      // Eski depolardan gelen ürünlere varsayılan "çok satan" işaretlerini uygula
-      list.forEach((p) => {
-        const d = DEFAULT_PRODUCTS.find((x) => x.id === p.id);
-        if (d && d.hit && p.hit === undefined) p.hit = true;
-      });
-      write("gp-products", list);
-      write("gp-seed", SEED_VERSION);
-    }
-    return list;
-  }
-
-  function saveProduct(product) {
-    const list = getProducts();
-    const i = list.findIndex((p) => p.id === product.id);
-    if (i >= 0) list[i] = product;
-    else list.unshift(product);
-    write("gp-products", list);
-  }
-
-  function deleteProduct(id) {
-    write("gp-products", getProducts().filter((p) => p.id !== id));
-  }
-
-  // ---------- KULLANICILAR & OTURUM ----------
-  // NOT: Şifreler demo amaçlı basitçe kodlanır. Gerçek sistemde şifre
-  // doğrulama sunucuda (bcrypt vb. ile) yapılmalıdır.
-  const hash = (s) => btoa(unescape(encodeURIComponent("gp$" + s)));
-
-  function getUsers() {
-    let users = read("gp-users", null);
-    if (!users) {
-      users = [{
-        name: "Site Yöneticisi",
-        email: "admin@quantorasolar.com.tr",
-        phone: "",
-        pass: hash("admin123"),
-        role: "admin",
-        created: Date.now()
-      }];
-      write("gp-users", users);
-    }
-    return users;
-  }
-
-  function register({ name, email, phone, pass }) {
-    const users = getUsers();
-    email = email.trim().toLowerCase();
-    if (users.some((u) => u.email === email)) {
-      return { ok: false, error: "Bu e-posta ile kayıtlı bir hesap zaten var." };
-    }
-    users.push({ name: name.trim(), email, phone: phone.trim(), pass: hash(pass), role: "user", created: Date.now() });
-    write("gp-users", users);
-    return { ok: true };
-  }
-
-  function login(email, pass) {
-    email = email.trim().toLowerCase();
-    const user = getUsers().find((u) => u.email === email && u.pass === hash(pass));
-    if (!user) return { ok: false, error: "E-posta veya şifre hatalı." };
-    const session = { name: user.name, email: user.email, role: user.role };
-    write("gp-session", session);
-    return { ok: true, session };
-  }
-
-  function logout() {
-    localStorage.removeItem("gp-session");
-  }
-
-  function session() {
-    return read("gp-session", null);
-  }
-
-  function getUser(email) {
-    const u = getUsers().find((x) => x.email === email);
-    return u ? { name: u.name, email: u.email, phone: u.phone || "" } : null;
-  }
-
-  function updateProfile(email, data) {
-    const users = getUsers();
-    const u = users.find((x) => x.email === email);
-    if (!u) return { ok: false, error: "Kullanıcı bulunamadı." };
-    if (data.name && data.name.trim()) u.name = data.name.trim();
-    u.phone = (data.phone || "").trim();
-    write("gp-users", users);
-    const s = session();
-    if (s && s.email === email) {
-      s.name = u.name;
-      write("gp-session", s);
-    }
-    return { ok: true };
-  }
-
-  function changePassword(email, oldPass, newPass) {
-    const users = getUsers();
-    const u = users.find((x) => x.email === email && x.pass === hash(oldPass));
-    if (!u) return { ok: false, error: "Mevcut şifreniz hatalı." };
-    u.pass = hash(newPass);
-    write("gp-users", users);
-    return { ok: true };
-  }
-
-  // ---------- KEŞİF TALEPLERİ (İLETİŞİM FORMU) ----------
-  function addLead(lead) {
-    const leads = read("gp-leads", []);
-    leads.unshift({ ...lead, date: Date.now() });
-    write("gp-leads", leads);
-  }
-
-  function getLeads() {
-    return read("gp-leads", []);
-  }
-
-  function deleteLead(index) {
-    const leads = getLeads();
-    leads.splice(index, 1);
-    write("gp-leads", leads);
-  }
-
-  // ---------- SİPARİŞLER ----------
-  function addOrder(order) {
-    const orders = read("gp-orders", []);
-    orders.unshift({ ...order, date: Date.now() });
-    write("gp-orders", orders);
-  }
-
-  function getOrders() {
-    return read("gp-orders", []);
-  }
-
-  function getOrdersByEmail(email) {
-    return getOrders().filter((o) => o.email === email);
-  }
-
-  // ---------- ÖDEME (PayTR) ----------
-  // PayTR entegrasyonu bağlandığında bu fonksiyon sunucunuzdan iframe
-  // token'ı isteyecek ve müşteriyi PayTR ödeme sayfasına yönlendirecek.
-  // Şimdilik simülasyon yanıtı döner; sipariş "ödeme bekliyor" olarak
-  // kaydedilir.
-  function startCardPayment(order) {
-    return {
-      ok: true,
-      message: "Kart ödeme sayfası PayTR entegrasyonu tamamlandığında burada açılacaktır."
-    };
-  }
-
-  // ---------- AYARLAR ----------
-  function getSettings() {
-    return read("gp-settings", { whatsapp: "908500000000" });
-  }
-
-  function saveSettings(settings) {
-    write("gp-settings", { ...getSettings(), ...settings });
-  }
-
-  // ---------- SİTE İÇERİĞİ (iletişim + footer metinleri) ----------
   const DEFAULT_SITE = {
     phone: "0850 000 00 00",
     email: "info@quantorasolar.com.tr",
@@ -374,16 +60,320 @@ const Store = (() => {
     footerAbout: "Temiz enerjiyle daha aydınlık bir gelecek için 12 yıldır çalışıyoruz.",
     footerCopyright: "© 2026 Quantora Solar Enerji — Bu site örnek/demo amaçlıdır."
   };
+  const DEFAULT_SETTINGS = { whatsapp: "908500000000" };
+  const SEED_VERSION = 3;
 
-  function getSiteContent() {
-    return { ...DEFAULT_SITE, ...read("gp-site", {}) };
+  // ===================== BELLEK ÖNBELLEĞİ =====================
+  const cache = {
+    products: [], categories: [], slides: [], orders: [], leads: [],
+    site: { ...DEFAULT_SITE }, settings: { ...DEFAULT_SETTINGS }
+  };
+
+  // ===================== SUPABASE REST YARDIMCILARI =====================
+  const token = () => (read("gp-session", {}) || {}).token || SB_KEY;
+  async function sbSelect(table, query) {
+    const r = await fetch(SB_URL + "/rest/v1/" + table + "?" + (query || "select=*"), {
+      headers: { apikey: SB_KEY, Authorization: "Bearer " + token() }
+    });
+    if (!r.ok) throw new Error(table + " okunamadı (" + r.status + ")");
+    return r.json();
+  }
+  function sbWrite(method, table, query, body) {
+    return fetch(SB_URL + "/rest/v1/" + table + (query ? "?" + query : ""), {
+      method,
+      headers: {
+        apikey: SB_KEY, Authorization: "Bearer " + token(),
+        "Content-Type": "application/json",
+        Prefer: "return=minimal,resolution=merge-duplicates"
+      },
+      body: body ? JSON.stringify(body) : undefined
+    }).then((r) => { if (!r.ok) return r.text().then((t) => { throw new Error(t); }); });
+  }
+  function sbKv(k, v) { return sbWrite("POST", "kv", "", { k, v }); }
+  async function gotrue(path, body) {
+    const r = await fetch(SB_URL + "/auth/v1/" + path, {
+      method: "POST",
+      headers: { apikey: SB_KEY, "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    });
+    const data = await r.json().catch(() => ({}));
+    return { ok: r.ok, status: r.status, data };
   }
 
+  // ===================== YÜKLEME (bootstrap) =====================
+  let loadPromise = null;
+  function load() { return loadPromise || (loadPromise = doLoad().catch((e) => { logErr(e); fallbackLocal(); })); }
+  function ready(fn) { return load().then(fn); }
+
+  async function doLoad() {
+    if (MODE === "supabase") {
+      const [products, categories, slides, kv] = await Promise.all([
+        sbSelect("products", "select=*&order=sort"),
+        sbSelect("categories", "select=*&order=sort"),
+        sbSelect("slides", "select=*&order=sort"),
+        sbSelect("kv", "select=*")
+      ]);
+      cache.products = products.map(fromDbProduct);
+      cache.categories = categories.map((c) => ({ id: c.id, name: c.name }));
+      cache.slides = slides.map(fromDbSlide);
+      const kvMap = {};
+      kv.forEach((row) => (kvMap[row.k] = row.v));
+      cache.site = { ...DEFAULT_SITE, ...(kvMap.site || {}) };
+      cache.settings = { ...DEFAULT_SETTINGS, ...(kvMap.settings || {}) };
+
+      // Yönetici tüm siparişleri/talepleri, kullanıcı kendi siparişlerini görür
+      const s = session();
+      if (s && s.role === "admin") {
+        const [orders, leads] = await Promise.all([
+          sbSelect("orders", "select=*&order=created.desc"),
+          sbSelect("leads", "select=*&order=created.desc")
+        ]);
+        cache.orders = orders.map(fromDbOrder);
+        cache.leads = leads.map(fromDbLead);
+      } else if (s && s.email) {
+        const orders = await sbSelect("orders", "select=*&email=eq." + encodeURIComponent(s.email) + "&order=created.desc");
+        cache.orders = orders.map(fromDbOrder);
+      }
+    } else {
+      fallbackLocal();
+    }
+  }
+
+  function fallbackLocal() {
+    cache.categories = read("gp-cats", null) || seedLocal("gp-cats", DEFAULT_CATEGORIES);
+    cache.products = loadLocalProducts();
+    cache.slides = read("gp-slides", null) || seedLocal("gp-slides", DEFAULT_SLIDES);
+    cache.orders = read("gp-orders", []);
+    cache.leads = read("gp-leads", []);
+    cache.site = { ...DEFAULT_SITE, ...read("gp-site", {}) };
+    cache.settings = { ...DEFAULT_SETTINGS, ...read("gp-settings", {}) };
+  }
+  function seedLocal(key, val) { write(key, val); return val.map((x) => ({ ...x })); }
+  function loadLocalProducts() {
+    let list = read("gp-products", null);
+    if (!list) { write("gp-products", DEFAULT_PRODUCTS); write("gp-seed", SEED_VERSION); return DEFAULT_PRODUCTS.map((x) => ({ ...x })); }
+    if (read("gp-seed", 1) < SEED_VERSION) {
+      const ids = new Set(list.map((p) => p.id));
+      DEFAULT_PRODUCTS.forEach((p) => { if (!ids.has(p.id)) list.push(p); });
+      list.forEach((p) => { const d = DEFAULT_PRODUCTS.find((x) => x.id === p.id); if (d && d.hit && p.hit === undefined) p.hit = true; });
+      write("gp-products", list); write("gp-seed", SEED_VERSION);
+    }
+    return list;
+  }
+
+  // ---- DB satırı <-> uygulama nesnesi ----
+  function fromDbProduct(r) { return { id: r.id, cat: r.cat, img: r.img, photo: r.photo || "", name: r.name, specs: r.specs || [], price: r.price, stock: r.stock, hit: !!r.hit }; }
+  function toDbProduct(p, sort) { return { id: p.id, cat: p.cat, img: p.img, photo: p.photo || "", name: p.name, specs: p.specs || [], price: p.price, stock: p.stock, hit: !!p.hit, sort: sort == null ? 0 : sort }; }
+  function fromDbSlide(r) { return { id: r.id, image: r.image || "", art: r.art, title: r.title, subtitle: r.subtitle || "", btnText: r.btnText || "", btnLink: r.btnLink || "urunler.html" }; }
+  function toDbSlide(s, sort) { return { id: s.id, image: s.image || "", art: s.art, title: s.title, subtitle: s.subtitle || "", btnText: s.btnText || "", btnLink: s.btnLink || "urunler.html", sort: sort == null ? 0 : sort }; }
+  function fromDbOrder(r) { return { id: r.id, customer: r.customer, phone: r.phone, email: r.email, city: r.city, address: r.address, payment: r.payment, status: r.status, items: r.items || [], total: r.total, date: r.created }; }
+  function fromDbLead(r) { return { id: r.id, name: r.name, phone: r.phone, city: r.city, type: r.type, message: r.message, date: r.created }; }
+
+  // ===================== ÜRÜNLER =====================
+  function getProducts() { return cache.products; }
+  function saveProduct(product) {
+    const i = cache.products.findIndex((p) => p.id === product.id);
+    if (i >= 0) cache.products[i] = product; else cache.products.unshift(product);
+    if (persist) return sbWrite("POST", "products", "", toDbProduct(product)).catch(logErr);
+    write("gp-products", cache.products);
+  }
+  function deleteProduct(id) {
+    cache.products = cache.products.filter((p) => p.id !== id);
+    if (persist) return sbWrite("DELETE", "products", "id=eq." + encodeURIComponent(id)).catch(logErr);
+    write("gp-products", cache.products);
+  }
+
+  // ===================== KATEGORİLER =====================
+  function getCategories() { return cache.categories; }
+  function saveCategory(cat) {
+    if (cat.id) {
+      const ex = cache.categories.find((c) => c.id === cat.id);
+      if (ex) ex.name = cat.name.trim();
+      if (persist) return sbWrite("POST", "categories", "", { id: cat.id, name: cat.name.trim() }).catch(logErr);
+    } else {
+      const nc = { id: "c-" + Date.now(), name: cat.name.trim() };
+      cache.categories.push(nc);
+      if (persist) return sbWrite("POST", "categories", "", { id: nc.id, name: nc.name, sort: cache.categories.length }).catch(logErr);
+    }
+    write("gp-cats", cache.categories);
+  }
+  function deleteCategory(id) {
+    cache.categories = cache.categories.filter((c) => c.id !== id);
+    if (persist) return sbWrite("DELETE", "categories", "id=eq." + encodeURIComponent(id)).catch(logErr);
+    write("gp-cats", cache.categories);
+  }
+
+  // ===================== SLAYTLAR =====================
+  function getSlides() { return cache.slides; }
+  function saveSlide(slide) {
+    if (slide.id) {
+      const i = cache.slides.findIndex((s) => s.id === slide.id);
+      if (i >= 0) cache.slides[i] = slide;
+    } else { slide.id = "sl-" + Date.now(); cache.slides.push(slide); }
+    if (persist) return sbWrite("POST", "slides", "", toDbSlide(slide, cache.slides.findIndex((s) => s.id === slide.id))).catch(logErr);
+    write("gp-slides", cache.slides);
+  }
+  function deleteSlide(id) {
+    cache.slides = cache.slides.filter((s) => s.id !== id);
+    if (persist) return sbWrite("DELETE", "slides", "id=eq." + encodeURIComponent(id)).catch(logErr);
+    write("gp-slides", cache.slides);
+  }
+  function moveSlide(id, dir) {
+    const i = cache.slides.findIndex((s) => s.id === id), j = i + dir;
+    if (i < 0 || j < 0 || j >= cache.slides.length) return;
+    const t = cache.slides[i]; cache.slides[i] = cache.slides[j]; cache.slides[j] = t;
+    if (persist) { cache.slides.forEach((s, k) => sbWrite("POST", "slides", "", toDbSlide(s, k)).catch(logErr)); return; }
+    write("gp-slides", cache.slides);
+  }
+
+  // ===================== OTURUM & KULLANICILAR =====================
+  const hash = (s) => btoa(unescape(encodeURIComponent("gp$" + s)));
+  function session() { return read("gp-session", null); }
+  function logout() { localStorage.removeItem("gp-session"); }
+
+  function getUsersLocal() {
+    let users = read("gp-users", null);
+    if (!users) {
+      users = [{ name: "Site Yöneticisi", email: "admin@quantorasolar.com.tr", phone: "", pass: hash("admin123"), role: "admin", created: Date.now() }];
+      write("gp-users", users);
+    }
+    return users;
+  }
+
+  async function register({ name, email, phone, pass }) {
+    email = (email || "").trim().toLowerCase();
+    if (persist) {
+      const r = await gotrue("signup", { email, password: pass, data: { name: (name || "").trim(), phone: (phone || "").trim() } });
+      if (!r.ok) return { ok: false, error: (r.data && (r.data.msg || r.data.error_description)) || "Kayıt yapılamadı." };
+      return { ok: true };
+    }
+    const users = getUsersLocal();
+    if (users.some((u) => u.email === email)) return { ok: false, error: "Bu e-posta ile kayıtlı bir hesap zaten var." };
+    users.push({ name: (name || "").trim(), email, phone: (phone || "").trim(), pass: hash(pass), role: "user", created: Date.now() });
+    write("gp-users", users);
+    return { ok: true };
+  }
+
+  async function login(email, pass) {
+    email = (email || "").trim().toLowerCase();
+    if (persist) {
+      const r = await gotrue("token?grant_type=password", { email, password: pass });
+      if (!r.ok) return { ok: false, error: "E-posta veya şifre hatalı." };
+      const tk = r.data.access_token;
+      const user = r.data.user || {};
+      const meta = user.user_metadata || {};
+      let role = "user", phone = meta.phone || "", name = meta.name || email;
+      try {
+        const prof = await fetch(SB_URL + "/rest/v1/profiles?id=eq." + user.id + "&select=role,phone,name", {
+          headers: { apikey: SB_KEY, Authorization: "Bearer " + tk }
+        }).then((x) => x.json());
+        if (prof && prof[0]) { role = prof[0].role || role; phone = prof[0].phone || phone; name = prof[0].name || name; }
+      } catch (_) {}
+      const s = { name, email, role, phone, token: tk, uid: user.id };
+      write("gp-session", s);
+      return { ok: true, session: s };
+    }
+    const user = getUsersLocal().find((u) => u.email === email && u.pass === hash(pass));
+    if (!user) return { ok: false, error: "E-posta veya şifre hatalı." };
+    const s = { name: user.name, email: user.email, role: user.role };
+    write("gp-session", s);
+    return { ok: true, session: s };
+  }
+
+  function getUser(email) {
+    if (persist) { const s = session(); return s ? { name: s.name, email: s.email, phone: s.phone || "" } : null; }
+    const u = getUsersLocal().find((x) => x.email === email);
+    return u ? { name: u.name, email: u.email, phone: u.phone || "" } : null;
+  }
+
+  async function updateProfile(email, data) {
+    if (persist) {
+      const s = session();
+      if (!s) return { ok: false, error: "Oturum bulunamadı." };
+      const patch = { name: (data.name || "").trim(), phone: (data.phone || "").trim() };
+      await sbWrite("PATCH", "profiles", "id=eq." + s.uid, patch).catch(logErr);
+      s.name = patch.name || s.name; s.phone = patch.phone; write("gp-session", s);
+      return { ok: true };
+    }
+    const users = getUsersLocal();
+    const u = users.find((x) => x.email === email);
+    if (!u) return { ok: false, error: "Kullanıcı bulunamadı." };
+    if (data.name && data.name.trim()) u.name = data.name.trim();
+    u.phone = (data.phone || "").trim();
+    write("gp-users", users);
+    const s = session();
+    if (s && s.email === email) { s.name = u.name; write("gp-session", s); }
+    return { ok: true };
+  }
+
+  async function changePassword(email, oldPass, newPass) {
+    if (persist) {
+      const r = await fetch(SB_URL + "/auth/v1/user", {
+        method: "PUT",
+        headers: { apikey: SB_KEY, Authorization: "Bearer " + token(), "Content-Type": "application/json" },
+        body: JSON.stringify({ password: newPass })
+      });
+      if (!r.ok) return { ok: false, error: "Şifre değiştirilemedi." };
+      return { ok: true };
+    }
+    const users = getUsersLocal();
+    const u = users.find((x) => x.email === email && x.pass === hash(oldPass));
+    if (!u) return { ok: false, error: "Mevcut şifreniz hatalı." };
+    u.pass = hash(newPass);
+    write("gp-users", users);
+    return { ok: true };
+  }
+
+  // ===================== İLETİŞİM TALEPLERİ =====================
+  function addLead(lead) {
+    const row = { ...lead, date: Date.now() };
+    cache.leads.unshift(row);
+    if (persist) return sbWrite("POST", "leads", "", { id: "l" + Date.now(), name: lead.name, phone: lead.phone, city: lead.city || "", type: lead.type || "", message: lead.message || "", created: row.date }).catch(logErr);
+    write("gp-leads", cache.leads);
+  }
+  function getLeads() { return cache.leads; }
+  function deleteLead(index) {
+    const lead = cache.leads[index];
+    cache.leads.splice(index, 1);
+    if (persist) { if (lead && lead.id) sbWrite("DELETE", "leads", "id=eq." + encodeURIComponent(lead.id)).catch(logErr); return; }
+    write("gp-leads", cache.leads);
+  }
+
+  // ===================== SİPARİŞLER =====================
+  function addOrder(order) {
+    const row = { ...order, id: order.id || ("o" + Date.now()), date: Date.now() };
+    cache.orders.unshift(row);
+    if (persist) return sbWrite("POST", "orders", "", {
+      id: row.id, customer: order.customer, phone: order.phone || "", email: order.email || "",
+      city: order.city || "", address: order.address || "", payment: order.payment || "",
+      status: order.status || "", items: order.items || [], total: order.total, created: row.date
+    }).catch(logErr);
+    write("gp-orders", cache.orders);
+  }
+  function getOrders() { return cache.orders; }
+  function getOrdersByEmail(email) { return cache.orders.filter((o) => o.email === email); }
+
+  // ===================== ÖDEME (PayTR) =====================
+  function startCardPayment(order) {
+    return { ok: true, message: "Kart ödeme sayfası PayTR entegrasyonu tamamlandığında burada açılacaktır." };
+  }
+
+  // ===================== AYARLAR & SİTE İÇERİĞİ =====================
+  function getSettings() { return cache.settings; }
+  function saveSettings(settings) {
+    cache.settings = { ...cache.settings, ...settings };
+    if (persist) return sbKv("settings", cache.settings).catch(logErr);
+    write("gp-settings", cache.settings);
+  }
+  function getSiteContent() { return { ...DEFAULT_SITE, ...cache.site }; }
   function saveSiteContent(data) {
-    write("gp-site", { ...getSiteContent(), ...data });
+    cache.site = { ...cache.site, ...data };
+    if (persist) return sbKv("site", cache.site).catch(logErr);
+    write("gp-site", cache.site);
   }
 
   return {
+    mode: MODE, load, ready,
     getProducts, saveProduct, deleteProduct,
     getCategories, saveCategory, deleteCategory,
     getSlides, saveSlide, deleteSlide, moveSlide,
