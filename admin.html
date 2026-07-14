@@ -24,6 +24,7 @@
       <button class="admin-nav-btn" data-view="products">Ürünler</button>
       <button class="admin-nav-btn" data-view="upload">Ürün Yükle</button>
       <button class="admin-nav-btn" data-view="categories">Kategoriler</button>
+      <button class="admin-nav-btn" data-view="slides">Vitrin (Slider)</button>
       <button class="admin-nav-btn" data-view="orders">Siparişler</button>
       <button class="admin-nav-btn" data-view="leads">İletişim Talepleri</button>
       <button class="admin-nav-btn" data-view="settings">Ayarlar</button>
@@ -159,6 +160,65 @@
             <thead><tr><th>Kategori</th><th>Ürün Sayısı</th><th></th></tr></thead>
             <tbody id="catRows"></tbody>
           </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- VİTRİN / SLIDER -->
+    <section class="admin-view" id="view-slides" hidden>
+      <div class="upload-grid">
+        <div class="admin-panel">
+          <h2 id="slideFormTitle">Yeni Slayt Ekle</h2>
+          <form id="slideForm">
+            <input type="hidden" id="slId">
+            <div class="form-group">
+              <label>Slayt görseli</label>
+              <div class="drop-zone" id="slDrop">
+                <input type="file" id="slPhotoFile" accept="image/*" hidden>
+                <div class="drop-zone-inner" id="slDropInner">
+                  <strong>Görseli buraya sürükleyip bırakın</strong>
+                  <span>veya tıklayıp bilgisayarınızdan seçin — geniş (yatay) görseller idealdir</span>
+                </div>
+              </div>
+              <input type="text" id="slPhotoUrl" class="up-url" placeholder="veya görsel bağlantısı: https://...">
+              <button type="button" class="row-btn row-btn-danger" id="slPhotoRemove">Görseli Kaldır</button>
+              <small class="photo-hint">Görsel yüklemezseniz kategoriye uygun hazır çizim gösterilir.</small>
+            </div>
+            <div class="form-group">
+              <label for="slTitle">Başlık *</label>
+              <input type="text" id="slTitle" required placeholder="Örn. Yüksek Verimli Güneş Panelleri">
+            </div>
+            <div class="form-group">
+              <label for="slSub">Alt başlık</label>
+              <textarea id="slSub" rows="2" placeholder="Kısa açıklama metni"></textarea>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="slBtnText">Buton yazısı</label>
+                <input type="text" id="slBtnText" placeholder="Ürünleri İncele">
+              </div>
+              <div class="form-group">
+                <label for="slBtnLink">Buton bağlantısı</label>
+                <input type="text" id="slBtnLink" placeholder="urunler.html">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="slArt">Hazır çizim <small>(görsel yoksa)</small></label>
+              <select id="slArt">
+                <option value="roof">Çatı kurulumu</option>
+                <option value="field">Arazi tipi santral</option>
+                <option value="carport">Solar otopark</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-block">Slaytı Kaydet</button>
+            <button type="button" class="btn btn-outline btn-block" id="slCancel" hidden>Vazgeç / Yeni Slayt</button>
+            <p class="form-status" id="slStatus" role="status"></p>
+          </form>
+        </div>
+        <div class="admin-panel">
+          <h2>Mevcut Slaytlar</h2>
+          <p class="panel-hint">Slaytlar ana sayfada bu sırayla döner. Sırayı ok tuşlarıyla değiştirebilirsiniz.</p>
+          <div id="slideList"></div>
         </div>
       </div>
     </section>

@@ -6,6 +6,7 @@ Tamamen statik olduğu için herhangi bir sunucu kurulumu gerektirmez.
 ## Özellikler
 
 - Mobil uyumlu (responsive) tek sayfa tasarım
+- **Ana sayfa vitrin slider'ı**: otomatik kayan, dokunmatik destekli showroom; slaytların görselleri/metinleri/butonları admin panelinden yönetilir
 - **Ürünler sayfası** (`urunler.html`): filtreli tam mağaza; ana sayfada yalnızca 'çok satan' işaretli ürünler vitrini gösterilir (işaret admin panelindeki ürün formlarından yönetilir)
 - **Ürün fotoğrafları**: admin panelinden bilgisayardan yükleme (otomatik küçültülür) veya görsel bağlantısı; fotoğrafı olmayan ürünlerde kategoriye uygun çizim gösterilir
 - **Sepet**: localStorage ile kalıcı sepet, adet artır/azalt, WhatsApp üzerinden sipariş gönderme

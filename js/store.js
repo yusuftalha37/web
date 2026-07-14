@@ -137,6 +137,62 @@ const Store = (() => {
     write("gp-cats", getCategories().filter((c) => c.id !== id));
   }
 
+  // ---------- VİTRİN / SLİDER ----------
+  // Ana sayfadaki kayan showroom görselleri. Admin panelinden yönetilir.
+  const DEFAULT_SLIDES = [
+    {
+      id: "sl1", image: "", art: "roof",
+      title: "Güneş Enerjisinde Türkiye'nin Her Yerine Gönderim",
+      subtitle: "Panel, invertör, akü ve hazır paketler stoktan — siparişiniz aynı gün kargoda.",
+      btnText: "Ürünleri İncele", btnLink: "urunler.html"
+    },
+    {
+      id: "sl2", image: "", art: "field",
+      title: "Yüksek Verimli Monokristal Paneller",
+      subtitle: "%21+ verim, 25 yıla varan garanti. Ev, işyeri ve tarım için uygun çözümler.",
+      btnText: "Panelleri Gör", btnLink: "urunler.html"
+    },
+    {
+      id: "sl3", image: "", art: "carport",
+      title: "Karavan ve Bağ Evi Solar Paketleri",
+      subtitle: "Şebekeden bağımsız, kur-kullan hazır sistemler. Montaj kılavuzu ve destek dahil.",
+      btnText: "Paketleri Gör", btnLink: "urunler.html"
+    }
+  ];
+
+  function getSlides() {
+    let slides = read("gp-slides", null);
+    if (!slides) {
+      slides = DEFAULT_SLIDES;
+      write("gp-slides", slides);
+    }
+    return slides;
+  }
+
+  function saveSlide(slide) {
+    const slides = getSlides();
+    if (slide.id) {
+      const i = slides.findIndex((s) => s.id === slide.id);
+      if (i >= 0) { slides[i] = slide; write("gp-slides", slides); return; }
+    }
+    slide.id = "sl-" + Date.now();
+    slides.push(slide);
+    write("gp-slides", slides);
+  }
+
+  function deleteSlide(id) {
+    write("gp-slides", getSlides().filter((s) => s.id !== id));
+  }
+
+  function moveSlide(id, dir) {
+    const slides = getSlides();
+    const i = slides.findIndex((s) => s.id === id);
+    const j = i + dir;
+    if (i < 0 || j < 0 || j >= slides.length) return;
+    [slides[i], slides[j]] = [slides[j], slides[i]];
+    write("gp-slides", slides);
+  }
+
   // Varsayılan ürün listesine yeni ürünler eklendiğinde bu sürümü artırın;
   // mevcut tarayıcılardaki listelere yalnızca eksik olanlar eklenir.
   const SEED_VERSION = 3;
@@ -311,6 +367,7 @@ const Store = (() => {
   return {
     getProducts, saveProduct, deleteProduct,
     getCategories, saveCategory, deleteCategory,
+    getSlides, saveSlide, deleteSlide, moveSlide,
     register, login, logout, session,
     getUser, updateProfile, changePassword,
     addLead, getLeads, deleteLead,
@@ -319,6 +376,75 @@ const Store = (() => {
     getSettings, saveSettings
   };
 })();
+
+// ---- Vitrin slayt görselleri (SVG sahneler) ----
+// Kullanıcı kendi fotoğrafını yükleyene kadar varsayılan olarak gösterilir.
+const SLIDE_ART = {
+  roof: `
+    <svg viewBox="0 0 1200 460" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <defs><linearGradient id="skRoof" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#bfe0f2"/><stop offset="1" stop-color="#e9f4fb"/></linearGradient></defs>
+      <rect width="1200" height="330" fill="url(#skRoof)"/>
+      <circle cx="1000" cy="90" r="52" fill="#ffd24d"/>
+      <g stroke="#ffd24d" stroke-width="7" stroke-linecap="round">
+        <line x1="1000" y1="8" x2="1000" y2="26"/><line x1="1000" y1="154" x2="1000" y2="172"/>
+        <line x1="918" y1="90" x2="936" y2="90"/><line x1="1064" y1="90" x2="1082" y2="90"/></g>
+      <rect y="330" width="1200" height="130" fill="#9ab97e"/>
+      <polygon points="250,330 560,150 870,330" fill="#7a4a2b"/>
+      <rect x="330" y="330" width="460" height="110" fill="#e6d8c2"/>
+      <rect x="520" y="360" width="80" height="80" fill="#6b4a2f"/>
+      <rect x="380" y="356" width="60" height="46" fill="#9cc3de"/>
+      <rect x="680" y="356" width="60" height="46" fill="#9cc3de"/>
+      <g transform="rotate(-30.2 560 240)">
+        <rect x="360" y="205" width="90" height="60" fill="#123f66" stroke="#0a2138" stroke-width="3"/>
+        <rect x="456" y="205" width="90" height="60" fill="#174a75" stroke="#0a2138" stroke-width="3"/>
+        <rect x="552" y="205" width="90" height="60" fill="#123f66" stroke="#0a2138" stroke-width="3"/>
+        <rect x="648" y="205" width="90" height="60" fill="#174a75" stroke="#0a2138" stroke-width="3"/>
+      </g>
+    </svg>`,
+  field: `
+    <svg viewBox="0 0 1200 460" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <defs><linearGradient id="skField" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#cfe6f5"/><stop offset="1" stop-color="#eef7fc"/></linearGradient></defs>
+      <rect width="1200" height="300" fill="url(#skField)"/>
+      <circle cx="150" cy="90" r="46" fill="#ffd24d"/>
+      <path d="M0 300 Q300 262 600 292 T1200 280 V460 H0 Z" fill="#9cb87e"/>
+      <g>
+        <rect x="70" y="300" width="150" height="52" fill="#123f66" stroke="#0a2138" stroke-width="4" transform="skewX(-15)"/>
+        <rect x="270" y="300" width="150" height="52" fill="#174a75" stroke="#0a2138" stroke-width="4" transform="skewX(-15)"/>
+        <rect x="470" y="300" width="150" height="52" fill="#123f66" stroke="#0a2138" stroke-width="4" transform="skewX(-15)"/>
+        <rect x="670" y="300" width="150" height="52" fill="#174a75" stroke="#0a2138" stroke-width="4" transform="skewX(-15)"/>
+        <rect x="180" y="372" width="150" height="52" fill="#174a75" stroke="#0a2138" stroke-width="4" transform="skewX(-15)"/>
+        <rect x="380" y="372" width="150" height="52" fill="#123f66" stroke="#0a2138" stroke-width="4" transform="skewX(-15)"/>
+        <rect x="580" y="372" width="150" height="52" fill="#174a75" stroke="#0a2138" stroke-width="4" transform="skewX(-15)"/>
+        <rect x="780" y="372" width="150" height="52" fill="#123f66" stroke="#0a2138" stroke-width="4" transform="skewX(-15)"/>
+      </g>
+    </svg>`,
+  carport: `
+    <svg viewBox="0 0 1200 460" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <defs><linearGradient id="skCar" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#c6def0"/><stop offset="1" stop-color="#eaf4fb"/></linearGradient></defs>
+      <rect width="1200" height="330" fill="url(#skCar)"/>
+      <circle cx="1010" cy="86" r="48" fill="#ffd24d"/>
+      <rect y="330" width="1200" height="130" fill="#9a9a94"/>
+      <g stroke="#fff" stroke-width="4" stroke-dasharray="26 22"><line x1="0" y1="404" x2="1200" y2="404"/></g>
+      <rect x="250" y="230" width="16" height="120" fill="#5b6770"/>
+      <rect x="900" y="230" width="16" height="120" fill="#5b6770"/>
+      <g transform="rotate(-6 600 200)">
+        <rect x="180" y="182" width="760" height="16" fill="#8395a5"/>
+        <rect x="200" y="140" width="170" height="42" fill="#123f66" stroke="#0a2138" stroke-width="3"/>
+        <rect x="380" y="140" width="170" height="42" fill="#174a75" stroke="#0a2138" stroke-width="3"/>
+        <rect x="560" y="140" width="170" height="42" fill="#123f66" stroke="#0a2138" stroke-width="3"/>
+        <rect x="740" y="140" width="170" height="42" fill="#174a75" stroke="#0a2138" stroke-width="3"/>
+      </g>
+      <g>
+        <rect x="470" y="300" width="240" height="54" rx="16" fill="#b03a2e"/>
+        <path d="M508 300 q30 -34 84 -34 h44 q46 0 66 34 Z" fill="#c0453a"/>
+        <rect x="536" y="276" width="64" height="26" rx="5" fill="#d9e8f2"/>
+        <circle cx="516" cy="354" r="22" fill="#2c3640"/><circle cx="664" cy="354" r="22" fill="#2c3640"/>
+      </g>
+    </svg>`
+};
 
 // ---- Ürün görselleri (SVG) ----
 // Mağaza, sepet ve admin önizlemesi ortak kullanır.

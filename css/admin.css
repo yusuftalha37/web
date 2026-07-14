@@ -426,6 +426,63 @@
 
 #upStatus { text-align: left; }
 
+/* ---- Vitrin / slider ---- */
+.slide-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.slide-row-thumb {
+  width: 96px;
+  height: 54px;
+  flex-shrink: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: #f1f5f9;
+}
+
+.slide-row-thumb img,
+.slide-row-thumb svg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.slide-row-info { flex: 1; min-width: 0; }
+
+.slide-row-info strong {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--navy);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.slide-row-info span {
+  font-size: 0.8rem;
+  color: var(--muted);
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.slide-row-actions {
+  display: flex;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.slide-row-actions .row-btn { margin-left: 0; }
+
+.slide-row-actions .row-btn[disabled] { opacity: 0.35; cursor: default; }
+
 /* ---- Modal ---- */
 .modal-overlay {
   position: fixed;

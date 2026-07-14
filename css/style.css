@@ -343,6 +343,128 @@ img, svg { max-width: 100%; }
   padding-top: 12px;
 }
 
+/* ============ VİTRİN / SHOWROOM SLIDER ============ */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.showroom {
+  position: relative;
+  overflow: hidden;
+  background: var(--blue-dark);
+  border-bottom: 3px solid var(--orange);
+  touch-action: pan-y;
+}
+
+.showroom-track {
+  display: flex;
+  transition: transform 0.5s ease;
+}
+
+.slide {
+  position: relative;
+  flex: 0 0 100%;
+  height: 440px;
+}
+
+.slide-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+}
+
+.slide-bg-art svg { width: 100%; height: 100%; display: block; }
+
+.slide-shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(7, 28, 44, 0.82) 0%, rgba(7, 28, 44, 0.45) 55%, rgba(7, 28, 44, 0.08) 100%);
+}
+
+.slide-content {
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.slide-title {
+  color: #fff;
+  font-size: 34px;
+  line-height: 1.2;
+  max-width: 640px;
+  margin-bottom: 14px;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
+}
+
+.slide-sub {
+  color: #e8f1f8;
+  font-size: 15px;
+  max-width: 560px;
+  margin-bottom: 22px;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.45);
+}
+
+.showroom-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border: none;
+  background: rgba(255, 255, 255, 0.85);
+  color: var(--blue);
+  font-size: 26px;
+  line-height: 1;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  transition: background 0.15s;
+}
+
+.showroom-nav:hover { background: #fff; }
+.showroom-nav.prev { left: 18px; }
+.showroom-nav.next { right: 18px; }
+
+.showroom-dots {
+  position: absolute;
+  bottom: 16px;
+  left: 0;
+  right: 0;
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.showroom-dots .dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+}
+
+.showroom-dots .dot.active { background: var(--orange); border-color: var(--orange); }
+
+.showroom.single .showroom-nav,
+.showroom.single .showroom-dots { display: none; }
+
 /* ============ SAYFA BANDI (iç sayfalar) ============ */
 .page-band {
   background: var(--blue-dark) repeating-linear-gradient(
@@ -1346,6 +1468,11 @@ img, svg { max-width: 100%; }
     max-width: none;
     margin: 4px 0 0;
   }
+
+  .slide { height: 320px; }
+  .slide-title { font-size: 22px; }
+  .slide-sub { font-size: 13px; margin-bottom: 16px; }
+  .showroom-nav { width: 36px; height: 36px; font-size: 22px; }
 
   .hamburger { display: flex; }
 

@@ -44,6 +44,7 @@ const VIEW_TITLES = {
   products: "Ürünler",
   upload: "Ürün Yükle",
   categories: "Kategoriler",
+  slides: "Vitrin (Slider)",
   orders: "Siparişler",
   leads: "İletişim Talepleri",
   settings: "Ayarlar"
@@ -443,6 +444,146 @@ document.getElementById("catRows").addEventListener("click", (e) => {
   }
 });
 
+// ---------- VİTRİN / SLIDER ----------
+const slideForm = document.getElementById("slideForm");
+const slDrop = document.getElementById("slDrop");
+const slDropInner = document.getElementById("slDropInner");
+const slPhotoFile = document.getElementById("slPhotoFile");
+const slPhotoUrl = document.getElementById("slPhotoUrl");
+let slidePhoto = "";
+const SL_DROP_DEFAULT = slDropInner.innerHTML;
+
+function setSlidePhoto(src) {
+  slidePhoto = src || "";
+  slDropInner.innerHTML = slidePhoto
+    ? `<img src="${escHtml(slidePhoto)}" alt="Önizleme"><span>Değiştirmek için tıklayın veya yeni görsel sürükleyin</span>`
+    : SL_DROP_DEFAULT;
+  slDrop.classList.toggle("has-photo", !!slidePhoto);
+}
+
+slDrop.addEventListener("click", () => slPhotoFile.click());
+slDrop.addEventListener("dragover", (e) => { e.preventDefault(); slDrop.classList.add("drag"); });
+slDrop.addEventListener("dragleave", () => slDrop.classList.remove("drag"));
+slDrop.addEventListener("drop", (e) => {
+  e.preventDefault();
+  slDrop.classList.remove("drag");
+  const file = e.dataTransfer.files[0];
+  if (file) readImageFile(file, (d) => { setSlidePhoto(d); slPhotoUrl.value = ""; });
+});
+slPhotoFile.addEventListener("change", () => {
+  const file = slPhotoFile.files[0];
+  if (file) readImageFile(file, (d) => { setSlidePhoto(d); slPhotoUrl.value = ""; });
+});
+slPhotoUrl.addEventListener("change", () => {
+  const url = slPhotoUrl.value.trim();
+  if (!url) return;
+  if (!/^https?:\/\//.test(url)) { alert("Görsel bağlantısı http:// veya https:// ile başlamalıdır."); return; }
+  setSlidePhoto(url);
+  slPhotoFile.value = "";
+});
+document.getElementById("slPhotoRemove").addEventListener("click", () => {
+  setSlidePhoto("");
+  slPhotoFile.value = "";
+  slPhotoUrl.value = "";
+});
+
+function resetSlideForm() {
+  document.getElementById("slideFormTitle").textContent = "Yeni Slayt Ekle";
+  document.getElementById("slId").value = "";
+  document.getElementById("slTitle").value = "";
+  document.getElementById("slSub").value = "";
+  document.getElementById("slBtnText").value = "";
+  document.getElementById("slBtnLink").value = "";
+  document.getElementById("slArt").value = "roof";
+  slPhotoFile.value = "";
+  slPhotoUrl.value = "";
+  setSlidePhoto("");
+  document.getElementById("slCancel").hidden = true;
+}
+
+document.getElementById("slCancel").addEventListener("click", resetSlideForm);
+
+function editSlide(s) {
+  document.getElementById("slideFormTitle").textContent = "Slaytı Düzenle";
+  document.getElementById("slId").value = s.id;
+  document.getElementById("slTitle").value = s.title || "";
+  document.getElementById("slSub").value = s.subtitle || "";
+  document.getElementById("slBtnText").value = s.btnText || "";
+  document.getElementById("slBtnLink").value = s.btnLink || "";
+  document.getElementById("slArt").value = s.art || "roof";
+  slPhotoUrl.value = s.image && !String(s.image).startsWith("data:") ? s.image : "";
+  setSlidePhoto(s.image || "");
+  document.getElementById("slCancel").hidden = false;
+  window.scrollTo(0, 0);
+}
+
+function renderSlides() {
+  const slides = Store.getSlides();
+  document.getElementById("slideList").innerHTML =
+    slides.map((s, i) => `
+      <div class="slide-row">
+        <div class="slide-row-thumb">${
+          s.image ? `<img src="${escHtml(s.image)}" alt="">` : (SLIDE_ART[s.art] || SLIDE_ART.roof)
+        }</div>
+        <div class="slide-row-info">
+          <strong>${escHtml(s.title || "(başlıksız)")}</strong>
+          <span>${escHtml(s.subtitle || "")}</span>
+        </div>
+        <div class="slide-row-actions">
+          <button class="row-btn" data-act="up" data-id="${s.id}" ${i === 0 ? "disabled" : ""} aria-label="Yukarı">↑</button>
+          <button class="row-btn" data-act="down" data-id="${s.id}" ${i === slides.length - 1 ? "disabled" : ""} aria-label="Aşağı">↓</button>
+          <button class="row-btn" data-act="edit" data-id="${s.id}">Düzenle</button>
+          <button class="row-btn row-btn-danger" data-act="del" data-id="${s.id}">Sil</button>
+        </div>
+      </div>`).join("") ||
+    '<p class="empty-row">Henüz slayt yok. Soldaki formdan ekleyin.</p>';
+}
+
+document.getElementById("slideList").addEventListener("click", (e) => {
+  const btn = e.target.closest(".row-btn");
+  if (!btn) return;
+  const { id, act } = btn.dataset;
+  const slide = Store.getSlides().find((s) => s.id === id);
+  if (act === "up") { Store.moveSlide(id, -1); renderSlides(); }
+  if (act === "down") { Store.moveSlide(id, 1); renderSlides(); }
+  if (act === "edit" && slide) editSlide(slide);
+  if (act === "del" && slide && confirm("Bu slayt silinsin mi?")) {
+    Store.deleteSlide(id);
+    if (document.getElementById("slId").value === id) resetSlideForm();
+    renderSlides();
+  }
+});
+
+slideForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const status = document.getElementById("slStatus");
+  const title = document.getElementById("slTitle").value.trim();
+  if (!title) {
+    status.textContent = "Lütfen bir başlık girin.";
+    status.className = "form-status err";
+    return;
+  }
+  try {
+    Store.saveSlide({
+      id: document.getElementById("slId").value || "",
+      image: slidePhoto,
+      art: document.getElementById("slArt").value,
+      title,
+      subtitle: document.getElementById("slSub").value.trim(),
+      btnText: document.getElementById("slBtnText").value.trim(),
+      btnLink: document.getElementById("slBtnLink").value.trim() || "urunler.html"
+    });
+  } catch (err) {
+    status.textContent = "Kayıt başarısız: tarayıcı depolama alanı doldu. Daha küçük görsel kullanın.";
+    status.className = "form-status err";
+    return;
+  }
+  status.textContent = "Slayt kaydedildi.";
+  status.className = "form-status ok";
+  resetSlideForm();
+  renderSlides();
+});
+
 // ---------- SİPARİŞLER ----------
 function renderOrders() {
   const orders = Store.getOrders();
@@ -518,6 +659,7 @@ function renderAll() {
   renderDashboard();
   renderProducts();
   renderCategories();
+  renderSlides();
   renderOrders();
   renderLeads();
   renderUploadPreview();

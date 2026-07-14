@@ -352,6 +352,128 @@ img, svg { max-width: 100%; }
   padding-top: 12px;
 }
 
+/* ============ VİTRİN / SHOWROOM SLIDER ============ */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.showroom {
+  position: relative;
+  overflow: hidden;
+  background: var(--blue-dark);
+  border-bottom: 3px solid var(--orange);
+  touch-action: pan-y;
+}
+
+.showroom-track {
+  display: flex;
+  transition: transform 0.5s ease;
+}
+
+.slide {
+  position: relative;
+  flex: 0 0 100%;
+  height: 440px;
+}
+
+.slide-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+}
+
+.slide-bg-art svg { width: 100%; height: 100%; display: block; }
+
+.slide-shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(7, 28, 44, 0.82) 0%, rgba(7, 28, 44, 0.45) 55%, rgba(7, 28, 44, 0.08) 100%);
+}
+
+.slide-content {
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.slide-title {
+  color: #fff;
+  font-size: 34px;
+  line-height: 1.2;
+  max-width: 640px;
+  margin-bottom: 14px;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
+}
+
+.slide-sub {
+  color: #e8f1f8;
+  font-size: 15px;
+  max-width: 560px;
+  margin-bottom: 22px;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.45);
+}
+
+.showroom-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border: none;
+  background: rgba(255, 255, 255, 0.85);
+  color: var(--blue);
+  font-size: 26px;
+  line-height: 1;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  transition: background 0.15s;
+}
+
+.showroom-nav:hover { background: #fff; }
+.showroom-nav.prev { left: 18px; }
+.showroom-nav.next { right: 18px; }
+
+.showroom-dots {
+  position: absolute;
+  bottom: 16px;
+  left: 0;
+  right: 0;
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.showroom-dots .dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+}
+
+.showroom-dots .dot.active { background: var(--orange); border-color: var(--orange); }
+
+.showroom.single .showroom-nav,
+.showroom.single .showroom-dots { display: none; }
+
 /* ============ SAYFA BANDI (iç sayfalar) ============ */
 .page-band {
   background: var(--blue-dark) repeating-linear-gradient(
@@ -1356,6 +1478,11 @@ img, svg { max-width: 100%; }
     margin: 4px 0 0;
   }
 
+  .slide { height: 320px; }
+  .slide-title { font-size: 22px; }
+  .slide-sub { font-size: 13px; margin-bottom: 16px; }
+  .showroom-nav { width: 36px; height: 36px; font-size: 22px; }
+
   .hamburger { display: flex; }
 
   .mainmenu-inner { flex-wrap: wrap; }
@@ -1826,6 +1953,63 @@ img, svg { max-width: 100%; }
 
 #upStatus { text-align: left; }
 
+/* ---- Vitrin / slider ---- */
+.slide-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.slide-row-thumb {
+  width: 96px;
+  height: 54px;
+  flex-shrink: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: #f1f5f9;
+}
+
+.slide-row-thumb img,
+.slide-row-thumb svg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.slide-row-info { flex: 1; min-width: 0; }
+
+.slide-row-info strong {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--navy);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.slide-row-info span {
+  font-size: 0.8rem;
+  color: var(--muted);
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.slide-row-actions {
+  display: flex;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.slide-row-actions .row-btn { margin-left: 0; }
+
+.slide-row-actions .row-btn[disabled] { opacity: 0.35; cursor: default; }
+
 /* ---- Modal ---- */
 .modal-overlay {
   position: fixed;
@@ -1962,19 +2146,13 @@ img, svg { max-width: 100%; }
     </div>
   </nav>
 
-  <!-- BANNER -->
-  <section class="hero" id="anasayfa">
-    <div class="container">
-      <h1>Güneş Paneli ve Solar Enerji Ürünlerinde<br>Türkiye'nin Her Yerine Gönderim</h1>
-      <p>Güneş paneli, invertör, solar akü ve hazır güneş enerjisi paketlerini stoktan, uygun fiyatlarla
-      satıyoruz. Siparişiniz aynı gün kargoda — 81 ilin tamamına sigortalı gönderim. Her ürünle birlikte
-      adım adım montaj kılavuzu ve ücretsiz telefon desteği veriyoruz.</p>
-      <div class="hero-actions">
-        <a href="#magaza" class="btn">Ürünleri İncele — Hemen Sipariş Ver</a>
-        <a href="#hesaplayici" class="btn btn-ghost">Tasarrufunu Hesapla</a>
-      </div>
-      <div class="hero-facts">10.000'den fazla gönderilen sipariş &nbsp;•&nbsp; 81 ile kargo &nbsp;•&nbsp; 12 yıllık sektör tecrübesi</div>
-    </div>
+  <!-- VİTRİN / SHOWROOM SLIDER -->
+  <section class="showroom" id="anasayfa" aria-label="Vitrin">
+    <h1 class="visually-hidden">Güneş Paneli ve Solar Enerji Ürünleri — Türkiye'nin Her Yerine Gönderim</h1>
+    <div class="showroom-track" id="showroomTrack"></div>
+    <button class="showroom-nav prev" id="showroomPrev" aria-label="Önceki slayt">‹</button>
+    <button class="showroom-nav next" id="showroomNext" aria-label="Sonraki slayt">›</button>
+    <div class="showroom-dots" id="showroomDots"></div>
   </section>
 
   <!-- AVANTAJLAR ŞERİDİ -->
@@ -2866,6 +3044,7 @@ img, svg { max-width: 100%; }
       <button class="admin-nav-btn" data-view="products">Ürünler</button>
       <button class="admin-nav-btn" data-view="upload">Ürün Yükle</button>
       <button class="admin-nav-btn" data-view="categories">Kategoriler</button>
+      <button class="admin-nav-btn" data-view="slides">Vitrin (Slider)</button>
       <button class="admin-nav-btn" data-view="orders">Siparişler</button>
       <button class="admin-nav-btn" data-view="leads">İletişim Talepleri</button>
       <button class="admin-nav-btn" data-view="settings">Ayarlar</button>
@@ -3001,6 +3180,65 @@ img, svg { max-width: 100%; }
             <thead><tr><th>Kategori</th><th>Ürün Sayısı</th><th></th></tr></thead>
             <tbody id="catRows"></tbody>
           </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- VİTRİN / SLIDER -->
+    <section class="admin-view" id="view-slides" hidden>
+      <div class="upload-grid">
+        <div class="admin-panel">
+          <h2 id="slideFormTitle">Yeni Slayt Ekle</h2>
+          <form id="slideForm">
+            <input type="hidden" id="slId">
+            <div class="form-group">
+              <label>Slayt görseli</label>
+              <div class="drop-zone" id="slDrop">
+                <input type="file" id="slPhotoFile" accept="image/*" hidden>
+                <div class="drop-zone-inner" id="slDropInner">
+                  <strong>Görseli buraya sürükleyip bırakın</strong>
+                  <span>veya tıklayıp bilgisayarınızdan seçin — geniş (yatay) görseller idealdir</span>
+                </div>
+              </div>
+              <input type="text" id="slPhotoUrl" class="up-url" placeholder="veya görsel bağlantısı: https://...">
+              <button type="button" class="row-btn row-btn-danger" id="slPhotoRemove">Görseli Kaldır</button>
+              <small class="photo-hint">Görsel yüklemezseniz kategoriye uygun hazır çizim gösterilir.</small>
+            </div>
+            <div class="form-group">
+              <label for="slTitle">Başlık *</label>
+              <input type="text" id="slTitle" required placeholder="Örn. Yüksek Verimli Güneş Panelleri">
+            </div>
+            <div class="form-group">
+              <label for="slSub">Alt başlık</label>
+              <textarea id="slSub" rows="2" placeholder="Kısa açıklama metni"></textarea>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="slBtnText">Buton yazısı</label>
+                <input type="text" id="slBtnText" placeholder="Ürünleri İncele">
+              </div>
+              <div class="form-group">
+                <label for="slBtnLink">Buton bağlantısı</label>
+                <input type="text" id="slBtnLink" placeholder="urunler.html">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="slArt">Hazır çizim <small>(görsel yoksa)</small></label>
+              <select id="slArt">
+                <option value="roof">Çatı kurulumu</option>
+                <option value="field">Arazi tipi santral</option>
+                <option value="carport">Solar otopark</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-block">Slaytı Kaydet</button>
+            <button type="button" class="btn btn-outline btn-block" id="slCancel" hidden>Vazgeç / Yeni Slayt</button>
+            <p class="form-status" id="slStatus" role="status"></p>
+          </form>
+        </div>
+        <div class="admin-panel">
+          <h2>Mevcut Slaytlar</h2>
+          <p class="panel-hint">Slaytlar ana sayfada bu sırayla döner. Sırayı ok tuşlarıyla değiştirebilirsiniz.</p>
+          <div id="slideList"></div>
         </div>
       </div>
     </section>
@@ -3286,6 +3524,62 @@ const Store = (() => {
     write("gp-cats", getCategories().filter((c) => c.id !== id));
   }
 
+  // ---------- VİTRİN / SLİDER ----------
+  // Ana sayfadaki kayan showroom görselleri. Admin panelinden yönetilir.
+  const DEFAULT_SLIDES = [
+    {
+      id: "sl1", image: "", art: "roof",
+      title: "Güneş Enerjisinde Türkiye'nin Her Yerine Gönderim",
+      subtitle: "Panel, invertör, akü ve hazır paketler stoktan — siparişiniz aynı gün kargoda.",
+      btnText: "Ürünleri İncele", btnLink: "urunler.html"
+    },
+    {
+      id: "sl2", image: "", art: "field",
+      title: "Yüksek Verimli Monokristal Paneller",
+      subtitle: "%21+ verim, 25 yıla varan garanti. Ev, işyeri ve tarım için uygun çözümler.",
+      btnText: "Panelleri Gör", btnLink: "urunler.html"
+    },
+    {
+      id: "sl3", image: "", art: "carport",
+      title: "Karavan ve Bağ Evi Solar Paketleri",
+      subtitle: "Şebekeden bağımsız, kur-kullan hazır sistemler. Montaj kılavuzu ve destek dahil.",
+      btnText: "Paketleri Gör", btnLink: "urunler.html"
+    }
+  ];
+
+  function getSlides() {
+    let slides = read("gp-slides", null);
+    if (!slides) {
+      slides = DEFAULT_SLIDES;
+      write("gp-slides", slides);
+    }
+    return slides;
+  }
+
+  function saveSlide(slide) {
+    const slides = getSlides();
+    if (slide.id) {
+      const i = slides.findIndex((s) => s.id === slide.id);
+      if (i >= 0) { slides[i] = slide; write("gp-slides", slides); return; }
+    }
+    slide.id = "sl-" + Date.now();
+    slides.push(slide);
+    write("gp-slides", slides);
+  }
+
+  function deleteSlide(id) {
+    write("gp-slides", getSlides().filter((s) => s.id !== id));
+  }
+
+  function moveSlide(id, dir) {
+    const slides = getSlides();
+    const i = slides.findIndex((s) => s.id === id);
+    const j = i + dir;
+    if (i < 0 || j < 0 || j >= slides.length) return;
+    [slides[i], slides[j]] = [slides[j], slides[i]];
+    write("gp-slides", slides);
+  }
+
   // Varsayılan ürün listesine yeni ürünler eklendiğinde bu sürümü artırın;
   // mevcut tarayıcılardaki listelere yalnızca eksik olanlar eklenir.
   const SEED_VERSION = 3;
@@ -3460,6 +3754,7 @@ const Store = (() => {
   return {
     getProducts, saveProduct, deleteProduct,
     getCategories, saveCategory, deleteCategory,
+    getSlides, saveSlide, deleteSlide, moveSlide,
     register, login, logout, session,
     getUser, updateProfile, changePassword,
     addLead, getLeads, deleteLead,
@@ -3468,6 +3763,75 @@ const Store = (() => {
     getSettings, saveSettings
   };
 })();
+
+// ---- Vitrin slayt görselleri (SVG sahneler) ----
+// Kullanıcı kendi fotoğrafını yükleyene kadar varsayılan olarak gösterilir.
+const SLIDE_ART = {
+  roof: `
+    <svg viewBox="0 0 1200 460" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <defs><linearGradient id="skRoof" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#bfe0f2"/><stop offset="1" stop-color="#e9f4fb"/></linearGradient></defs>
+      <rect width="1200" height="330" fill="url(#skRoof)"/>
+      <circle cx="1000" cy="90" r="52" fill="#ffd24d"/>
+      <g stroke="#ffd24d" stroke-width="7" stroke-linecap="round">
+        <line x1="1000" y1="8" x2="1000" y2="26"/><line x1="1000" y1="154" x2="1000" y2="172"/>
+        <line x1="918" y1="90" x2="936" y2="90"/><line x1="1064" y1="90" x2="1082" y2="90"/></g>
+      <rect y="330" width="1200" height="130" fill="#9ab97e"/>
+      <polygon points="250,330 560,150 870,330" fill="#7a4a2b"/>
+      <rect x="330" y="330" width="460" height="110" fill="#e6d8c2"/>
+      <rect x="520" y="360" width="80" height="80" fill="#6b4a2f"/>
+      <rect x="380" y="356" width="60" height="46" fill="#9cc3de"/>
+      <rect x="680" y="356" width="60" height="46" fill="#9cc3de"/>
+      <g transform="rotate(-30.2 560 240)">
+        <rect x="360" y="205" width="90" height="60" fill="#123f66" stroke="#0a2138" stroke-width="3"/>
+        <rect x="456" y="205" width="90" height="60" fill="#174a75" stroke="#0a2138" stroke-width="3"/>
+        <rect x="552" y="205" width="90" height="60" fill="#123f66" stroke="#0a2138" stroke-width="3"/>
+        <rect x="648" y="205" width="90" height="60" fill="#174a75" stroke="#0a2138" stroke-width="3"/>
+      </g>
+    </svg>`,
+  field: `
+    <svg viewBox="0 0 1200 460" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <defs><linearGradient id="skField" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#cfe6f5"/><stop offset="1" stop-color="#eef7fc"/></linearGradient></defs>
+      <rect width="1200" height="300" fill="url(#skField)"/>
+      <circle cx="150" cy="90" r="46" fill="#ffd24d"/>
+      <path d="M0 300 Q300 262 600 292 T1200 280 V460 H0 Z" fill="#9cb87e"/>
+      <g>
+        <rect x="70" y="300" width="150" height="52" fill="#123f66" stroke="#0a2138" stroke-width="4" transform="skewX(-15)"/>
+        <rect x="270" y="300" width="150" height="52" fill="#174a75" stroke="#0a2138" stroke-width="4" transform="skewX(-15)"/>
+        <rect x="470" y="300" width="150" height="52" fill="#123f66" stroke="#0a2138" stroke-width="4" transform="skewX(-15)"/>
+        <rect x="670" y="300" width="150" height="52" fill="#174a75" stroke="#0a2138" stroke-width="4" transform="skewX(-15)"/>
+        <rect x="180" y="372" width="150" height="52" fill="#174a75" stroke="#0a2138" stroke-width="4" transform="skewX(-15)"/>
+        <rect x="380" y="372" width="150" height="52" fill="#123f66" stroke="#0a2138" stroke-width="4" transform="skewX(-15)"/>
+        <rect x="580" y="372" width="150" height="52" fill="#174a75" stroke="#0a2138" stroke-width="4" transform="skewX(-15)"/>
+        <rect x="780" y="372" width="150" height="52" fill="#123f66" stroke="#0a2138" stroke-width="4" transform="skewX(-15)"/>
+      </g>
+    </svg>`,
+  carport: `
+    <svg viewBox="0 0 1200 460" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <defs><linearGradient id="skCar" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#c6def0"/><stop offset="1" stop-color="#eaf4fb"/></linearGradient></defs>
+      <rect width="1200" height="330" fill="url(#skCar)"/>
+      <circle cx="1010" cy="86" r="48" fill="#ffd24d"/>
+      <rect y="330" width="1200" height="130" fill="#9a9a94"/>
+      <g stroke="#fff" stroke-width="4" stroke-dasharray="26 22"><line x1="0" y1="404" x2="1200" y2="404"/></g>
+      <rect x="250" y="230" width="16" height="120" fill="#5b6770"/>
+      <rect x="900" y="230" width="16" height="120" fill="#5b6770"/>
+      <g transform="rotate(-6 600 200)">
+        <rect x="180" y="182" width="760" height="16" fill="#8395a5"/>
+        <rect x="200" y="140" width="170" height="42" fill="#123f66" stroke="#0a2138" stroke-width="3"/>
+        <rect x="380" y="140" width="170" height="42" fill="#174a75" stroke="#0a2138" stroke-width="3"/>
+        <rect x="560" y="140" width="170" height="42" fill="#123f66" stroke="#0a2138" stroke-width="3"/>
+        <rect x="740" y="140" width="170" height="42" fill="#174a75" stroke="#0a2138" stroke-width="3"/>
+      </g>
+      <g>
+        <rect x="470" y="300" width="240" height="54" rx="16" fill="#b03a2e"/>
+        <path d="M508 300 q30 -34 84 -34 h44 q46 0 66 34 Z" fill="#c0453a"/>
+        <rect x="536" y="276" width="64" height="26" rx="5" fill="#d9e8f2"/>
+        <circle cx="516" cy="354" r="22" fill="#2c3640"/><circle cx="664" cy="354" r="22" fill="#2c3640"/>
+      </g>
+    </svg>`
+};
 
 // ---- Ürün görselleri (SVG) ----
 // Mağaza, sepet ve admin önizlemesi ortak kullanır.
@@ -3597,6 +3961,18 @@ function initSite(root) {
   const $ = (sel) => root.querySelector(sel);
 
   const tlFmt = (n) => "₺" + Math.round(n).toLocaleString("tr-TR");
+
+  // Sayfa bağlantısı: tek dosya sürümünde dosya adlarını hash rotasına çevirir
+  function pageLink(href) {
+    if (typeof goPage !== "function") return href; // çok dosyalı sürüm
+    const map = {
+      "urunler.html": "#magaza", "index.html": "#", "sepet.html": "#sepet",
+      "giris.html": "#giris", "hesap.html": "#hesap", "admin.html": "#admin"
+    };
+    if (map[href]) return map[href];
+    if (href.indexOf("index.html#") === 0) return "#" + href.slice("index.html#".length);
+    return href;
+  }
 
   // ============ MOBİL MENÜ ============
   const hamburger = $("#hamburger");
@@ -3741,7 +4117,7 @@ function initSite(root) {
 
       if (list.length === 0) {
         shopGrid.innerHTML = q
-          ? `<p class="shop-empty">“${escHtml(q)}” ile eşleşen ürün bulunamadı. Farklı bir kelime deneyin ya da <a href="index.html#iletisim">bize yazın</a>, tedarik edelim.</p>`
+          ? `<p class="shop-empty">“${escHtml(q)}” ile eşleşen ürün bulunamadı. Farklı bir kelime deneyin ya da <a href="${pageLink("index.html#iletisim")}">bize yazın</a>, tedarik edelim.</p>`
           : '<p class="shop-empty">Bu kategoride henüz ürün bulunmuyor.</p>';
         return;
       }
@@ -3809,6 +4185,77 @@ function initSite(root) {
       if (typeof goPage === "function") location.hash = "#magaza"; // tek dosya sürümü
       else location.href = "urunler.html";
     });
+  }
+
+  // ============ VİTRİN / SHOWROOM SLIDER ============
+  const showroomTrack = $("#showroomTrack");
+
+  if (showroomTrack) {
+    const showroom = showroomTrack.closest(".showroom");
+    const dotsEl = $("#showroomDots");
+    const slides = Store.getSlides();
+    let index = 0;
+    let timer = null;
+
+    showroomTrack.innerHTML = slides
+      .map((s) => {
+        const bg = s.image
+          ? `<div class="slide-bg" style="background-image:url('${String(s.image).replace(/'/g, "%27")}')"></div>`
+          : `<div class="slide-bg slide-bg-art">${SLIDE_ART[s.art] || SLIDE_ART.roof}</div>`;
+        return `
+        <div class="slide">
+          ${bg}
+          <div class="slide-shade"></div>
+          <div class="container slide-content">
+            <h2 class="slide-title">${escHtml(s.title || "")}</h2>
+            ${s.subtitle ? `<p class="slide-sub">${escHtml(s.subtitle)}</p>` : ""}
+            ${s.btnText ? `<a class="btn" href="${escHtml(pageLink(s.btnLink || "urunler.html"))}">${escHtml(s.btnText)}</a>` : ""}
+          </div>
+        </div>`;
+      })
+      .join("");
+
+    dotsEl.innerHTML = slides
+      .map((_, i) => `<button class="dot" data-i="${i}" aria-label="Slayt ${i + 1}"></button>`)
+      .join("");
+    const dots = Array.from(dotsEl.children);
+
+    // Tek slayt varsa ok ve noktaları gizle
+    if (slides.length <= 1) showroom.classList.add("single");
+
+    function go(i) {
+      index = (i + slides.length) % slides.length;
+      showroomTrack.style.transform = "translateX(-" + index * 100 + "%)";
+      dots.forEach((d, di) => d.classList.toggle("active", di === index));
+    }
+    const next = () => go(index + 1);
+    const prev = () => go(index - 1);
+    const stop = () => timer && (clearInterval(timer), (timer = null));
+    const start = () => { stop(); if (slides.length > 1) timer = setInterval(next, 5000); };
+
+    $("#showroomNext").addEventListener("click", () => { next(); start(); });
+    $("#showroomPrev").addEventListener("click", () => { prev(); start(); });
+    dotsEl.addEventListener("click", (e) => {
+      const b = e.target.closest(".dot");
+      if (b) { go(+b.dataset.i); start(); }
+    });
+
+    showroom.addEventListener("mouseenter", stop);
+    showroom.addEventListener("mouseleave", start);
+
+    // Dokunmatik / fare ile kaydırma
+    let x0 = null;
+    showroom.addEventListener("pointerdown", (e) => { x0 = e.clientX; stop(); });
+    window.addEventListener("pointerup", (e) => {
+      if (x0 === null) return;
+      const dx = e.clientX - x0;
+      if (Math.abs(dx) > 40) (dx < 0 ? next : prev)();
+      x0 = null;
+      start();
+    });
+
+    go(0);
+    start();
   }
 
   // ============ TASARRUF HESAPLAYICI ============
@@ -4321,6 +4768,7 @@ const VIEW_TITLES = {
   products: "Ürünler",
   upload: "Ürün Yükle",
   categories: "Kategoriler",
+  slides: "Vitrin (Slider)",
   orders: "Siparişler",
   leads: "İletişim Talepleri",
   settings: "Ayarlar"
@@ -4720,6 +5168,146 @@ document.getElementById("catRows").addEventListener("click", (e) => {
   }
 });
 
+// ---------- VİTRİN / SLIDER ----------
+const slideForm = document.getElementById("slideForm");
+const slDrop = document.getElementById("slDrop");
+const slDropInner = document.getElementById("slDropInner");
+const slPhotoFile = document.getElementById("slPhotoFile");
+const slPhotoUrl = document.getElementById("slPhotoUrl");
+let slidePhoto = "";
+const SL_DROP_DEFAULT = slDropInner.innerHTML;
+
+function setSlidePhoto(src) {
+  slidePhoto = src || "";
+  slDropInner.innerHTML = slidePhoto
+    ? `<img src="${escHtml(slidePhoto)}" alt="Önizleme"><span>Değiştirmek için tıklayın veya yeni görsel sürükleyin</span>`
+    : SL_DROP_DEFAULT;
+  slDrop.classList.toggle("has-photo", !!slidePhoto);
+}
+
+slDrop.addEventListener("click", () => slPhotoFile.click());
+slDrop.addEventListener("dragover", (e) => { e.preventDefault(); slDrop.classList.add("drag"); });
+slDrop.addEventListener("dragleave", () => slDrop.classList.remove("drag"));
+slDrop.addEventListener("drop", (e) => {
+  e.preventDefault();
+  slDrop.classList.remove("drag");
+  const file = e.dataTransfer.files[0];
+  if (file) readImageFile(file, (d) => { setSlidePhoto(d); slPhotoUrl.value = ""; });
+});
+slPhotoFile.addEventListener("change", () => {
+  const file = slPhotoFile.files[0];
+  if (file) readImageFile(file, (d) => { setSlidePhoto(d); slPhotoUrl.value = ""; });
+});
+slPhotoUrl.addEventListener("change", () => {
+  const url = slPhotoUrl.value.trim();
+  if (!url) return;
+  if (!/^https?:\/\//.test(url)) { alert("Görsel bağlantısı http:// veya https:// ile başlamalıdır."); return; }
+  setSlidePhoto(url);
+  slPhotoFile.value = "";
+});
+document.getElementById("slPhotoRemove").addEventListener("click", () => {
+  setSlidePhoto("");
+  slPhotoFile.value = "";
+  slPhotoUrl.value = "";
+});
+
+function resetSlideForm() {
+  document.getElementById("slideFormTitle").textContent = "Yeni Slayt Ekle";
+  document.getElementById("slId").value = "";
+  document.getElementById("slTitle").value = "";
+  document.getElementById("slSub").value = "";
+  document.getElementById("slBtnText").value = "";
+  document.getElementById("slBtnLink").value = "";
+  document.getElementById("slArt").value = "roof";
+  slPhotoFile.value = "";
+  slPhotoUrl.value = "";
+  setSlidePhoto("");
+  document.getElementById("slCancel").hidden = true;
+}
+
+document.getElementById("slCancel").addEventListener("click", resetSlideForm);
+
+function editSlide(s) {
+  document.getElementById("slideFormTitle").textContent = "Slaytı Düzenle";
+  document.getElementById("slId").value = s.id;
+  document.getElementById("slTitle").value = s.title || "";
+  document.getElementById("slSub").value = s.subtitle || "";
+  document.getElementById("slBtnText").value = s.btnText || "";
+  document.getElementById("slBtnLink").value = s.btnLink || "";
+  document.getElementById("slArt").value = s.art || "roof";
+  slPhotoUrl.value = s.image && !String(s.image).startsWith("data:") ? s.image : "";
+  setSlidePhoto(s.image || "");
+  document.getElementById("slCancel").hidden = false;
+  window.scrollTo(0, 0);
+}
+
+function renderSlides() {
+  const slides = Store.getSlides();
+  document.getElementById("slideList").innerHTML =
+    slides.map((s, i) => `
+      <div class="slide-row">
+        <div class="slide-row-thumb">${
+          s.image ? `<img src="${escHtml(s.image)}" alt="">` : (SLIDE_ART[s.art] || SLIDE_ART.roof)
+        }</div>
+        <div class="slide-row-info">
+          <strong>${escHtml(s.title || "(başlıksız)")}</strong>
+          <span>${escHtml(s.subtitle || "")}</span>
+        </div>
+        <div class="slide-row-actions">
+          <button class="row-btn" data-act="up" data-id="${s.id}" ${i === 0 ? "disabled" : ""} aria-label="Yukarı">↑</button>
+          <button class="row-btn" data-act="down" data-id="${s.id}" ${i === slides.length - 1 ? "disabled" : ""} aria-label="Aşağı">↓</button>
+          <button class="row-btn" data-act="edit" data-id="${s.id}">Düzenle</button>
+          <button class="row-btn row-btn-danger" data-act="del" data-id="${s.id}">Sil</button>
+        </div>
+      </div>`).join("") ||
+    '<p class="empty-row">Henüz slayt yok. Soldaki formdan ekleyin.</p>';
+}
+
+document.getElementById("slideList").addEventListener("click", (e) => {
+  const btn = e.target.closest(".row-btn");
+  if (!btn) return;
+  const { id, act } = btn.dataset;
+  const slide = Store.getSlides().find((s) => s.id === id);
+  if (act === "up") { Store.moveSlide(id, -1); renderSlides(); }
+  if (act === "down") { Store.moveSlide(id, 1); renderSlides(); }
+  if (act === "edit" && slide) editSlide(slide);
+  if (act === "del" && slide && confirm("Bu slayt silinsin mi?")) {
+    Store.deleteSlide(id);
+    if (document.getElementById("slId").value === id) resetSlideForm();
+    renderSlides();
+  }
+});
+
+slideForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const status = document.getElementById("slStatus");
+  const title = document.getElementById("slTitle").value.trim();
+  if (!title) {
+    status.textContent = "Lütfen bir başlık girin.";
+    status.className = "form-status err";
+    return;
+  }
+  try {
+    Store.saveSlide({
+      id: document.getElementById("slId").value || "",
+      image: slidePhoto,
+      art: document.getElementById("slArt").value,
+      title,
+      subtitle: document.getElementById("slSub").value.trim(),
+      btnText: document.getElementById("slBtnText").value.trim(),
+      btnLink: document.getElementById("slBtnLink").value.trim() || "urunler.html"
+    });
+  } catch (err) {
+    status.textContent = "Kayıt başarısız: tarayıcı depolama alanı doldu. Daha küçük görsel kullanın.";
+    status.className = "form-status err";
+    return;
+  }
+  status.textContent = "Slayt kaydedildi.";
+  status.className = "form-status ok";
+  resetSlideForm();
+  renderSlides();
+});
+
 // ---------- SİPARİŞLER ----------
 function renderOrders() {
   const orders = Store.getOrders();
@@ -4795,6 +5383,7 @@ function renderAll() {
   renderDashboard();
   renderProducts();
   renderCategories();
+  renderSlides();
   renderOrders();
   renderLeads();
   renderUploadPreview();

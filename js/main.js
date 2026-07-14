@@ -10,6 +10,18 @@ function initSite(root) {
 
   const tlFmt = (n) => "₺" + Math.round(n).toLocaleString("tr-TR");
 
+  // Sayfa bağlantısı: tek dosya sürümünde dosya adlarını hash rotasına çevirir
+  function pageLink(href) {
+    if (typeof goPage !== "function") return href; // çok dosyalı sürüm
+    const map = {
+      "urunler.html": "#magaza", "index.html": "#", "sepet.html": "#sepet",
+      "giris.html": "#giris", "hesap.html": "#hesap", "admin.html": "#admin"
+    };
+    if (map[href]) return map[href];
+    if (href.indexOf("index.html#") === 0) return "#" + href.slice("index.html#".length);
+    return href;
+  }
+
   // ============ MOBİL MENÜ ============
   const hamburger = $("#hamburger");
   const navLinks = $("#navLinks");
@@ -153,7 +165,7 @@ function initSite(root) {
 
       if (list.length === 0) {
         shopGrid.innerHTML = q
-          ? `<p class="shop-empty">“${escHtml(q)}” ile eşleşen ürün bulunamadı. Farklı bir kelime deneyin ya da <a href="index.html#iletisim">bize yazın</a>, tedarik edelim.</p>`
+          ? `<p class="shop-empty">“${escHtml(q)}” ile eşleşen ürün bulunamadı. Farklı bir kelime deneyin ya da <a href="${pageLink("index.html#iletisim")}">bize yazın</a>, tedarik edelim.</p>`
           : '<p class="shop-empty">Bu kategoride henüz ürün bulunmuyor.</p>';
         return;
       }
@@ -221,6 +233,77 @@ function initSite(root) {
       if (typeof goPage === "function") location.hash = "#magaza"; // tek dosya sürümü
       else location.href = "urunler.html";
     });
+  }
+
+  // ============ VİTRİN / SHOWROOM SLIDER ============
+  const showroomTrack = $("#showroomTrack");
+
+  if (showroomTrack) {
+    const showroom = showroomTrack.closest(".showroom");
+    const dotsEl = $("#showroomDots");
+    const slides = Store.getSlides();
+    let index = 0;
+    let timer = null;
+
+    showroomTrack.innerHTML = slides
+      .map((s) => {
+        const bg = s.image
+          ? `<div class="slide-bg" style="background-image:url('${String(s.image).replace(/'/g, "%27")}')"></div>`
+          : `<div class="slide-bg slide-bg-art">${SLIDE_ART[s.art] || SLIDE_ART.roof}</div>`;
+        return `
+        <div class="slide">
+          ${bg}
+          <div class="slide-shade"></div>
+          <div class="container slide-content">
+            <h2 class="slide-title">${escHtml(s.title || "")}</h2>
+            ${s.subtitle ? `<p class="slide-sub">${escHtml(s.subtitle)}</p>` : ""}
+            ${s.btnText ? `<a class="btn" href="${escHtml(pageLink(s.btnLink || "urunler.html"))}">${escHtml(s.btnText)}</a>` : ""}
+          </div>
+        </div>`;
+      })
+      .join("");
+
+    dotsEl.innerHTML = slides
+      .map((_, i) => `<button class="dot" data-i="${i}" aria-label="Slayt ${i + 1}"></button>`)
+      .join("");
+    const dots = Array.from(dotsEl.children);
+
+    // Tek slayt varsa ok ve noktaları gizle
+    if (slides.length <= 1) showroom.classList.add("single");
+
+    function go(i) {
+      index = (i + slides.length) % slides.length;
+      showroomTrack.style.transform = "translateX(-" + index * 100 + "%)";
+      dots.forEach((d, di) => d.classList.toggle("active", di === index));
+    }
+    const next = () => go(index + 1);
+    const prev = () => go(index - 1);
+    const stop = () => timer && (clearInterval(timer), (timer = null));
+    const start = () => { stop(); if (slides.length > 1) timer = setInterval(next, 5000); };
+
+    $("#showroomNext").addEventListener("click", () => { next(); start(); });
+    $("#showroomPrev").addEventListener("click", () => { prev(); start(); });
+    dotsEl.addEventListener("click", (e) => {
+      const b = e.target.closest(".dot");
+      if (b) { go(+b.dataset.i); start(); }
+    });
+
+    showroom.addEventListener("mouseenter", stop);
+    showroom.addEventListener("mouseleave", start);
+
+    // Dokunmatik / fare ile kaydırma
+    let x0 = null;
+    showroom.addEventListener("pointerdown", (e) => { x0 = e.clientX; stop(); });
+    window.addEventListener("pointerup", (e) => {
+      if (x0 === null) return;
+      const dx = e.clientX - x0;
+      if (Math.abs(dx) > 40) (dx < 0 ? next : prev)();
+      x0 = null;
+      start();
+    });
+
+    go(0);
+    start();
   }
 
   // ============ TASARRUF HESAPLAYICI ============
