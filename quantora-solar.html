@@ -313,6 +313,102 @@ img, svg { max-width: 100%; }
   background: #ffffff;
 }
 
+/* ============ KATEGORİ ÇUBUĞU (Solar Depo tarzı) ============ */
+.catbar {
+  background: #ffffff;
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.catbar-inner {
+  display: flex;
+  align-items: stretch;
+}
+
+.catbar-all {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.catbar-all-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 42px;
+  background: var(--orange);
+  border: none;
+  color: #fff;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 0.02em;
+  padding: 0 18px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.catbar-all-btn:hover { background: var(--orange-dark); }
+
+.catbar-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 240px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-top: none;
+  list-style: none;
+  z-index: 90;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.14);
+  display: none;
+}
+
+.catbar-all:hover .catbar-dropdown,
+.catbar-all.open .catbar-dropdown { display: block; }
+
+.catbar-dropdown a {
+  display: block;
+  padding: 10px 16px;
+  color: var(--text);
+  text-decoration: none;
+  font-size: 13px;
+  border-bottom: 1px solid var(--border);
+}
+
+.catbar-dropdown li:last-child a { border-bottom: none; }
+
+.catbar-dropdown a:hover {
+  background: var(--bg-alt);
+  color: var(--blue);
+  padding-left: 20px;
+}
+
+.catbar-links {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  padding-left: 6px;
+  min-width: 0;
+}
+
+.catbar-link {
+  display: flex;
+  align-items: center;
+  height: 42px;
+  color: var(--text);
+  text-decoration: none;
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 0 14px;
+  white-space: nowrap;
+  border-bottom: 3px solid transparent;
+}
+
+.catbar-link:hover {
+  color: var(--orange-dark);
+  border-bottom-color: var(--orange);
+}
+
 /* ============ BANNER ============ */
 .hero {
   background: var(--blue-dark) repeating-linear-gradient(
@@ -1572,6 +1668,10 @@ img, svg { max-width: 100%; }
     margin: 4px 0 0;
   }
 
+  .catbar-links { display: none; }
+  .catbar-all { width: 100%; }
+  .catbar-all-btn { width: 100%; justify-content: center; }
+
   .slide { height: 320px; }
   .slide-title { font-size: 22px; }
   .slide-sub { font-size: 13px; margin-bottom: 16px; }
@@ -2241,6 +2341,20 @@ img, svg { max-width: 100%; }
     </div>
   </nav>
 
+  <!-- KATEGORİ ÇUBUĞU (Solar Depo tarzı) -->
+  <nav class="catbar">
+    <div class="container catbar-inner">
+      <div class="catbar-all" id="catbarAll">
+        <button type="button" class="catbar-all-btn">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          TÜM KATEGORİLER
+        </button>
+        <ul class="catbar-dropdown" id="catbarDropdown"></ul>
+      </div>
+      <div class="catbar-links" id="catbarLinks"></div>
+    </div>
+  </nav>
+
   <!-- VİTRİN / SHOWROOM SLIDER -->
   <section class="showroom" id="anasayfa" aria-label="Vitrin">
     <h1 class="visually-hidden">Güneş Paneli ve Solar Enerji Ürünleri — Türkiye'nin Her Yerine Gönderim</h1>
@@ -2733,6 +2847,20 @@ img, svg { max-width: 100%; }
     </div>
   </nav>
 
+  <!-- KATEGORİ ÇUBUĞU (Solar Depo tarzı) -->
+  <nav class="catbar">
+    <div class="container catbar-inner">
+      <div class="catbar-all" id="catbarAll">
+        <button type="button" class="catbar-all-btn">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          TÜM KATEGORİLER
+        </button>
+        <ul class="catbar-dropdown" id="catbarDropdown"></ul>
+      </div>
+      <div class="catbar-links" id="catbarLinks"></div>
+    </div>
+  </nav>
+
   <!-- SAYFA BAŞLIĞI -->
   <section class="page-band">
     <div class="container">
@@ -2870,6 +2998,20 @@ img, svg { max-width: 100%; }
         SEPET
         <span class="cart-count" id="cartCount" hidden>0</span>
       </a>
+    </div>
+  </nav>
+
+  <!-- KATEGORİ ÇUBUĞU (Solar Depo tarzı) -->
+  <nav class="catbar">
+    <div class="container catbar-inner">
+      <div class="catbar-all" id="catbarAll">
+        <button type="button" class="catbar-all-btn">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          TÜM KATEGORİLER
+        </button>
+        <ul class="catbar-dropdown" id="catbarDropdown"></ul>
+      </div>
+      <div class="catbar-links" id="catbarLinks"></div>
     </div>
   </nav>
 
@@ -4459,17 +4601,25 @@ function initSite(root) {
       };
       searchInput.addEventListener("input", applySearch);
 
-      // Başka sayfadan aranarak gelindiyse terimi al ve uygula
-      const loadStoredQuery = () => {
+      // Başka sayfadan arama/kategori seçilerek gelindiyse uygula
+      const loadStoredState = () => {
         const q = sessionStorage.getItem("gp-q");
         if (q !== null) {
           searchInput.value = q;
           sessionStorage.removeItem("gp-q");
         }
+        const c = sessionStorage.getItem("gp-cat");
+        if (c !== null) {
+          currentCat = c;
+          selectedPowers.clear();
+          sessionStorage.removeItem("gp-cat");
+          if (catList) buildCatList();
+        }
         applySearch();
       };
-      window.addEventListener("hashchange", loadStoredQuery);
-      loadStoredQuery();
+      window.addEventListener("hashchange", loadStoredState);
+      window.addEventListener("gp-apply-filters", loadStoredState);
+      loadStoredState();
     } else {
       renderShop();
     }
@@ -4486,6 +4636,58 @@ function initSite(root) {
       if (typeof goPage === "function") location.hash = "#magaza"; // tek dosya sürümü
       else location.href = "urunler.html";
     });
+  }
+
+  // ============ KATEGORİ ÇUBUĞU (Solar Depo tarzı) ============
+  const catbarLinks = $("#catbarLinks");
+  const catbarDropdown = $("#catbarDropdown");
+  const catbarAll = $("#catbarAll");
+
+  if (catbarLinks || catbarDropdown) {
+    if (catbarLinks) {
+      catbarLinks.innerHTML = CATEGORIES.map(
+        (c) => `<a href="${pageLink("urunler.html")}" class="catbar-link" data-cat="${c.id}">${escHtml(c.name)}</a>`
+      ).join("");
+    }
+    if (catbarDropdown) {
+      catbarDropdown.innerHTML =
+        `<li><a href="${pageLink("urunler.html")}" data-cat="all">Tüm Ürünler</a></li>` +
+        CATEGORIES.map(
+          (c) => `<li><a href="${pageLink("urunler.html")}" data-cat="${c.id}">${escHtml(c.name)}</a></li>`
+        ).join("");
+    }
+
+    const onProductsPage = !!$("#catList");
+
+    const catbarClick = (e) => {
+      const a = e.target.closest("[data-cat]");
+      if (!a) return;
+      e.preventDefault();
+      if (catbarAll) catbarAll.classList.remove("open");
+      sessionStorage.setItem("gp-cat", a.dataset.cat);
+      if (onProductsPage) {
+        window.dispatchEvent(new Event("gp-apply-filters"));
+        const m = $("#magaza");
+        if (m) m.scrollIntoView({ behavior: "smooth", block: "start" });
+      } else if (typeof goPage === "function") {
+        location.hash = "#magaza";
+      } else {
+        location.href = "urunler.html";
+      }
+    };
+
+    if (catbarLinks) catbarLinks.addEventListener("click", catbarClick);
+    if (catbarDropdown) catbarDropdown.addEventListener("click", catbarClick);
+
+    // "TÜM KATEGORİLER" — dokunmatik için tıklamayla aç/kapa
+    if (catbarAll) {
+      const allBtn = catbarAll.querySelector(".catbar-all-btn");
+      allBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        catbarAll.classList.toggle("open");
+      });
+      document.addEventListener("click", () => catbarAll.classList.remove("open"));
+    }
   }
 
   // ============ VİTRİN / SHOWROOM SLIDER ============

@@ -304,6 +304,102 @@ img, svg { max-width: 100%; }
   background: #ffffff;
 }
 
+/* ============ KATEGORİ ÇUBUĞU (Solar Depo tarzı) ============ */
+.catbar {
+  background: #ffffff;
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.catbar-inner {
+  display: flex;
+  align-items: stretch;
+}
+
+.catbar-all {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.catbar-all-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 42px;
+  background: var(--orange);
+  border: none;
+  color: #fff;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 0.02em;
+  padding: 0 18px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.catbar-all-btn:hover { background: var(--orange-dark); }
+
+.catbar-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 240px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-top: none;
+  list-style: none;
+  z-index: 90;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.14);
+  display: none;
+}
+
+.catbar-all:hover .catbar-dropdown,
+.catbar-all.open .catbar-dropdown { display: block; }
+
+.catbar-dropdown a {
+  display: block;
+  padding: 10px 16px;
+  color: var(--text);
+  text-decoration: none;
+  font-size: 13px;
+  border-bottom: 1px solid var(--border);
+}
+
+.catbar-dropdown li:last-child a { border-bottom: none; }
+
+.catbar-dropdown a:hover {
+  background: var(--bg-alt);
+  color: var(--blue);
+  padding-left: 20px;
+}
+
+.catbar-links {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  padding-left: 6px;
+  min-width: 0;
+}
+
+.catbar-link {
+  display: flex;
+  align-items: center;
+  height: 42px;
+  color: var(--text);
+  text-decoration: none;
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 0 14px;
+  white-space: nowrap;
+  border-bottom: 3px solid transparent;
+}
+
+.catbar-link:hover {
+  color: var(--orange-dark);
+  border-bottom-color: var(--orange);
+}
+
 /* ============ BANNER ============ */
 .hero {
   background: var(--blue-dark) repeating-linear-gradient(
@@ -1562,6 +1658,10 @@ img, svg { max-width: 100%; }
     max-width: none;
     margin: 4px 0 0;
   }
+
+  .catbar-links { display: none; }
+  .catbar-all { width: 100%; }
+  .catbar-all-btn { width: 100%; justify-content: center; }
 
   .slide { height: 320px; }
   .slide-title { font-size: 22px; }

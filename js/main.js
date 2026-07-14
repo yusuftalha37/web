@@ -308,17 +308,25 @@ function initSite(root) {
       };
       searchInput.addEventListener("input", applySearch);
 
-      // Başka sayfadan aranarak gelindiyse terimi al ve uygula
-      const loadStoredQuery = () => {
+      // Başka sayfadan arama/kategori seçilerek gelindiyse uygula
+      const loadStoredState = () => {
         const q = sessionStorage.getItem("gp-q");
         if (q !== null) {
           searchInput.value = q;
           sessionStorage.removeItem("gp-q");
         }
+        const c = sessionStorage.getItem("gp-cat");
+        if (c !== null) {
+          currentCat = c;
+          selectedPowers.clear();
+          sessionStorage.removeItem("gp-cat");
+          if (catList) buildCatList();
+        }
         applySearch();
       };
-      window.addEventListener("hashchange", loadStoredQuery);
-      loadStoredQuery();
+      window.addEventListener("hashchange", loadStoredState);
+      window.addEventListener("gp-apply-filters", loadStoredState);
+      loadStoredState();
     } else {
       renderShop();
     }
@@ -335,6 +343,58 @@ function initSite(root) {
       if (typeof goPage === "function") location.hash = "#magaza"; // tek dosya sürümü
       else location.href = "urunler.html";
     });
+  }
+
+  // ============ KATEGORİ ÇUBUĞU (Solar Depo tarzı) ============
+  const catbarLinks = $("#catbarLinks");
+  const catbarDropdown = $("#catbarDropdown");
+  const catbarAll = $("#catbarAll");
+
+  if (catbarLinks || catbarDropdown) {
+    if (catbarLinks) {
+      catbarLinks.innerHTML = CATEGORIES.map(
+        (c) => `<a href="${pageLink("urunler.html")}" class="catbar-link" data-cat="${c.id}">${escHtml(c.name)}</a>`
+      ).join("");
+    }
+    if (catbarDropdown) {
+      catbarDropdown.innerHTML =
+        `<li><a href="${pageLink("urunler.html")}" data-cat="all">Tüm Ürünler</a></li>` +
+        CATEGORIES.map(
+          (c) => `<li><a href="${pageLink("urunler.html")}" data-cat="${c.id}">${escHtml(c.name)}</a></li>`
+        ).join("");
+    }
+
+    const onProductsPage = !!$("#catList");
+
+    const catbarClick = (e) => {
+      const a = e.target.closest("[data-cat]");
+      if (!a) return;
+      e.preventDefault();
+      if (catbarAll) catbarAll.classList.remove("open");
+      sessionStorage.setItem("gp-cat", a.dataset.cat);
+      if (onProductsPage) {
+        window.dispatchEvent(new Event("gp-apply-filters"));
+        const m = $("#magaza");
+        if (m) m.scrollIntoView({ behavior: "smooth", block: "start" });
+      } else if (typeof goPage === "function") {
+        location.hash = "#magaza";
+      } else {
+        location.href = "urunler.html";
+      }
+    };
+
+    if (catbarLinks) catbarLinks.addEventListener("click", catbarClick);
+    if (catbarDropdown) catbarDropdown.addEventListener("click", catbarClick);
+
+    // "TÜM KATEGORİLER" — dokunmatik için tıklamayla aç/kapa
+    if (catbarAll) {
+      const allBtn = catbarAll.querySelector(".catbar-all-btn");
+      allBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        catbarAll.classList.toggle("open");
+      });
+      document.addEventListener("click", () => catbarAll.classList.remove("open"));
+    }
   }
 
   // ============ VİTRİN / SHOWROOM SLIDER ============
