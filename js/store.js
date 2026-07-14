@@ -364,6 +364,25 @@ const Store = (() => {
     write("gp-settings", { ...getSettings(), ...settings });
   }
 
+  // ---------- SİTE İÇERİĞİ (iletişim + footer metinleri) ----------
+  const DEFAULT_SITE = {
+    phone: "0850 000 00 00",
+    email: "info@quantorasolar.com.tr",
+    address: "Örnek Mah. Enerji Cad. No:1, Ankara",
+    hours: "Hafta içi 09:00 - 18:00, Cumartesi 10:00 - 15:00",
+    topNote: "Türkiye'nin her yerine hızlı gönderim",
+    footerAbout: "Temiz enerjiyle daha aydınlık bir gelecek için 12 yıldır çalışıyoruz.",
+    footerCopyright: "© 2026 Quantora Solar Enerji — Bu site örnek/demo amaçlıdır."
+  };
+
+  function getSiteContent() {
+    return { ...DEFAULT_SITE, ...read("gp-site", {}) };
+  }
+
+  function saveSiteContent(data) {
+    write("gp-site", { ...getSiteContent(), ...data });
+  }
+
   return {
     getProducts, saveProduct, deleteProduct,
     getCategories, saveCategory, deleteCategory,
@@ -373,7 +392,8 @@ const Store = (() => {
     addLead, getLeads, deleteLead,
     addOrder, getOrders, getOrdersByEmail,
     startCardPayment,
-    getSettings, saveSettings
+    getSettings, saveSettings,
+    getSiteContent, saveSiteContent
   };
 })();
 
@@ -556,4 +576,22 @@ function escHtml(s) {
   return String(s).replace(/[&<>"']/g, (c) => ({
     "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
   }[c]));
+}
+
+// Admin panelinden düzenlenen site içeriğini (telefon, e-posta, adres,
+// footer metinleri) [data-site] işaretli öğelere yerleştirir.
+function applySiteContent(root) {
+  root = root || document;
+  if (typeof Store === "undefined") return;
+  const site = Store.getSiteContent();
+  root.querySelectorAll("[data-site]").forEach((el) => {
+    const key = el.getAttribute("data-site");
+    if (site[key] != null) el.textContent = site[key];
+  });
+  root.querySelectorAll('a[data-site="phone"]').forEach((a) => {
+    a.href = "tel:" + String(site.phone).replace(/[^\d+]/g, "");
+  });
+  root.querySelectorAll('a[data-site="email"]').forEach((a) => {
+    a.href = "mailto:" + site.email;
+  });
 }

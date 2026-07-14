@@ -22,6 +22,9 @@ function initSite(root) {
     return href;
   }
 
+  // Admin panelinden düzenlenen iletişim/footer metinlerini yerleştir
+  applySiteContent(root);
+
   // ============ MOBİL MENÜ ============
   const hamburger = $("#hamburger");
   const navLinks = $("#navLinks");

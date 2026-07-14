@@ -47,6 +47,7 @@ const VIEW_TITLES = {
   slides: "Vitrin (Slider)",
   orders: "Siparişler",
   leads: "İletişim Talepleri",
+  content: "Site İçeriği",
   settings: "Ayarlar"
 };
 
@@ -633,6 +634,38 @@ document.getElementById("leadRows").addEventListener("click", (e) => {
     renderAll();
   }
 });
+
+// ---------- SİTE İÇERİĞİ ----------
+const CONTENT_FIELDS = {
+  ctPhone: "phone",
+  ctEmail: "email",
+  ctAddress: "address",
+  ctHours: "hours",
+  ctTopNote: "topNote",
+  ctFooterAbout: "footerAbout",
+  ctFooterCopyright: "footerCopyright"
+};
+
+function loadContentForm() {
+  const site = Store.getSiteContent();
+  Object.entries(CONTENT_FIELDS).forEach(([id, key]) => {
+    document.getElementById(id).value = site[key] || "";
+  });
+}
+
+document.getElementById("contentForm").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const data = {};
+  Object.entries(CONTENT_FIELDS).forEach(([id, key]) => {
+    data[key] = document.getElementById(id).value.trim();
+  });
+  Store.saveSiteContent(data);
+  const status = document.getElementById("contentStatus");
+  status.textContent = "Site içeriği kaydedildi. Sitede otomatik güncellenecektir.";
+  status.className = "form-status ok";
+});
+
+loadContentForm();
 
 // ---------- AYARLAR ----------
 const waNumberInput = document.getElementById("waNumber");
