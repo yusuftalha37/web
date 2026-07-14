@@ -158,6 +158,46 @@ img, svg { max-width: 100%; }
   color: var(--muted);
 }
 
+/* ============ ARAMA ÇUBUĞU ============ */
+.site-search {
+  display: flex;
+  flex: 1;
+  max-width: 420px;
+  margin: 0 24px;
+  border: 1px solid #bbbbbb;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: #fff;
+}
+
+.site-search input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  padding: 9px 12px;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--text);
+}
+
+.site-search input::placeholder { color: #9a9a9a; }
+
+.site-search button {
+  border: none;
+  background: linear-gradient(#155a91, var(--blue));
+  color: #fff;
+  padding: 0 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.site-search button:hover { background: var(--blue-dark); }
+
+.site-search:focus-within { border-color: var(--blue); }
+
 /* ============ ANA MENÜ ============ */
 .mainmenu {
   background: linear-gradient(#155a91, var(--blue));
@@ -1299,6 +1339,13 @@ img, svg { max-width: 100%; }
 
   .header-row { flex-direction: column; gap: 8px; text-align: center; }
   .header-contact { text-align: center; }
+
+  .site-search {
+    order: 3;
+    width: 100%;
+    max-width: none;
+    margin: 4px 0 0;
+  }
 
   .hamburger { display: flex; }
 
