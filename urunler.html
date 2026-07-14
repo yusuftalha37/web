@@ -108,9 +108,29 @@
   <!-- MAĞAZA -->
   <section class="section" id="magaza">
     <div class="container">
-      <div class="shop-filters" id="shopFilters"></div>
-      <div class="shop-grid" id="shopGrid"></div>
-      <p class="shop-note">Aradığınız ürünü bulamadınız mı? <a href="index.html#iletisim">Bize yazın</a>, tedarik edelim. Fiyatlar KDV dahildir; kur ve stok durumuna göre güncellenebilir. Stoktaki ürünler aynı gün kargoya verilir; toplu alım için teklif isteyin.</p>
+      <div class="shop-layout">
+        <!-- SOL KENAR: FİLTRELER -->
+        <aside class="shop-sidebar">
+          <div class="filter-box">
+            <div class="box-title">Kategoriler</div>
+            <ul class="cat-list" id="catList"></ul>
+          </div>
+          <div class="filter-box" id="powerBox" hidden>
+            <div class="box-title">Güç / Kapasite</div>
+            <div class="facet-list" id="powerList"></div>
+          </div>
+          <button class="btn btn-outline btn-block" id="clearFilters" hidden>Filtreleri Temizle</button>
+        </aside>
+
+        <!-- SAĞ: ÜRÜNLER -->
+        <div class="shop-main">
+          <div class="shop-toolbar">
+            <span class="shop-result" id="resultCount"></span>
+          </div>
+          <div class="shop-grid" id="shopGrid"></div>
+          <p class="shop-note">Aradığınız ürünü bulamadınız mı? <a href="index.html#iletisim">Bize yazın</a>, tedarik edelim. Fiyatlar KDV dahildir; kur ve stok durumuna göre güncellenebilir. Stoktaki ürünler aynı gün kargoya verilir; toplu alım için teklif isteyin.</p>
+        </div>
+      </div>
     </div>
   </section>
 

@@ -148,49 +148,143 @@ function initSite(root) {
       </article>`;
   }
 
+  // Ürün adı/özelliklerinden güç-kapasite etiketleri çıkarır (460W, 100Ah, 5 kW, 48V…)
+  const UNIT_RANK = { W: 0, kW: 1, kWh: 2, Wh: 3, Ah: 4, A: 5, V: 6 };
+  const UNIT_CANON = { w: "W", kw: "kW", kwh: "kWh", wh: "Wh", ah: "Ah", a: "A", v: "V" };
+  function extractTags(p) {
+    const text = p.name + " " + p.specs.join(" ");
+    const re = /(\d+(?:[.,]\d+)?)\s?(kWh|kW|Wh|W|Ah|A|V)\b/gi;
+    const tags = new Set();
+    let m;
+    while ((m = re.exec(text))) {
+      const unit = UNIT_CANON[m[2].toLowerCase()];
+      const spaced = unit === "kW" || unit === "kWh";
+      tags.add(m[1] + (spaced ? " " : "") + unit);
+    }
+    return tags;
+  }
+  function tagValue(t) {
+    const m = t.match(/(\d+(?:[.,]\d+)?)\s?(\S+)/);
+    return [UNIT_RANK[m[2]] ?? 9, parseFloat(m[1].replace(",", "."))];
+  }
+  PRODUCTS.forEach((p) => { p._tags = extractTags(p); });
+
   if (shopGrid) {
     // data-mode="featured": ana sayfadaki 'En Çok Satan Ürünler' vitrini
     const featured = shopGrid.dataset.mode === "featured";
+    const catList = $("#catList");     // ürünler sayfası: sol kenar kategori listesi
+    const powerBox = $("#powerBox");
+    const powerList = $("#powerList");
+    const resultCount = $("#resultCount");
+    const clearBtn = $("#clearFilters");
+
     let currentCat = "all";
+    let selectedPowers = new Set();
+
+    const currentQuery = () => (!featured && searchInput ? searchInput.value.trim() : "");
+
+    // Kategori + arama uygulanmış liste (güç filtresi hariç — facet bundan üretilir)
+    function baseList() {
+      const q = currentQuery();
+      return PRODUCTS.filter(
+        (p) => (currentCat === "all" || p.cat === currentCat) && matchesQuery(p, q)
+      );
+    }
 
     function renderShop() {
       let list;
-      const q = (!featured && searchInput) ? searchInput.value.trim() : "";
+      const q = currentQuery();
       if (featured) {
         list = PRODUCTS.filter((p) => p.hit);
-        if (list.length === 0) list = PRODUCTS; // hiç işaret yoksa hepsinden göster
+        if (list.length === 0) list = PRODUCTS;
         list = list.slice(0, 8);
       } else {
-        list = PRODUCTS.filter(
-          (p) => (currentCat === "all" || p.cat === currentCat) && matchesQuery(p, q)
+        list = baseList().filter(
+          (p) => selectedPowers.size === 0 || Array.from(p._tags).some((t) => selectedPowers.has(t))
         );
       }
+
+      if (resultCount) resultCount.textContent = list.length + " ürün";
 
       if (list.length === 0) {
         shopGrid.innerHTML = q
           ? `<p class="shop-empty">“${escHtml(q)}” ile eşleşen ürün bulunamadı. Farklı bir kelime deneyin ya da <a href="${pageLink("index.html#iletisim")}">bize yazın</a>, tedarik edelim.</p>`
-          : '<p class="shop-empty">Bu kategoride henüz ürün bulunmuyor.</p>';
+          : '<p class="shop-empty">Bu filtrelerle eşleşen ürün bulunamadı.</p>';
         return;
       }
-
       shopGrid.innerHTML = list.map(productCard).join("");
     }
 
-    if (shopFilters) {
-      shopFilters.innerHTML =
-        '<button class="filter-btn active" data-cat="all">Tümü</button>' +
-        CATEGORIES.map(
-          (c) => `<button class="filter-btn" data-cat="${c.id}">${escHtml(c.name)}</button>`
-        ).join("");
+    // ---- Sol kenar: kategori listesi + güç/kapasite facet'i (ürünler sayfası) ----
+    function buildCatList() {
+      catList.innerHTML =
+        `<li><button class="cat-link${currentCat === "all" ? " active" : ""}" data-cat="all">Tüm Ürünler <span>${PRODUCTS.length}</span></button></li>` +
+        CATEGORIES.map((c) => {
+          const n = PRODUCTS.filter((p) => p.cat === c.id).length;
+          return `<li><button class="cat-link${currentCat === c.id ? " active" : ""}" data-cat="${c.id}">${escHtml(c.name)} <span>${n}</span></button></li>`;
+        }).join("");
+    }
 
-      shopFilters.addEventListener("click", (e) => {
-        const btn = e.target.closest(".filter-btn");
-        if (!btn) return;
-        shopFilters.querySelectorAll(".filter-btn").forEach((b) => b.classList.remove("active"));
-        btn.classList.add("active");
-        currentCat = btn.dataset.cat;
-        renderShop();
+    function buildPowerFacet() {
+      const counts = {};
+      baseList().forEach((p) => p._tags.forEach((t) => (counts[t] = (counts[t] || 0) + 1)));
+      const tags = Object.keys(counts).sort((a, b) => {
+        const [ra, va] = tagValue(a), [rb, vb] = tagValue(b);
+        return ra - rb || va - vb;
       });
+      // Artık geçerli olmayan seçili filtreleri temizle
+      selectedPowers.forEach((t) => { if (!(t in counts)) selectedPowers.delete(t); });
+
+      if (tags.length === 0) {
+        powerBox.hidden = true;
+        powerList.innerHTML = "";
+        return;
+      }
+      powerBox.hidden = false;
+      powerList.innerHTML = tags
+        .map((t) => `<label class="facet"><input type="checkbox" value="${escHtml(t)}"${selectedPowers.has(t) ? " checked" : ""}> <span class="facet-name">${escHtml(t)}</span> <span class="facet-count">${counts[t]}</span></label>`)
+        .join("");
+    }
+
+    function updateClear() {
+      if (clearBtn) clearBtn.hidden = currentCat === "all" && selectedPowers.size === 0 && !currentQuery();
+    }
+
+    if (catList) {
+      buildCatList();
+      buildPowerFacet();
+
+      catList.addEventListener("click", (e) => {
+        const btn = e.target.closest(".cat-link");
+        if (!btn) return;
+        currentCat = btn.dataset.cat;
+        selectedPowers.clear();
+        buildCatList();
+        buildPowerFacet();
+        renderShop();
+        updateClear();
+      });
+
+      powerList.addEventListener("change", (e) => {
+        const cb = e.target.closest('input[type="checkbox"]');
+        if (!cb) return;
+        if (cb.checked) selectedPowers.add(cb.value);
+        else selectedPowers.delete(cb.value);
+        renderShop();
+        updateClear();
+      });
+
+      if (clearBtn) {
+        clearBtn.addEventListener("click", () => {
+          currentCat = "all";
+          selectedPowers.clear();
+          if (searchInput) searchInput.value = "";
+          buildCatList();
+          buildPowerFacet();
+          renderShop();
+          updateClear();
+        });
+      }
     }
 
     shopGrid.addEventListener("click", (e) => {
@@ -207,7 +301,12 @@ function initSite(root) {
 
     // Mağaza sayfasında arama kutusu ürünleri canlı filtreler
     if (!featured && searchInput) {
-      searchInput.addEventListener("input", renderShop);
+      const applySearch = () => {
+        buildPowerFacet();
+        renderShop();
+        updateClear();
+      };
+      searchInput.addEventListener("input", applySearch);
 
       // Başka sayfadan aranarak gelindiyse terimi al ve uygula
       const loadStoredQuery = () => {
@@ -216,7 +315,7 @@ function initSite(root) {
           searchInput.value = q;
           sessionStorage.removeItem("gp-q");
         }
-        renderShop();
+        applySearch();
       };
       window.addEventListener("hashchange", loadStoredQuery);
       loadStoredQuery();

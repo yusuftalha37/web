@@ -748,6 +748,95 @@ img, svg { max-width: 100%; }
   padding: 24px 0;
 }
 
+/* ---- Sol kenar filtre düzeni (ürünler sayfası) ---- */
+.shop-layout {
+  display: grid;
+  grid-template-columns: 232px 1fr;
+  gap: 22px;
+  align-items: start;
+}
+
+.shop-sidebar {
+  position: sticky;
+  top: 12px;
+}
+
+.filter-box {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 14px;
+}
+
+.cat-list { list-style: none; padding: 6px 0; }
+
+.cat-link {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  background: none;
+  border: none;
+  text-align: left;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--text);
+  padding: 8px 14px;
+  cursor: pointer;
+  border-left: 3px solid transparent;
+}
+
+.cat-link:hover { background: var(--bg-alt); color: var(--blue); }
+
+.cat-link.active {
+  background: #eef4f9;
+  color: var(--blue);
+  font-weight: bold;
+  border-left-color: var(--orange);
+}
+
+.cat-link span {
+  font-size: 11px;
+  color: var(--muted);
+  background: var(--bg-alt);
+  border-radius: 10px;
+  padding: 1px 8px;
+}
+
+.cat-link.active span { background: #fff; }
+
+.facet-list { padding: 10px 14px; }
+
+.facet {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 0;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.facet input { accent-color: var(--orange); cursor: pointer; }
+
+.facet-name { flex: 1; }
+
+.facet-count {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.shop-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 14px;
+  min-height: 18px;
+}
+
+.shop-result { font-size: 12px; color: var(--muted); }
+
+.shop-main .shop-grid { grid-template-columns: repeat(3, 1fr); }
+
 .shop-note {
   margin-top: 20px;
   color: var(--muted);
@@ -1458,6 +1547,11 @@ img, svg { max-width: 100%; }
 @media (max-width: 960px) {
   .cards, .testimonials { grid-template-columns: 1fr 1fr; }
   .shop-grid, .gallery { grid-template-columns: repeat(2, 1fr); }
+  .shop-main .shop-grid { grid-template-columns: repeat(2, 1fr); }
+  .shop-layout { grid-template-columns: 1fr; }
+  .shop-sidebar { position: static; }
+  .cat-list { display: flex; flex-wrap: wrap; padding: 8px; gap: 6px; }
+  .cat-link { width: auto; border: 1px solid var(--border); border-radius: var(--radius); border-left-width: 3px; }
   .steps { grid-template-columns: repeat(2, 1fr); }
   .calc-wrap, .contact-wrap { grid-template-columns: 1fr; }
   .footer-grid { grid-template-columns: 1fr 1fr; }
@@ -1519,6 +1613,7 @@ img, svg { max-width: 100%; }
 
   .cards, .testimonials, .steps { grid-template-columns: 1fr; }
   .shop-grid, .gallery { grid-template-columns: 1fr; }
+  .shop-main .shop-grid { grid-template-columns: 1fr; }
   .form-row { grid-template-columns: 1fr; }
   .calc-results { grid-template-columns: 1fr; }
   .footer-grid { grid-template-columns: 1fr; }
@@ -2649,9 +2744,29 @@ img, svg { max-width: 100%; }
   <!-- MAĞAZA -->
   <section class="section" id="magaza">
     <div class="container">
-      <div class="shop-filters" id="shopFilters"></div>
-      <div class="shop-grid" id="shopGrid"></div>
-      <p class="shop-note">Aradığınız ürünü bulamadınız mı? <a href="#iletisim">Bize yazın</a>, tedarik edelim. Fiyatlar KDV dahildir; kur ve stok durumuna göre güncellenebilir. Stoktaki ürünler aynı gün kargoya verilir; toplu alım için teklif isteyin.</p>
+      <div class="shop-layout">
+        <!-- SOL KENAR: FİLTRELER -->
+        <aside class="shop-sidebar">
+          <div class="filter-box">
+            <div class="box-title">Kategoriler</div>
+            <ul class="cat-list" id="catList"></ul>
+          </div>
+          <div class="filter-box" id="powerBox" hidden>
+            <div class="box-title">Güç / Kapasite</div>
+            <div class="facet-list" id="powerList"></div>
+          </div>
+          <button class="btn btn-outline btn-block" id="clearFilters" hidden>Filtreleri Temizle</button>
+        </aside>
+
+        <!-- SAĞ: ÜRÜNLER -->
+        <div class="shop-main">
+          <div class="shop-toolbar">
+            <span class="shop-result" id="resultCount"></span>
+          </div>
+          <div class="shop-grid" id="shopGrid"></div>
+          <p class="shop-note">Aradığınız ürünü bulamadınız mı? <a href="#iletisim">Bize yazın</a>, tedarik edelim. Fiyatlar KDV dahildir; kur ve stok durumuna göre güncellenebilir. Stoktaki ürünler aynı gün kargoya verilir; toplu alım için teklif isteyin.</p>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -4184,49 +4299,143 @@ function initSite(root) {
       </article>`;
   }
 
+  // Ürün adı/özelliklerinden güç-kapasite etiketleri çıkarır (460W, 100Ah, 5 kW, 48V…)
+  const UNIT_RANK = { W: 0, kW: 1, kWh: 2, Wh: 3, Ah: 4, A: 5, V: 6 };
+  const UNIT_CANON = { w: "W", kw: "kW", kwh: "kWh", wh: "Wh", ah: "Ah", a: "A", v: "V" };
+  function extractTags(p) {
+    const text = p.name + " " + p.specs.join(" ");
+    const re = /(\d+(?:[.,]\d+)?)\s?(kWh|kW|Wh|W|Ah|A|V)\b/gi;
+    const tags = new Set();
+    let m;
+    while ((m = re.exec(text))) {
+      const unit = UNIT_CANON[m[2].toLowerCase()];
+      const spaced = unit === "kW" || unit === "kWh";
+      tags.add(m[1] + (spaced ? " " : "") + unit);
+    }
+    return tags;
+  }
+  function tagValue(t) {
+    const m = t.match(/(\d+(?:[.,]\d+)?)\s?(\S+)/);
+    return [UNIT_RANK[m[2]] ?? 9, parseFloat(m[1].replace(",", "."))];
+  }
+  PRODUCTS.forEach((p) => { p._tags = extractTags(p); });
+
   if (shopGrid) {
     // data-mode="featured": ana sayfadaki 'En Çok Satan Ürünler' vitrini
     const featured = shopGrid.dataset.mode === "featured";
+    const catList = $("#catList");     // ürünler sayfası: sol kenar kategori listesi
+    const powerBox = $("#powerBox");
+    const powerList = $("#powerList");
+    const resultCount = $("#resultCount");
+    const clearBtn = $("#clearFilters");
+
     let currentCat = "all";
+    let selectedPowers = new Set();
+
+    const currentQuery = () => (!featured && searchInput ? searchInput.value.trim() : "");
+
+    // Kategori + arama uygulanmış liste (güç filtresi hariç — facet bundan üretilir)
+    function baseList() {
+      const q = currentQuery();
+      return PRODUCTS.filter(
+        (p) => (currentCat === "all" || p.cat === currentCat) && matchesQuery(p, q)
+      );
+    }
 
     function renderShop() {
       let list;
-      const q = (!featured && searchInput) ? searchInput.value.trim() : "";
+      const q = currentQuery();
       if (featured) {
         list = PRODUCTS.filter((p) => p.hit);
-        if (list.length === 0) list = PRODUCTS; // hiç işaret yoksa hepsinden göster
+        if (list.length === 0) list = PRODUCTS;
         list = list.slice(0, 8);
       } else {
-        list = PRODUCTS.filter(
-          (p) => (currentCat === "all" || p.cat === currentCat) && matchesQuery(p, q)
+        list = baseList().filter(
+          (p) => selectedPowers.size === 0 || Array.from(p._tags).some((t) => selectedPowers.has(t))
         );
       }
+
+      if (resultCount) resultCount.textContent = list.length + " ürün";
 
       if (list.length === 0) {
         shopGrid.innerHTML = q
           ? `<p class="shop-empty">“${escHtml(q)}” ile eşleşen ürün bulunamadı. Farklı bir kelime deneyin ya da <a href="${pageLink("index.html#iletisim")}">bize yazın</a>, tedarik edelim.</p>`
-          : '<p class="shop-empty">Bu kategoride henüz ürün bulunmuyor.</p>';
+          : '<p class="shop-empty">Bu filtrelerle eşleşen ürün bulunamadı.</p>';
         return;
       }
-
       shopGrid.innerHTML = list.map(productCard).join("");
     }
 
-    if (shopFilters) {
-      shopFilters.innerHTML =
-        '<button class="filter-btn active" data-cat="all">Tümü</button>' +
-        CATEGORIES.map(
-          (c) => `<button class="filter-btn" data-cat="${c.id}">${escHtml(c.name)}</button>`
-        ).join("");
+    // ---- Sol kenar: kategori listesi + güç/kapasite facet'i (ürünler sayfası) ----
+    function buildCatList() {
+      catList.innerHTML =
+        `<li><button class="cat-link${currentCat === "all" ? " active" : ""}" data-cat="all">Tüm Ürünler <span>${PRODUCTS.length}</span></button></li>` +
+        CATEGORIES.map((c) => {
+          const n = PRODUCTS.filter((p) => p.cat === c.id).length;
+          return `<li><button class="cat-link${currentCat === c.id ? " active" : ""}" data-cat="${c.id}">${escHtml(c.name)} <span>${n}</span></button></li>`;
+        }).join("");
+    }
 
-      shopFilters.addEventListener("click", (e) => {
-        const btn = e.target.closest(".filter-btn");
-        if (!btn) return;
-        shopFilters.querySelectorAll(".filter-btn").forEach((b) => b.classList.remove("active"));
-        btn.classList.add("active");
-        currentCat = btn.dataset.cat;
-        renderShop();
+    function buildPowerFacet() {
+      const counts = {};
+      baseList().forEach((p) => p._tags.forEach((t) => (counts[t] = (counts[t] || 0) + 1)));
+      const tags = Object.keys(counts).sort((a, b) => {
+        const [ra, va] = tagValue(a), [rb, vb] = tagValue(b);
+        return ra - rb || va - vb;
       });
+      // Artık geçerli olmayan seçili filtreleri temizle
+      selectedPowers.forEach((t) => { if (!(t in counts)) selectedPowers.delete(t); });
+
+      if (tags.length === 0) {
+        powerBox.hidden = true;
+        powerList.innerHTML = "";
+        return;
+      }
+      powerBox.hidden = false;
+      powerList.innerHTML = tags
+        .map((t) => `<label class="facet"><input type="checkbox" value="${escHtml(t)}"${selectedPowers.has(t) ? " checked" : ""}> <span class="facet-name">${escHtml(t)}</span> <span class="facet-count">${counts[t]}</span></label>`)
+        .join("");
+    }
+
+    function updateClear() {
+      if (clearBtn) clearBtn.hidden = currentCat === "all" && selectedPowers.size === 0 && !currentQuery();
+    }
+
+    if (catList) {
+      buildCatList();
+      buildPowerFacet();
+
+      catList.addEventListener("click", (e) => {
+        const btn = e.target.closest(".cat-link");
+        if (!btn) return;
+        currentCat = btn.dataset.cat;
+        selectedPowers.clear();
+        buildCatList();
+        buildPowerFacet();
+        renderShop();
+        updateClear();
+      });
+
+      powerList.addEventListener("change", (e) => {
+        const cb = e.target.closest('input[type="checkbox"]');
+        if (!cb) return;
+        if (cb.checked) selectedPowers.add(cb.value);
+        else selectedPowers.delete(cb.value);
+        renderShop();
+        updateClear();
+      });
+
+      if (clearBtn) {
+        clearBtn.addEventListener("click", () => {
+          currentCat = "all";
+          selectedPowers.clear();
+          if (searchInput) searchInput.value = "";
+          buildCatList();
+          buildPowerFacet();
+          renderShop();
+          updateClear();
+        });
+      }
     }
 
     shopGrid.addEventListener("click", (e) => {
@@ -4243,7 +4452,12 @@ function initSite(root) {
 
     // Mağaza sayfasında arama kutusu ürünleri canlı filtreler
     if (!featured && searchInput) {
-      searchInput.addEventListener("input", renderShop);
+      const applySearch = () => {
+        buildPowerFacet();
+        renderShop();
+        updateClear();
+      };
+      searchInput.addEventListener("input", applySearch);
 
       // Başka sayfadan aranarak gelindiyse terimi al ve uygula
       const loadStoredQuery = () => {
@@ -4252,7 +4466,7 @@ function initSite(root) {
           searchInput.value = q;
           sessionStorage.removeItem("gp-q");
         }
-        renderShop();
+        applySearch();
       };
       window.addEventListener("hashchange", loadStoredQuery);
       loadStoredQuery();

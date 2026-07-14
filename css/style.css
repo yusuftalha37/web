@@ -739,6 +739,95 @@ img, svg { max-width: 100%; }
   padding: 24px 0;
 }
 
+/* ---- Sol kenar filtre düzeni (ürünler sayfası) ---- */
+.shop-layout {
+  display: grid;
+  grid-template-columns: 232px 1fr;
+  gap: 22px;
+  align-items: start;
+}
+
+.shop-sidebar {
+  position: sticky;
+  top: 12px;
+}
+
+.filter-box {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 14px;
+}
+
+.cat-list { list-style: none; padding: 6px 0; }
+
+.cat-link {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  background: none;
+  border: none;
+  text-align: left;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--text);
+  padding: 8px 14px;
+  cursor: pointer;
+  border-left: 3px solid transparent;
+}
+
+.cat-link:hover { background: var(--bg-alt); color: var(--blue); }
+
+.cat-link.active {
+  background: #eef4f9;
+  color: var(--blue);
+  font-weight: bold;
+  border-left-color: var(--orange);
+}
+
+.cat-link span {
+  font-size: 11px;
+  color: var(--muted);
+  background: var(--bg-alt);
+  border-radius: 10px;
+  padding: 1px 8px;
+}
+
+.cat-link.active span { background: #fff; }
+
+.facet-list { padding: 10px 14px; }
+
+.facet {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 0;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.facet input { accent-color: var(--orange); cursor: pointer; }
+
+.facet-name { flex: 1; }
+
+.facet-count {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.shop-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 14px;
+  min-height: 18px;
+}
+
+.shop-result { font-size: 12px; color: var(--muted); }
+
+.shop-main .shop-grid { grid-template-columns: repeat(3, 1fr); }
+
 .shop-note {
   margin-top: 20px;
   color: var(--muted);
@@ -1449,6 +1538,11 @@ img, svg { max-width: 100%; }
 @media (max-width: 960px) {
   .cards, .testimonials { grid-template-columns: 1fr 1fr; }
   .shop-grid, .gallery { grid-template-columns: repeat(2, 1fr); }
+  .shop-main .shop-grid { grid-template-columns: repeat(2, 1fr); }
+  .shop-layout { grid-template-columns: 1fr; }
+  .shop-sidebar { position: static; }
+  .cat-list { display: flex; flex-wrap: wrap; padding: 8px; gap: 6px; }
+  .cat-link { width: auto; border: 1px solid var(--border); border-radius: var(--radius); border-left-width: 3px; }
   .steps { grid-template-columns: repeat(2, 1fr); }
   .calc-wrap, .contact-wrap { grid-template-columns: 1fr; }
   .footer-grid { grid-template-columns: 1fr 1fr; }
@@ -1510,6 +1604,7 @@ img, svg { max-width: 100%; }
 
   .cards, .testimonials, .steps { grid-template-columns: 1fr; }
   .shop-grid, .gallery { grid-template-columns: 1fr; }
+  .shop-main .shop-grid { grid-template-columns: 1fr; }
   .form-row { grid-template-columns: 1fr; }
   .calc-results { grid-template-columns: 1fr; }
   .footer-grid { grid-template-columns: 1fr; }
