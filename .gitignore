@@ -5,3 +5,6 @@ data.json.tmp
 # Yerel/geçici
 *.log
 .DS_Store
+
+# Teslim/çıktı arşivleri
+*.zip
