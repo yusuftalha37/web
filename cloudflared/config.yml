@@ -1,0 +1,25 @@
+# ============================================================
+# Cloudflare Tunnel yapılandırması — Quantora Solar
+# Tünel adı: solar-arena
+# ------------------------------------------------------------
+# Aşağıdaki 2 yeri KENDİNİZE göre doldurun:
+#   1) <TUNNEL_UUID>   -> "cloudflared tunnel create solar-arena"
+#                         komutunun verdiği kimlik (UUID)
+#   2) alanadiniz.com  -> kendi alan adınız
+#
+# credentials-file yolu işletim sistemine göre:
+#   Windows: C:\Users\KULLANICI\.cloudflared\<TUNNEL_UUID>.json
+#   Linux/Mac: /root/.cloudflared/<TUNNEL_UUID>.json
+# ============================================================
+
+tunnel: solar-arena
+credentials-file: C:\Users\Administrator\.cloudflared\<TUNNEL_UUID>.json
+
+ingress:
+  # Alan adınıza gelen istekleri sunucudaki siteye (Node) yönlendir
+  - hostname: alanadiniz.com
+    service: http://localhost:3000
+  - hostname: www.alanadiniz.com
+    service: http://localhost:3000
+  # Eşleşmeyen her şey için 404 (zorunlu son kural)
+  - service: http_status:404
