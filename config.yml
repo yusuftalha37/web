@@ -1,0 +1,8 @@
+# Cloudflare Tunnel — Quantora Solar (solararena.store)
+tunnel: cdcca99a-a4c8-4cb6-afc3-26b281497d70
+credentials-file: C:\Users\Administrator\.cloudflared\cdcca99a-a4c8-4cb6-afc3-26b281497d70.json
+
+ingress:
+  - hostname: solararena.store
+    service: http://localhost:3000
+  - service: http_status:404

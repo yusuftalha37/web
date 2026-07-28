@@ -1,0 +1,46 @@
+========================================================
+  QUANTORA SOLAR — TEK TIKLA BASLATMA
+========================================================
+
+NE YAPMANIZ GEREKIYOR (ilk kurulum, bir kere):
+
+1) Bu zip'i sunucudaki bir klasore acin. Ornek:  C:\quantora
+   (icinde: baslat.bat, config.yml, server.js, index.html, js\ ... hepsi olsun)
+
+2) Node.js kurulu olsun:  https://nodejs.org  (LTS surumu)
+
+3) cloudflared kurulu olsun:
+   https://github.com/cloudflare/cloudflared/releases
+   (cloudflared-windows-amd64.msi)
+
+4) Tunel yetki dosyaniz yerinde olsun:
+   C:\Users\Administrator\.cloudflared\cdcca99a-a4c8-4cb6-afc3-26b281497d70.json
+   (Bu dosyayi "cloudflared tunnel create" komutu zaten olusturmustu.)
+
+--------------------------------------------------------
+
+HER GUN KULLANIM:
+
+  >>> baslat.bat dosyasina CIFT TIKLAYIN <<<
+
+Acilanlar:
+  - "Quantora Sunucu"   penceresi  -> siteyi calistirir
+  - "Cloudflare Tunnel" penceresi  -> solararena.store'u baglar
+  - Tarayici otomatik acilir:  https://solararena.store
+
+NOT: Bu iki pencere ACIK KALMALI. Kapatirsaniz site kapanir.
+
+--------------------------------------------------------
+
+YONETICI GIRISI (ilk acilis):
+  E-posta: admin@quantorasolar.com.tr
+  Sifre:   admin123
+  (Girdikten sonra Hesabim > Sifre Degistir ile mutlaka degistirin.)
+
+--------------------------------------------------------
+
+7/24 OTOMATIK CALISSIN (istege bagli):
+  Pencere acmadan, sunucu her acildiginda kendiliginden calissin
+  isterseniz KURULUM-WINDOWS.md (NSSM) ve KURULUM-CLOUDFLARE.md
+  (cloudflared service install) adimlarini uygulayin.
+========================================================
