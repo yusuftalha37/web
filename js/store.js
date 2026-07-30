@@ -27,9 +27,9 @@ const Store = (() => {
     { id: "pnl-460", hit: true, cat: "panel", img: "panel", name: "460W Half-Cut Monokristal Güneş Paneli", specs: ["120 hücre · %21,3 verim", "Çerçeve: eloksallı alüminyum, IP68 bağlantı kutusu", "25 yıl performans garantisi"], price: 4850, stock: 25 },
     { id: "pnl-550", hit: true, cat: "panel", img: "panel", name: "550W Monokristal Güneş Paneli", specs: ["144 hücre · %21,7 verim", "Çift cam (bifacial) teknoloji", "30 yıl performans garantisi"], price: 5950, stock: 18 },
     { id: "pnl-flx", cat: "panel", img: "flex", name: "285W Esnek Güneş Paneli", specs: ["Karavan, tekne ve tiny house için", "Yarı esnek ETFE yüzey", "Sadece 4,8 kg"], price: 6750, stock: 4 },
-    { id: "inv-5g", cat: "inverter", img: "inverter", name: "5 kW On-Grid İnvertör (Monofaze)", specs: ["2 MPPT girişi", "Wi-Fi izleme modülü dahil", "5 yıl garanti"], price: 38500, stock: 9 },
-    { id: "inv-6h", hit: true, cat: "inverter", img: "inverter", name: "6 kW Hibrit İnvertör 48V", specs: ["120A MPPT şarj kontrollü", "Şebeke + akü + jeneratör girişi", "Paralellenebilir (9 adede kadar)"], price: 52900, stock: 7 },
-    { id: "inv-3s", cat: "inverter", img: "inverter", name: "3 kW Tam Sinüs İnvertör 24V", specs: ["Off-grid kullanım için", "LCD ekran, USB çıkış", "Düşük bekleme tüketimi"], price: 14750, stock: 14 },
+    { id: "inv-5g", cat: "inverter", img: "inverter", authorized: true, name: "5 kW On-Grid İnvertör (Monofaze)", specs: ["2 MPPT girişi", "Wi-Fi izleme modülü dahil", "5 yıl garanti"], price: 38500, stock: 9 },
+    { id: "inv-6h", hit: true, cat: "inverter", img: "inverter", authorized: true, name: "6 kW Hibrit İnvertör 48V", specs: ["120A MPPT şarj kontrollü", "Şebeke + akü + jeneratör girişi", "Paralellenebilir (9 adede kadar)"], price: 52900, stock: 7 },
+    { id: "inv-3s", cat: "inverter", img: "inverter", authorized: true, name: "3 kW Tam Sinüs İnvertör 24V", specs: ["Off-grid kullanım için", "LCD ekran, USB çıkış", "Düşük bekleme tüketimi"], price: 14750, stock: 14 },
     { id: "aku-lfp", hit: true, cat: "aku", img: "battery", name: "48V 100Ah LiFePO4 Lityum Akü", specs: ["5,12 kWh kapasite", "6.000+ çevrim ömrü", "Dahili BMS, Bluetooth takip"], price: 58900, stock: 6 },
     { id: "aku-jel", cat: "aku", img: "battery", name: "12V 150Ah Derin Döngü Jel Akü", specs: ["Bakım gerektirmez", "Solar sistemler için optimize", "2 yıl garanti"], price: 9850, stock: 22 },
     { id: "kit-krv", hit: true, cat: "paket", img: "kit", name: "Karavan Solar Paketi 410W", specs: ["410W panel + 30A MPPT regülatör", "Kablolama ve montaj aparatları dahil", "Kurulum şeması ile birlikte"], price: 32500, stock: 3 },
@@ -60,6 +60,7 @@ const Store = (() => {
     topNote: "Türkiye'nin her yerine hızlı gönderim",
     brandTagline: "Enerji Sistemleri San. Tic. Ltd. Şti.",
     headerContactNote: "Sipariş ve bilgi için hemen arayın",
+    authorizedLabel: "Yetkili Satıcı",
     // ---- Avantaj şeridi ----
     strip1: "25 Yıl Panel Garantisi",
     strip2: "36 Aya Varan Taksit",
@@ -246,8 +247,8 @@ const Store = (() => {
   }
 
   // ---- DB satırı <-> uygulama nesnesi ----
-  function fromDbProduct(r) { return { id: r.id, cat: r.cat, img: r.img, photo: r.photo || "", name: r.name, specs: r.specs || [], price: r.price, stock: r.stock, hit: !!r.hit }; }
-  function toDbProduct(p, sort) { return { id: p.id, cat: p.cat, img: p.img, photo: p.photo || "", name: p.name, specs: p.specs || [], price: p.price, stock: p.stock, hit: !!p.hit, sort: sort == null ? 0 : sort }; }
+  function fromDbProduct(r) { return { id: r.id, cat: r.cat, img: r.img, photo: r.photo || "", name: r.name, specs: r.specs || [], price: r.price, stock: r.stock, hit: !!r.hit, authorized: !!r.authorized }; }
+  function toDbProduct(p, sort) { return { id: p.id, cat: p.cat, img: p.img, photo: p.photo || "", name: p.name, specs: p.specs || [], price: p.price, stock: p.stock, hit: !!p.hit, authorized: !!p.authorized, sort: sort == null ? 0 : sort }; }
   function fromDbSlide(r) { return { id: r.id, image: r.image || "", art: r.art, title: r.title, subtitle: r.subtitle || "", btnText: r.btnText || "", btnLink: r.btnLink || "urunler.html" }; }
   function toDbSlide(s, sort) { return { id: s.id, image: s.image || "", art: s.art, title: s.title, subtitle: s.subtitle || "", btnText: s.btnText || "", btnLink: s.btnLink || "urunler.html", sort: sort == null ? 0 : sort }; }
   function fromDbOrder(r) { return { id: r.id, customer: r.customer, phone: r.phone, email: r.email, city: r.city, address: r.address, payment: r.payment, status: r.status, items: r.items || [], total: r.total, date: r.created }; }

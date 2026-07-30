@@ -754,6 +754,40 @@ img, svg { max-width: 100%; }
   border-color: #ead196;
 }
 
+/* Yetkili satıcı — görselin üstünde köşe şeridi */
+.auth-ribbon {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 2;
+  font-size: 10px;
+  font-weight: bold;
+  letter-spacing: 0.02em;
+  padding: 3px 9px;
+  border-radius: var(--radius);
+  background: linear-gradient(#155a91, var(--blue));
+  color: #fff;
+  border: 1px solid var(--blue-dark);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+/* Yetkili satıcı — kart gövdesinde onaylı rozet */
+.auth-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  align-self: flex-start;
+  margin-top: 4px;
+  font-size: 10.5px;
+  font-weight: bold;
+  color: #0f6b3a;
+  background: #e8f6ec;
+  border: 1px solid #b7e0c2;
+  border-radius: 20px;
+  padding: 2px 9px 2px 7px;
+}
+.auth-badge svg { color: #1a9c54; }
+
 .product-body {
   padding: 12px 14px 14px;
   display: flex;
@@ -3429,6 +3463,7 @@ img, svg { max-width: 100%; }
               <textarea id="upSpecs" rows="3" placeholder="120 hücre · %21,3 verim&#10;25 yıl performans garantisi"></textarea>
             </div>
             <label class="check-label"><input type="checkbox" id="upHit"> Çok satan ürün — ana sayfadaki vitrinde göster</label>
+            <label class="check-label"><input type="checkbox" id="upAuthorized"> Yetkili satıcı ürünü — kartta "Yetkili Satıcı" rozeti göster</label>
             <button type="submit" class="btn btn-block">Ürünü Mağazaya Yükle</button>
             <p class="form-status" id="upStatus" role="status"></p>
           </form>
@@ -3693,6 +3728,7 @@ img, svg { max-width: 100%; }
           <textarea id="pfSpecs" rows="3" placeholder="120 hücre · %21,3 verim&#10;25 yıl performans garantisi"></textarea>
         </div>
         <label class="check-label"><input type="checkbox" id="pfHit"> Çok satan ürün — ana sayfadaki vitrinde göster</label>
+        <label class="check-label"><input type="checkbox" id="pfAuthorized"> Yetkili satıcı ürünü — kartta "Yetkili Satıcı" rozeti göster</label>
         <button type="submit" class="btn btn-block">Kaydet</button>
       </form>
     </div>
@@ -3758,9 +3794,9 @@ const Store = (() => {
     { id: "pnl-460", hit: true, cat: "panel", img: "panel", name: "460W Half-Cut Monokristal Güneş Paneli", specs: ["120 hücre · %21,3 verim", "Çerçeve: eloksallı alüminyum, IP68 bağlantı kutusu", "25 yıl performans garantisi"], price: 4850, stock: 25 },
     { id: "pnl-550", hit: true, cat: "panel", img: "panel", name: "550W Monokristal Güneş Paneli", specs: ["144 hücre · %21,7 verim", "Çift cam (bifacial) teknoloji", "30 yıl performans garantisi"], price: 5950, stock: 18 },
     { id: "pnl-flx", cat: "panel", img: "flex", name: "285W Esnek Güneş Paneli", specs: ["Karavan, tekne ve tiny house için", "Yarı esnek ETFE yüzey", "Sadece 4,8 kg"], price: 6750, stock: 4 },
-    { id: "inv-5g", cat: "inverter", img: "inverter", name: "5 kW On-Grid İnvertör (Monofaze)", specs: ["2 MPPT girişi", "Wi-Fi izleme modülü dahil", "5 yıl garanti"], price: 38500, stock: 9 },
-    { id: "inv-6h", hit: true, cat: "inverter", img: "inverter", name: "6 kW Hibrit İnvertör 48V", specs: ["120A MPPT şarj kontrollü", "Şebeke + akü + jeneratör girişi", "Paralellenebilir (9 adede kadar)"], price: 52900, stock: 7 },
-    { id: "inv-3s", cat: "inverter", img: "inverter", name: "3 kW Tam Sinüs İnvertör 24V", specs: ["Off-grid kullanım için", "LCD ekran, USB çıkış", "Düşük bekleme tüketimi"], price: 14750, stock: 14 },
+    { id: "inv-5g", cat: "inverter", img: "inverter", authorized: true, name: "5 kW On-Grid İnvertör (Monofaze)", specs: ["2 MPPT girişi", "Wi-Fi izleme modülü dahil", "5 yıl garanti"], price: 38500, stock: 9 },
+    { id: "inv-6h", hit: true, cat: "inverter", img: "inverter", authorized: true, name: "6 kW Hibrit İnvertör 48V", specs: ["120A MPPT şarj kontrollü", "Şebeke + akü + jeneratör girişi", "Paralellenebilir (9 adede kadar)"], price: 52900, stock: 7 },
+    { id: "inv-3s", cat: "inverter", img: "inverter", authorized: true, name: "3 kW Tam Sinüs İnvertör 24V", specs: ["Off-grid kullanım için", "LCD ekran, USB çıkış", "Düşük bekleme tüketimi"], price: 14750, stock: 14 },
     { id: "aku-lfp", hit: true, cat: "aku", img: "battery", name: "48V 100Ah LiFePO4 Lityum Akü", specs: ["5,12 kWh kapasite", "6.000+ çevrim ömrü", "Dahili BMS, Bluetooth takip"], price: 58900, stock: 6 },
     { id: "aku-jel", cat: "aku", img: "battery", name: "12V 150Ah Derin Döngü Jel Akü", specs: ["Bakım gerektirmez", "Solar sistemler için optimize", "2 yıl garanti"], price: 9850, stock: 22 },
     { id: "kit-krv", hit: true, cat: "paket", img: "kit", name: "Karavan Solar Paketi 410W", specs: ["410W panel + 30A MPPT regülatör", "Kablolama ve montaj aparatları dahil", "Kurulum şeması ile birlikte"], price: 32500, stock: 3 },
@@ -3791,6 +3827,7 @@ const Store = (() => {
     topNote: "Türkiye'nin her yerine hızlı gönderim",
     brandTagline: "Enerji Sistemleri San. Tic. Ltd. Şti.",
     headerContactNote: "Sipariş ve bilgi için hemen arayın",
+    authorizedLabel: "Yetkili Satıcı",
     // ---- Avantaj şeridi ----
     strip1: "25 Yıl Panel Garantisi",
     strip2: "36 Aya Varan Taksit",
@@ -3977,8 +4014,8 @@ const Store = (() => {
   }
 
   // ---- DB satırı <-> uygulama nesnesi ----
-  function fromDbProduct(r) { return { id: r.id, cat: r.cat, img: r.img, photo: r.photo || "", name: r.name, specs: r.specs || [], price: r.price, stock: r.stock, hit: !!r.hit }; }
-  function toDbProduct(p, sort) { return { id: p.id, cat: p.cat, img: p.img, photo: p.photo || "", name: p.name, specs: p.specs || [], price: p.price, stock: p.stock, hit: !!p.hit, sort: sort == null ? 0 : sort }; }
+  function fromDbProduct(r) { return { id: r.id, cat: r.cat, img: r.img, photo: r.photo || "", name: r.name, specs: r.specs || [], price: r.price, stock: r.stock, hit: !!r.hit, authorized: !!r.authorized }; }
+  function toDbProduct(p, sort) { return { id: p.id, cat: p.cat, img: p.img, photo: p.photo || "", name: p.name, specs: p.specs || [], price: p.price, stock: p.stock, hit: !!p.hit, authorized: !!p.authorized, sort: sort == null ? 0 : sort }; }
   function fromDbSlide(r) { return { id: r.id, image: r.image || "", art: r.art, title: r.title, subtitle: r.subtitle || "", btnText: r.btnText || "", btnLink: r.btnLink || "urunler.html" }; }
   function toDbSlide(s, sort) { return { id: s.id, image: s.image || "", art: s.art, title: s.title, subtitle: s.subtitle || "", btnText: s.btnText || "", btnLink: s.btnLink || "urunler.html", sort: sort == null ? 0 : sort }; }
   function fromDbOrder(r) { return { id: r.id, customer: r.customer, phone: r.phone, email: r.email, city: r.city, address: r.address, payment: r.payment, status: r.status, items: r.items || [], total: r.total, date: r.created }; }
@@ -4588,14 +4625,20 @@ function initSite(root) {
 
   function productCard(p) {
     const low = p.stock <= 5;
+    const authLabel = (Store.getSiteContent().authorizedLabel || "Yetkili Satıcı");
+    const authBadge = p.authorized
+      ? `<span class="auth-badge" title="${escHtml(authLabel)}"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>${escHtml(authLabel)}</span>`
+      : "";
     return `
       <article class="product">
         <div class="product-img${p.photo ? " has-photo" : ""}">
           <span class="stock-badge${low ? " low" : ""}">${low ? "Son " + p.stock + " adet" : "Stokta"}</span>
+          ${p.authorized ? `<span class="auth-ribbon">${escHtml(authLabel)}</span>` : ""}
           ${productMedia(p)}
         </div>
         <div class="product-body">
           <span class="product-cat">${escHtml(catName(p.cat))}</span>
+          ${authBadge}
           <h3>${escHtml(p.name)}</h3>
           <ul class="product-specs">${p.specs.map((s) => `<li>${escHtml(s)}</li>`).join("")}</ul>
           <div class="product-foot">
@@ -5521,7 +5564,7 @@ function renderProducts() {
     products.map((p) => `
       <tr>
         <td>${thumbHtml(p)}</td>
-        <td class="cell-strong">${p.hit ? '<span class="hit-star" title="Çok satan">★</span> ' : ""}${escHtml(p.name)}</td>
+        <td class="cell-strong">${p.hit ? '<span class="hit-star" title="Çok satan">★</span> ' : ""}${escHtml(p.name)}${p.authorized ? ' <span class="pill pill-ok">Yetkili</span>' : ""}</td>
         <td>${escHtml(catName(p.cat))}</td>
         <td>${tlFmt(p.price)}</td>
         <td>${p.stock <= 5 ? `<span class="pill pill-warn">${p.stock} adet</span>` : p.stock + " adet"}</td>
@@ -5582,6 +5625,7 @@ function openProductModal(product) {
   document.getElementById("pfStock").value = product ? product.stock : "";
   document.getElementById("pfSpecs").value = product ? product.specs.join("\n") : "";
   document.getElementById("pfHit").checked = !!(product && product.hit);
+  document.getElementById("pfAuthorized").checked = !!(product && product.authorized);
   photoFile.value = "";
   photoUrl.value = product && product.photo && !product.photo.startsWith("data:") ? product.photo : "";
   setPhoto(product ? product.photo : "");
@@ -5621,6 +5665,7 @@ productForm.addEventListener("submit", (e) => {
       img: document.getElementById("pfImg").value,
       photo: currentPhoto,
       hit: document.getElementById("pfHit").checked,
+      authorized: document.getElementById("pfAuthorized").checked,
       price: parseInt(document.getElementById("pfPrice").value, 10) || 0,
       stock: parseInt(document.getElementById("pfStock").value, 10) || 0,
       specs: document.getElementById("pfSpecs").value
@@ -5714,17 +5759,21 @@ function renderUploadPreview() {
   const specs = document.getElementById("upSpecs").value
     .split("\n").map((s) => s.trim()).filter(Boolean);
   const low = !isNaN(stock) && stock <= 5;
+  const authorized = document.getElementById("upAuthorized").checked;
+  const authLabel = Store.getSiteContent().authorizedLabel || "Yetkili Satıcı";
 
   uploadPreview.innerHTML = `
     <article class="product">
       <div class="product-img${uploadPhoto ? " has-photo" : ""}">
         <span class="stock-badge${low ? " low" : ""}">${low ? "Son " + stock + " adet" : "Stokta"}</span>
+        ${authorized ? `<span class="auth-ribbon">${escHtml(authLabel)}</span>` : ""}
         ${uploadPhoto
           ? `<img src="${escHtml(uploadPhoto)}" alt="">`
           : (PRODUCT_ART[img] || PRODUCT_ART.panel)}
       </div>
       <div class="product-body">
         <span class="product-cat">${escHtml(catName(cat))}</span>
+        ${authorized ? `<span class="auth-badge"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>${escHtml(authLabel)}</span>` : ""}
         <h3>${escHtml(name)}</h3>
         <ul class="product-specs">${specs.map((s) => `<li>${escHtml(s)}</li>`).join("") || "<li>Ürün özellikleri</li>"}</ul>
         <div class="product-foot">
@@ -5738,6 +5787,7 @@ function renderUploadPreview() {
 ["upName", "upCat", "upImg", "upPrice", "upStock", "upSpecs"].forEach((id) => {
   document.getElementById(id).addEventListener("input", renderUploadPreview);
 });
+document.getElementById("upAuthorized").addEventListener("change", renderUploadPreview);
 
 uploadForm.addEventListener("submit", (e) => {
   e.preventDefault();
@@ -5756,6 +5806,7 @@ uploadForm.addEventListener("submit", (e) => {
       img: document.getElementById("upImg").value,
       photo: uploadPhoto,
       hit: document.getElementById("upHit").checked,
+      authorized: document.getElementById("upAuthorized").checked,
       price,
       stock: parseInt(document.getElementById("upStock").value, 10) || 0,
       specs: document.getElementById("upSpecs").value
@@ -6143,7 +6194,8 @@ const CONTENT_SCHEMA = [
   { group: "İletişim & Genel", fields: [
     ["phone", "Telefon"], ["email", "E-posta"], ["address", "Adres"],
     ["hours", "Çalışma saatleri"], ["topNote", "Üst bar notu"],
-    ["brandTagline", "Logo alt yazısı (ünvan)"], ["headerContactNote", "Başlıkta telefon altı not"]
+    ["brandTagline", "Logo alt yazısı (ünvan)"], ["headerContactNote", "Başlıkta telefon altı not"],
+    ["authorizedLabel", "Yetkili satıcı rozeti yazısı"]
   ]},
   { group: "Avantaj Şeridi", fields: [
     ["strip1", "1. madde"], ["strip2", "2. madde"], ["strip3", "3. madde"], ["strip4", "4. madde"]

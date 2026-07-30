@@ -128,7 +128,7 @@ function renderProducts() {
     products.map((p) => `
       <tr>
         <td>${thumbHtml(p)}</td>
-        <td class="cell-strong">${p.hit ? '<span class="hit-star" title="Çok satan">★</span> ' : ""}${escHtml(p.name)}</td>
+        <td class="cell-strong">${p.hit ? '<span class="hit-star" title="Çok satan">★</span> ' : ""}${escHtml(p.name)}${p.authorized ? ' <span class="pill pill-ok">Yetkili</span>' : ""}</td>
         <td>${escHtml(catName(p.cat))}</td>
         <td>${tlFmt(p.price)}</td>
         <td>${p.stock <= 5 ? `<span class="pill pill-warn">${p.stock} adet</span>` : p.stock + " adet"}</td>
@@ -189,6 +189,7 @@ function openProductModal(product) {
   document.getElementById("pfStock").value = product ? product.stock : "";
   document.getElementById("pfSpecs").value = product ? product.specs.join("\n") : "";
   document.getElementById("pfHit").checked = !!(product && product.hit);
+  document.getElementById("pfAuthorized").checked = !!(product && product.authorized);
   photoFile.value = "";
   photoUrl.value = product && product.photo && !product.photo.startsWith("data:") ? product.photo : "";
   setPhoto(product ? product.photo : "");
@@ -228,6 +229,7 @@ productForm.addEventListener("submit", (e) => {
       img: document.getElementById("pfImg").value,
       photo: currentPhoto,
       hit: document.getElementById("pfHit").checked,
+      authorized: document.getElementById("pfAuthorized").checked,
       price: parseInt(document.getElementById("pfPrice").value, 10) || 0,
       stock: parseInt(document.getElementById("pfStock").value, 10) || 0,
       specs: document.getElementById("pfSpecs").value
@@ -321,17 +323,21 @@ function renderUploadPreview() {
   const specs = document.getElementById("upSpecs").value
     .split("\n").map((s) => s.trim()).filter(Boolean);
   const low = !isNaN(stock) && stock <= 5;
+  const authorized = document.getElementById("upAuthorized").checked;
+  const authLabel = Store.getSiteContent().authorizedLabel || "Yetkili Satıcı";
 
   uploadPreview.innerHTML = `
     <article class="product">
       <div class="product-img${uploadPhoto ? " has-photo" : ""}">
         <span class="stock-badge${low ? " low" : ""}">${low ? "Son " + stock + " adet" : "Stokta"}</span>
+        ${authorized ? `<span class="auth-ribbon">${escHtml(authLabel)}</span>` : ""}
         ${uploadPhoto
           ? `<img src="${escHtml(uploadPhoto)}" alt="">`
           : (PRODUCT_ART[img] || PRODUCT_ART.panel)}
       </div>
       <div class="product-body">
         <span class="product-cat">${escHtml(catName(cat))}</span>
+        ${authorized ? `<span class="auth-badge"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>${escHtml(authLabel)}</span>` : ""}
         <h3>${escHtml(name)}</h3>
         <ul class="product-specs">${specs.map((s) => `<li>${escHtml(s)}</li>`).join("") || "<li>Ürün özellikleri</li>"}</ul>
         <div class="product-foot">
@@ -345,6 +351,7 @@ function renderUploadPreview() {
 ["upName", "upCat", "upImg", "upPrice", "upStock", "upSpecs"].forEach((id) => {
   document.getElementById(id).addEventListener("input", renderUploadPreview);
 });
+document.getElementById("upAuthorized").addEventListener("change", renderUploadPreview);
 
 uploadForm.addEventListener("submit", (e) => {
   e.preventDefault();
@@ -363,6 +370,7 @@ uploadForm.addEventListener("submit", (e) => {
       img: document.getElementById("upImg").value,
       photo: uploadPhoto,
       hit: document.getElementById("upHit").checked,
+      authorized: document.getElementById("upAuthorized").checked,
       price,
       stock: parseInt(document.getElementById("upStock").value, 10) || 0,
       specs: document.getElementById("upSpecs").value
@@ -750,7 +758,8 @@ const CONTENT_SCHEMA = [
   { group: "İletişim & Genel", fields: [
     ["phone", "Telefon"], ["email", "E-posta"], ["address", "Adres"],
     ["hours", "Çalışma saatleri"], ["topNote", "Üst bar notu"],
-    ["brandTagline", "Logo alt yazısı (ünvan)"], ["headerContactNote", "Başlıkta telefon altı not"]
+    ["brandTagline", "Logo alt yazısı (ünvan)"], ["headerContactNote", "Başlıkta telefon altı not"],
+    ["authorizedLabel", "Yetkili satıcı rozeti yazısı"]
   ]},
   { group: "Avantaj Şeridi", fields: [
     ["strip1", "1. madde"], ["strip2", "2. madde"], ["strip3", "3. madde"], ["strip4", "4. madde"]
