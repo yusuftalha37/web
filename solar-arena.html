@@ -377,6 +377,19 @@ img, svg { max-width: 100%; }
 
 .catbar-dropdown li:last-child a { border-bottom: none; }
 
+.catbar-ico {
+  width: 22px;
+  height: 22px;
+  object-fit: cover;
+  border-radius: 3px;
+  vertical-align: middle;
+  margin-right: 7px;
+  border: 1px solid var(--border);
+  background: #fff;
+}
+.catbar-dropdown a { display: flex; align-items: center; }
+.catbar-dropdown .catbar-ico { width: 26px; height: 26px; }
+
 .catbar-dropdown a:hover {
   background: var(--bg-alt);
   color: var(--blue);
@@ -3490,10 +3503,11 @@ img, svg { max-width: 100%; }
         </form>
       </div>
       <div class="admin-panel">
-        <p class="panel-hint">Kategoriler mağazadaki filtre butonlarında ve ürün formlarında kullanılır. İçinde ürün bulunan kategori silinemez; önce ürünleri başka kategoriye taşıyın.</p>
+        <p class="panel-hint">Kategoriler mağazadaki filtre butonlarında, üst kategori çubuğunda ve ürün formlarında kullanılır. Her kategoriye bir görsel (ikon) ekleyebilirsiniz; bu görsel üst kategori çubuğunda kategori adının yanında görünür. İçinde ürün bulunan kategori silinemez; önce ürünleri başka kategoriye taşıyın.</p>
+        <input type="file" id="catImgFile" accept="image/*" hidden>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Kategori</th><th>Ürün Sayısı</th><th></th></tr></thead>
+            <thead><tr><th>Görsel</th><th>Kategori</th><th>Ürün Sayısı</th><th></th></tr></thead>
             <tbody id="catRows"></tbody>
           </table>
         </div>
@@ -3966,7 +3980,7 @@ const Store = (() => {
         sbSelect("kv", "select=*")
       ]);
       cache.products = products.map(fromDbProduct);
-      cache.categories = categories.map((c) => ({ id: c.id, name: c.name }));
+      cache.categories = categories.map((c) => ({ id: c.id, name: c.name, image: c.image || "" }));
       cache.slides = slides.map(fromDbSlide);
       const kvMap = {};
       kv.forEach((row) => (kvMap[row.k] = row.v));
@@ -4038,14 +4052,20 @@ const Store = (() => {
   // ===================== KATEGORİLER =====================
   function getCategories() { return cache.categories; }
   function saveCategory(cat) {
+    const name = (cat.name || "").trim();
     if (cat.id) {
       const ex = cache.categories.find((c) => c.id === cat.id);
-      if (ex) ex.name = cat.name.trim();
-      if (persist) return sbWrite("POST", "categories", "", { id: cat.id, name: cat.name.trim() }).catch(logErr);
+      if (ex) {
+        if (name) ex.name = name;
+        if (cat.image !== undefined) ex.image = cat.image;
+      }
+      const row = { id: cat.id, name: ex ? ex.name : name };
+      if (cat.image !== undefined) row.image = cat.image;
+      if (persist) return sbWrite("POST", "categories", "", row).catch(logErr);
     } else {
-      const nc = { id: "c-" + Date.now(), name: cat.name.trim() };
+      const nc = { id: "c-" + Date.now(), name, image: cat.image || "" };
       cache.categories.push(nc);
-      if (persist) return sbWrite("POST", "categories", "", { id: nc.id, name: nc.name, sort: cache.categories.length }).catch(logErr);
+      if (persist) return sbWrite("POST", "categories", "", { id: nc.id, name: nc.name, image: nc.image, sort: cache.categories.length }).catch(logErr);
     }
     write("gp-cats", cache.categories);
   }
@@ -4852,16 +4872,17 @@ function initSite(root) {
   const catbarAll = $("#catbarAll");
 
   if (catbarLinks || catbarDropdown) {
+    const catIcon = (c) => c.image ? `<img class="catbar-ico" src="${escHtml(c.image)}" alt="">` : "";
     if (catbarLinks) {
       catbarLinks.innerHTML = CATEGORIES.map(
-        (c) => `<a href="${pageLink("urunler.html")}" class="catbar-link" data-cat="${c.id}">${escHtml(c.name)}</a>`
+        (c) => `<a href="${pageLink("urunler.html")}" class="catbar-link" data-cat="${c.id}">${catIcon(c)}${escHtml(c.name)}</a>`
       ).join("");
     }
     if (catbarDropdown) {
       catbarDropdown.innerHTML =
         `<li><a href="${pageLink("urunler.html")}" data-cat="all">Tüm Ürünler</a></li>` +
         CATEGORIES.map(
-          (c) => `<li><a href="${pageLink("urunler.html")}" data-cat="${c.id}">${escHtml(c.name)}</a></li>`
+          (c) => `<li><a href="${pageLink("urunler.html")}" data-cat="${c.id}">${catIcon(c)}${escHtml(c.name)}</a></li>`
         ).join("");
     }
 
@@ -5833,17 +5854,23 @@ function renderCategories() {
   document.getElementById("catRows").innerHTML =
     cats.map((c) => {
       const count = products.filter((p) => p.cat === c.id).length;
+      const thumb = c.image
+        ? `<img class="table-thumb" src="${escHtml(c.image)}" alt="">`
+        : '<span class="table-thumb table-thumb-empty">—</span>';
       return `
       <tr>
+        <td>${thumb}</td>
         <td class="cell-strong">${escHtml(c.name)}</td>
         <td>${count} ürün</td>
         <td class="cell-actions">
+          <button class="row-btn" data-act="setimg" data-id="${c.id}">${c.image ? "Görseli Değiştir" : "Görsel Ekle"}</button>
+          ${c.image ? `<button class="row-btn" data-act="rmimg" data-id="${c.id}">Görseli Kaldır</button>` : ""}
           <button class="row-btn" data-act="rename" data-id="${c.id}">Yeniden Adlandır</button>
           <button class="row-btn row-btn-danger" data-act="delcat" data-id="${c.id}">Sil</button>
         </td>
       </tr>`;
     }).join("") ||
-    '<tr><td colspan="3" class="empty-row">Henüz kategori yok.</td></tr>';
+    '<tr><td colspan="4" class="empty-row">Henüz kategori yok.</td></tr>';
 }
 
 document.getElementById("catForm").addEventListener("submit", (e) => {
@@ -5864,12 +5891,39 @@ document.getElementById("catForm").addEventListener("submit", (e) => {
   renderAll();
 });
 
+// Kategori görseli için gizli dosya girişi
+const catImgFile = document.getElementById("catImgFile");
+let pendingCatImgId = null;
+catImgFile.addEventListener("change", () => {
+  const file = catImgFile.files[0];
+  if (!file || !pendingCatImgId) return;
+  readImageFile(file, (dataUrl) => {
+    Store.saveCategory({ id: pendingCatImgId, image: dataUrl });
+    pendingCatImgId = null;
+    catImgFile.value = "";
+    renderAll();
+  });
+});
+
 document.getElementById("catRows").addEventListener("click", (e) => {
   const btn = e.target.closest(".row-btn");
   if (!btn) return;
   const { id, act } = btn.dataset;
   const cat = Store.getCategories().find((c) => c.id === id);
   if (!cat) return;
+
+  if (act === "setimg") {
+    pendingCatImgId = id;
+    catImgFile.value = "";
+    catImgFile.click();
+    return;
+  }
+
+  if (act === "rmimg") {
+    Store.saveCategory({ id, image: "" });
+    renderAll();
+    return;
+  }
 
   if (act === "rename") {
     const name = prompt("Kategorinin yeni adı:", cat.name);

@@ -397,17 +397,23 @@ function renderCategories() {
   document.getElementById("catRows").innerHTML =
     cats.map((c) => {
       const count = products.filter((p) => p.cat === c.id).length;
+      const thumb = c.image
+        ? `<img class="table-thumb" src="${escHtml(c.image)}" alt="">`
+        : '<span class="table-thumb table-thumb-empty">—</span>';
       return `
       <tr>
+        <td>${thumb}</td>
         <td class="cell-strong">${escHtml(c.name)}</td>
         <td>${count} ürün</td>
         <td class="cell-actions">
+          <button class="row-btn" data-act="setimg" data-id="${c.id}">${c.image ? "Görseli Değiştir" : "Görsel Ekle"}</button>
+          ${c.image ? `<button class="row-btn" data-act="rmimg" data-id="${c.id}">Görseli Kaldır</button>` : ""}
           <button class="row-btn" data-act="rename" data-id="${c.id}">Yeniden Adlandır</button>
           <button class="row-btn row-btn-danger" data-act="delcat" data-id="${c.id}">Sil</button>
         </td>
       </tr>`;
     }).join("") ||
-    '<tr><td colspan="3" class="empty-row">Henüz kategori yok.</td></tr>';
+    '<tr><td colspan="4" class="empty-row">Henüz kategori yok.</td></tr>';
 }
 
 document.getElementById("catForm").addEventListener("submit", (e) => {
@@ -428,12 +434,39 @@ document.getElementById("catForm").addEventListener("submit", (e) => {
   renderAll();
 });
 
+// Kategori görseli için gizli dosya girişi
+const catImgFile = document.getElementById("catImgFile");
+let pendingCatImgId = null;
+catImgFile.addEventListener("change", () => {
+  const file = catImgFile.files[0];
+  if (!file || !pendingCatImgId) return;
+  readImageFile(file, (dataUrl) => {
+    Store.saveCategory({ id: pendingCatImgId, image: dataUrl });
+    pendingCatImgId = null;
+    catImgFile.value = "";
+    renderAll();
+  });
+});
+
 document.getElementById("catRows").addEventListener("click", (e) => {
   const btn = e.target.closest(".row-btn");
   if (!btn) return;
   const { id, act } = btn.dataset;
   const cat = Store.getCategories().find((c) => c.id === id);
   if (!cat) return;
+
+  if (act === "setimg") {
+    pendingCatImgId = id;
+    catImgFile.value = "";
+    catImgFile.click();
+    return;
+  }
+
+  if (act === "rmimg") {
+    Store.saveCategory({ id, image: "" });
+    renderAll();
+    return;
+  }
 
   if (act === "rename") {
     const name = prompt("Kategorinin yeni adı:", cat.name);

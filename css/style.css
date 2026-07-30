@@ -368,6 +368,19 @@ img, svg { max-width: 100%; }
 
 .catbar-dropdown li:last-child a { border-bottom: none; }
 
+.catbar-ico {
+  width: 22px;
+  height: 22px;
+  object-fit: cover;
+  border-radius: 3px;
+  vertical-align: middle;
+  margin-right: 7px;
+  border: 1px solid var(--border);
+  background: #fff;
+}
+.catbar-dropdown a { display: flex; align-items: center; }
+.catbar-dropdown .catbar-ico { width: 26px; height: 26px; }
+
 .catbar-dropdown a:hover {
   background: var(--bg-alt);
   color: var(--blue);

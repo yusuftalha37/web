@@ -213,7 +213,8 @@ async function handleApi(req, res, u) {
       if (!isAdmin) return send(res, 403, { error: "yalnızca yönetici" });
       const key = table === "kv" ? "k" : "id";
       const i = DB[table].findIndex((r) => r[key] === b[key]);
-      if (i >= 0) DB[table][i] = b; else DB[table].push(b);
+      // Birleştir: gövdede olmayan alanlar (örn. sort) korunur
+      if (i >= 0) DB[table][i] = Object.assign({}, DB[table][i], b); else DB[table].push(b);
       saveDB(); return send(res, 201, null);
     }
     if (PUBLIC_INSERT.includes(table)) {

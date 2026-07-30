@@ -157,10 +157,11 @@
         </form>
       </div>
       <div class="admin-panel">
-        <p class="panel-hint">Kategoriler mağazadaki filtre butonlarında ve ürün formlarında kullanılır. İçinde ürün bulunan kategori silinemez; önce ürünleri başka kategoriye taşıyın.</p>
+        <p class="panel-hint">Kategoriler mağazadaki filtre butonlarında, üst kategori çubuğunda ve ürün formlarında kullanılır. Her kategoriye bir görsel (ikon) ekleyebilirsiniz; bu görsel üst kategori çubuğunda kategori adının yanında görünür. İçinde ürün bulunan kategori silinemez; önce ürünleri başka kategoriye taşıyın.</p>
+        <input type="file" id="catImgFile" accept="image/*" hidden>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Kategori</th><th>Ürün Sayısı</th><th></th></tr></thead>
+            <thead><tr><th>Görsel</th><th>Kategori</th><th>Ürün Sayısı</th><th></th></tr></thead>
             <tbody id="catRows"></tbody>
           </table>
         </div>

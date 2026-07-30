@@ -357,16 +357,17 @@ function initSite(root) {
   const catbarAll = $("#catbarAll");
 
   if (catbarLinks || catbarDropdown) {
+    const catIcon = (c) => c.image ? `<img class="catbar-ico" src="${escHtml(c.image)}" alt="">` : "";
     if (catbarLinks) {
       catbarLinks.innerHTML = CATEGORIES.map(
-        (c) => `<a href="${pageLink("urunler.html")}" class="catbar-link" data-cat="${c.id}">${escHtml(c.name)}</a>`
+        (c) => `<a href="${pageLink("urunler.html")}" class="catbar-link" data-cat="${c.id}">${catIcon(c)}${escHtml(c.name)}</a>`
       ).join("");
     }
     if (catbarDropdown) {
       catbarDropdown.innerHTML =
         `<li><a href="${pageLink("urunler.html")}" data-cat="all">Tüm Ürünler</a></li>` +
         CATEGORIES.map(
-          (c) => `<li><a href="${pageLink("urunler.html")}" data-cat="${c.id}">${escHtml(c.name)}</a></li>`
+          (c) => `<li><a href="${pageLink("urunler.html")}" data-cat="${c.id}">${catIcon(c)}${escHtml(c.name)}</a></li>`
         ).join("");
     }
 
