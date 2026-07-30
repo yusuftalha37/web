@@ -1,5 +1,5 @@
 // ============================================================
-// Quantora Solar — Kendi sunucunuz için tek dosyalık backend
+// Solar Arena — Kendi sunucunuz için tek dosyalık backend
 // ------------------------------------------------------------
 //  - Hem siteyi sunar hem de veri (ürün/sipariş/kullanıcı) API'si verir.
 //  - Hiçbir ek paket gerektirmez (yalnızca Node.js). Windows/Linux/Mac.
@@ -49,7 +49,7 @@ const SEED = {
     { id: "sl3", image: "", art: "carport", title: "Karavan ve Bağ Evi Solar Paketleri", subtitle: "Şebekeden bağımsız, kur-kullan hazır sistemler. Montaj kılavuzu ve destek dahil.", btnText: "Paketleri Gör", btnLink: "urunler.html", sort: 2 }
   ],
   kv: [
-    { k: "site", v: { phone: "0850 000 00 00", email: "info@quantorasolar.com.tr", address: "Örnek Mah. Enerji Cad. No:1, Ankara", hours: "Hafta içi 09:00 - 18:00, Cumartesi 10:00 - 15:00", topNote: "Türkiye'nin her yerine hızlı gönderim", footerAbout: "Temiz enerjiyle daha aydınlık bir gelecek için 12 yıldır çalışıyoruz.", footerCopyright: "© 2026 Quantora Solar Enerji" } },
+    { k: "site", v: { phone: "0850 000 00 00", email: "info@solararena.store", address: "Örnek Mah. Enerji Cad. No:1, Ankara", hours: "Hafta içi 09:00 - 18:00, Cumartesi 10:00 - 15:00", topNote: "Türkiye'nin her yerine hızlı gönderim", footerAbout: "Temiz enerjiyle daha aydınlık bir gelecek için 12 yıldır çalışıyoruz.", footerCopyright: "© 2026 Solar Arena Enerji" } },
     { k: "settings", v: { whatsapp: "908500000000" } }
   ],
   orders: [],
@@ -71,9 +71,9 @@ function loadDB() {
 
   // İlk kurulumda varsayılan yönetici hesabı
   if (!DB.users.some((u) => u.role === "admin")) {
-    DB.users.push(makeUser("admin@quantorasolar.com.tr", "admin123", "Site Yöneticisi", "", "admin"));
+    DB.users.push(makeUser("admin@solararena.store", "admin123", "Site Yöneticisi", "", "admin"));
     saveDB();
-    console.log("→ Varsayılan yönetici: admin@quantorasolar.com.tr / admin123 (giriş sonrası şifreyi değiştirin)");
+    console.log("→ Varsayılan yönetici: admin@solararena.store / admin123 (giriş sonrası şifreyi değiştirin)");
   }
 }
 let saveTimer = null;
@@ -285,6 +285,6 @@ http.createServer(async (req, res) => {
     serveStatic(req, res);
   }
 }).listen(PORT, () => {
-  console.log("Quantora Solar sunucusu çalışıyor:  http://localhost:" + PORT);
+  console.log("Solar Arena sunucusu çalışıyor:  http://localhost:" + PORT);
   console.log("Veri dosyası: " + DATA_FILE);
 });

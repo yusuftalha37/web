@@ -54,7 +54,7 @@ const Store = (() => {
   const DEFAULT_SITE = {
     // ---- İletişim / genel ----
     phone: "0850 000 00 00",
-    email: "info@quantorasolar.com.tr",
+    email: "info@solararena.store",
     address: "Örnek Mah. Enerji Cad. No:1, Ankara",
     hours: "Hafta içi 09:00 - 18:00, Cumartesi 10:00 - 15:00",
     topNote: "Türkiye'nin her yerine hızlı gönderim",
@@ -126,7 +126,7 @@ const Store = (() => {
     contactTitle: "Bize Ulaşın",
     contactText: "Sorularınız, ücretsiz sistem planlama ve toptan alım için formu doldurun; 24 saat içinde dönüş yapalım.",
     // ---- Neden biz ----
-    whyTitle: "Neden Quantora Solar?",
+    whyTitle: "Neden Solar Arena?",
     whyText: "Güneş paneli ve solar ürün alışverişinizi güvenle, kapınıza kadar getiriyoruz.",
     why1Title: "Türkiye'nin Her Yerine Gönderim",
     why1Text: "81 ilin tamamına sigortalı ve sağlam paketlenmiş kargo. Stoktaki ürünler aynı gün yola çıkar, 1-3 iş gününde teslim edilir.",
@@ -142,7 +142,7 @@ const Store = (() => {
     why6Text: "Ürünler kapınıza sorunsuz ulaşmazsa veya vazgeçerseniz 14 gün içinde koşulsuz iade ve değişim hakkınız var.",
     // ---- Footer ----
     footerAbout: "Temiz enerjiyle daha aydınlık bir gelecek için 12 yıldır çalışıyoruz.",
-    footerCopyright: "© 2026 Quantora Solar Enerji — Bu site örnek/demo amaçlıdır."
+    footerCopyright: "© 2026 Solar Arena Enerji — Bu site örnek/demo amaçlıdır."
   };
   const DEFAULT_SETTINGS = { whatsapp: "908500000000" };
   const SEED_VERSION = 3;
@@ -318,7 +318,7 @@ const Store = (() => {
   function getUsersLocal() {
     let users = read("gp-users", null);
     if (!users) {
-      users = [{ name: "Site Yöneticisi", email: "admin@quantorasolar.com.tr", phone: "", pass: hash("admin123"), role: "admin", created: Date.now() }];
+      users = [{ name: "Site Yöneticisi", email: "admin@solararena.store", phone: "", pass: hash("admin123"), role: "admin", created: Date.now() }];
       write("gp-users", users);
     }
     return users;

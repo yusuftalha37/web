@@ -18,7 +18,7 @@ gerek yoktur.
 
 ## 2) Dosyaları sunucuya kopyalayın
 
-Tüm proje dosyalarını bir klasöre atın, örn: `C:\quantora`
+Tüm proje dosyalarını bir klasöre atın, örn: `C:\solararena`
 (`server.js`, `index.html`, `css\`, `js\` vb. hepsi burada olsun).
 
 ## 3) Bağlantıyı ayarlayın
@@ -40,19 +40,19 @@ window.QS_CONFIG = {
 
 Komut İstemi'nde klasöre gidip:
 ```
-cd C:\quantora
+cd C:\solararena
 node server.js
 ```
 Şunu görürsünüz:
 ```
-Quantora Solar sunucusu çalışıyor:  http://localhost:3000
-→ Varsayılan yönetici: admin@quantorasolar.com.tr / admin123
+Solar Arena sunucusu çalışıyor:  http://localhost:3000
+→ Varsayılan yönetici: admin@solararena.store / admin123
 ```
 Tarayıcıda `http://localhost:3000` → site açılır. 🎉
 
 İlk açılışta `data.json` otomatik oluşur ve varsayılan ürünlerle,
 bir **yönetici hesabıyla** gelir:
-- E-posta: `admin@quantorasolar.com.tr`
+- E-posta: `admin@solararena.store`
 - Şifre: `admin123`
 - **Giriş yaptıktan sonra Hesabım > Şifre Değiştir ile mutlaka değiştirin.**
 
@@ -61,17 +61,17 @@ bir **yönetici hesabıyla** gelir:
 `node server.js` penceresi kapanınca site durur. 7/24 çalışması için
 sunucu bir **Windows servisi** olmalı. En kolayı **NSSM**:
 
-1. https://nssm.cc → indirip `nssm.exe`'yi `C:\quantora`'ya koyun.
+1. https://nssm.cc → indirip `nssm.exe`'yi `C:\solararena`'ya koyun.
 2. Yönetici Komut İstemi'nde:
    ```
-   nssm install QuantoraSolar
+   nssm install SolarArena
    ```
 3. Açılan pencerede:
    - **Path:** `C:\Program Files\nodejs\node.exe`
-   - **Startup directory:** `C:\quantora`
+   - **Startup directory:** `C:\solararena`
    - **Arguments:** `server.js`
    - (İsteğe bağlı) **Environment** sekmesine `PORT=3000` yazın.
-4. **Install service** → sonra `nssm start QuantoraSolar`.
+4. **Install service** → sonra `nssm start SolarArena`.
 
 Artık sunucu yeniden başlasa bile site otomatik ayağa kalkar.
 

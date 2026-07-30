@@ -1,5 +1,5 @@
 -- ============================================================
--- Quantora Solar — Supabase Kurulum Şeması
+-- Solar Arena — Supabase Kurulum Şeması
 -- Supabase panelinde: SQL Editor > New query > buraya yapıştır > Run
 -- (Bir kez çalıştırmanız yeterli.)
 -- ============================================================
@@ -156,7 +156,7 @@ insert into public.slides (id,image,art,title,subtitle,"btnText","btnLink",sort)
 on conflict (id) do nothing;
 
 insert into public.kv (k,v) values
-  ('site','{"phone": "0850 000 00 00", "email": "info@quantorasolar.com.tr", "address": "Örnek Mah. Enerji Cad. No:1, Ankara", "hours": "Hafta içi 09:00 - 18:00, Cumartesi 10:00 - 15:00", "topNote": "Türkiye''nin her yerine hızlı gönderim", "footerAbout": "Temiz enerjiyle daha aydınlık bir gelecek için 12 yıldır çalışıyoruz.", "footerCopyright": "© 2026 Quantora Solar Enerji"}'::jsonb),
+  ('site','{"phone": "0850 000 00 00", "email": "info@solararena.store", "address": "Örnek Mah. Enerji Cad. No:1, Ankara", "hours": "Hafta içi 09:00 - 18:00, Cumartesi 10:00 - 15:00", "topNote": "Türkiye''nin her yerine hızlı gönderim", "footerAbout": "Temiz enerjiyle daha aydınlık bir gelecek için 12 yıldır çalışıyoruz.", "footerCopyright": "© 2026 Solar Arena Enerji"}'::jsonb),
   ('settings','{"whatsapp": "908500000000"}'::jsonb)
 on conflict (k) do nothing;
 

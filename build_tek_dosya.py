@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Tüm siteyi (index + giriş + hesabım + admin) tek bir HTML dosyasında birleştirir.
-Çıktı: quantora-solar.html — çift tıklayınca tarayıcıda doğrudan çalışır.
+Çıktı: solar-arena.html — çift tıklayınca tarayıcıda doğrudan çalışır.
 
 Kullanım: python3 build_tek_dosya.py
 """
@@ -9,7 +9,7 @@ import re
 import pathlib
 
 ROOT = pathlib.Path(__file__).parent
-OUT = ROOT / "quantora-solar.html"
+OUT = ROOT / "solar-arena.html"
 
 
 def body_of(path):
@@ -123,8 +123,8 @@ single = f"""<!DOCTYPE html>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Quantora Solar Enerji — güneş enerjisi sistemleri satış ve kurulum. Tek dosyalık sürüm.">
-  <title>Quantora Solar Enerji | Güneş Paneli Satış &amp; Kurulum</title>
+  <meta name="description" content="Solar Arena Enerji — güneş enerjisi sistemleri satış ve kurulum. Tek dosyalık sürüm.">
+  <title>Solar Arena Enerji | Güneş Paneli Satış &amp; Kurulum</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>☀️</text></svg>">
   <style>
 {css}

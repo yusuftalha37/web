@@ -1,4 +1,4 @@
-# Quantora Solar — Supabase + Vercel Kurulum Kılavuzu
+# Solar Arena — Supabase + Vercel Kurulum Kılavuzu
 
 Bu site iki modda çalışır:
 
@@ -82,7 +82,7 @@ vercel --prod # canlıya al
   gösterilen DNS kayıtlarını alan adı sağlayıcınıza girin.
 - Ardından `index.html` ve `urunler.html` içindeki `canonical`,
   `og:url` ile `robots.txt` / `sitemap.xml` dosyalarındaki
-  `quantorasolar.com.tr` adreslerini kendi alan adınızla değiştirin.
+  `solararena.store` adreslerini kendi alan adınızla değiştirin.
 
 ---
 

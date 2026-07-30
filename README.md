@@ -1,4 +1,4 @@
-# Quantora Solar Enerji — Örnek Solar Enerji Satış Sitesi
+# Solar Arena Enerji — Örnek Solar Enerji Satış Sitesi
 
 Güneş enerjisi sistemleri satışı için hazırlanmış örnek/demo web sitesi.
 Tamamen statik olduğu için herhangi bir sunucu kurulumu gerektirmez.
@@ -14,7 +14,7 @@ Tamamen statik olduğu için herhangi bir sunucu kurulumu gerektirmez.
 - Etkileşimli tasarruf hesaplayıcı (fatura tutarına göre sistem gücü, yıllık tasarruf, geri ödeme süresi)
 - Müşteri referansları ve S.S.S. bölümü
 - Doğrulamalı iletişim/keşif talep formu — talepler admin paneline düşer
-- **Kullanıcı girişi & kayıt** (`giris.html`) — demo yönetici: `admin@quantorasolar.com.tr` / `admin123`
+- **Kullanıcı girişi & kayıt** (`giris.html`) — demo yönetici: `admin@solararena.store` / `admin123`
 - **Hesabım sayfası** (`hesap.html`) — profil güncelleme, şifre değiştirme, sipariş geçmişi
 - **Admin paneli** (`admin.html`) — ürün yükleme/düzenleme/silme, kategori yönetimi, sipariş talepleri, keşif talepleri, WhatsApp numarası ayarı
 - Harici bağımlılık yok: saf HTML + CSS + JavaScript
@@ -74,5 +74,5 @@ Edge Function gerekir — `KURULUM.md` içinde anlatılmıştır.
 - `js/config.js` — Supabase bağlantı ayarları (boşsa demo modu).
 - `supabase/schema.sql` — Supabase veritabanı kurulum betiği.
 - `vercel.json` — Vercel dağıtım ayarları.
-- `quantora-solar.html` — tek dosyalık demo (çift tıkla çalışır).
+- `solar-arena.html` — tek dosyalık demo (çift tıkla çalışır).
 - `build_tek_dosya.py` — tek dosyayı kaynaklardan yeniden üretir.

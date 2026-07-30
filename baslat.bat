@@ -1,10 +1,10 @@
 @echo off
 chcp 65001 >nul
-title Quantora Solar - Baslatici
+title Solar Arena - Baslatici
 cd /d "%~dp0"
 
 echo ============================================================
-echo    QUANTORA SOLAR - Site baslatiliyor...
+echo    SOLAR ARENA - Site baslatiliyor...
 echo ============================================================
 echo.
 
@@ -12,7 +12,7 @@ REM --- Kontrol 1: server.js bu klasorde mi? ---
 if not exist "%~dp0server.js" (
   echo [HATA] server.js bu klasorde bulunamadi.
   echo Bu dosyayi ^(baslat.bat^) site dosyalarinin oldugu klasore koyun.
-  echo Ornek: C:\quantora  ^(icinde server.js, index.html, js\ ... olmali^)
+  echo Ornek: C:\solararena  ^(icinde server.js, index.html, js\ ... olmali^)
   echo.
   pause
   exit /b 1
@@ -48,7 +48,7 @@ if not exist "%~dp0config.yml" (
 )
 
 echo [1/2] Web sunucusu baslatiliyor ^(server.js^)...
-start "Quantora Sunucu (server.js)" cmd /k "cd /d "%~dp0" && node server.js"
+start "Solar Arena Sunucu (server.js)" cmd /k "cd /d "%~dp0" && node server.js"
 
 REM Sunucunun ayaga kalkmasi icin kisa bekleme
 timeout /t 3 /nobreak >nul
@@ -63,7 +63,7 @@ start "" "https://solararena.store"
 echo.
 echo ============================================================
 echo  Iki pencere acildi:
-echo    - "Quantora Sunucu"   -^> siteyi ve verileri sunar
+echo    - "Solar Arena Sunucu"   -^> siteyi ve verileri sunar
 echo    - "Cloudflare Tunnel" -^> solararena.store'u sunucuya baglar
 echo.
 echo  Site adresi: https://solararena.store

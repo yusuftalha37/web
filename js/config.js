@@ -1,5 +1,5 @@
 // ============================================================
-// Quantora Solar — Bağlantı Ayarları
+// Solar Arena — Bağlantı Ayarları
 // ------------------------------------------------------------
 // Bu site KENDİ SUNUCUNUZDA (server.js) çalışıyor ve internete
 // Cloudflare Tunnel ile "solararena.store" alan adından açılıyor.
