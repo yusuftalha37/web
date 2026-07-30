@@ -48,6 +48,7 @@ const VIEW_TITLES = {
   categories: "Kategoriler",
   slides: "Vitrin (Slider)",
   orders: "Siparişler",
+  users: "Kullanıcılar",
   leads: "İletişim Talepleri",
   content: "Site İçeriği",
   settings: "Ayarlar"
@@ -637,6 +638,94 @@ document.getElementById("leadRows").addEventListener("click", (e) => {
   }
 });
 
+// ---------- KULLANICILAR ----------
+// Geçerli yöneticinin kimliği (kendini değiştirememesi için):
+// Supabase modunda uid, yerel modda e-posta.
+const selfUserId = adminSession
+  ? (Store.mode === "supabase" ? (adminSession.uid || "") : adminSession.email)
+  : "";
+
+async function renderUsers() {
+  const tbody = document.getElementById("userRows");
+  let users;
+  try { users = await Store.listUsers(); }
+  catch (err) {
+    tbody.innerHTML = '<tr><td colspan="6" class="empty-row">Kullanıcılar yüklenemedi.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = users.map((u) => {
+    const isSelf = String(u.id) === String(selfUserId);
+    return `
+      <tr>
+        <td class="cell-strong">${escHtml(u.name || "—")}${isSelf ? ' <span class="pill pill-ok">siz</span>' : ""}</td>
+        <td>${escHtml(u.email || "—")}</td>
+        <td>${escHtml(u.phone || "—")}</td>
+        <td>${u.role === "admin" ? '<span class="pill pill-warn">Yönetici</span>' : "Müşteri"}</td>
+        <td>${u.blocked ? '<span class="pill pill-warn">Engelli</span>' : '<span class="pill pill-ok">Aktif</span>'}</td>
+        <td class="cell-actions">${isSelf ? "—" : `
+          <button class="row-btn" data-act="role" data-id="${escHtml(u.id)}" data-role="${escHtml(u.role)}">${u.role === "admin" ? "Yetkiyi Al" : "Yönetici Yap"}</button>
+          <button class="row-btn" data-act="block" data-id="${escHtml(u.id)}" data-blocked="${u.blocked ? 1 : 0}">${u.blocked ? "Engeli Kaldır" : "Engelle"}</button>
+          <button class="row-btn row-btn-danger" data-act="deluser" data-id="${escHtml(u.id)}" data-name="${escHtml(u.name || u.email)}">Sil</button>`}
+        </td>
+      </tr>`;
+  }).join("") ||
+  '<tr><td colspan="6" class="empty-row">Henüz kayıtlı kullanıcı yok.</td></tr>';
+}
+
+document.getElementById("userRows").addEventListener("click", async (e) => {
+  const btn = e.target.closest(".row-btn");
+  if (!btn) return;
+  const { id, act } = btn.dataset;
+  if (act === "role") {
+    const makeAdmin = btn.dataset.role !== "admin";
+    if (!confirm(makeAdmin
+      ? "Bu kullanıcı yönetici yapılsın mı? Yönetim paneline erişebilecek."
+      : "Bu kullanıcının yönetici yetkisi kaldırılsın mı?")) return;
+    await Store.setUserRole(id, makeAdmin ? "admin" : "user");
+    renderUsers();
+  }
+  if (act === "block") {
+    const block = btn.dataset.blocked !== "1";
+    if (!confirm(block
+      ? "Bu hesap engellensin mi? Kullanıcı giriş yapamayacak."
+      : "Bu hesabın engeli kaldırılsın mı?")) return;
+    await Store.setUserBlocked(id, block);
+    renderUsers();
+  }
+  if (act === "deluser") {
+    if (!confirm('"' + (btn.dataset.name || "") + '" hesabı kalıcı olarak silinsin mi?')) return;
+    await Store.deleteUser(id);
+    renderUsers();
+  }
+});
+
+document.getElementById("userForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const status = document.getElementById("userFormStatus");
+  const pass = document.getElementById("nuPass").value;
+  if (pass.length < 6) {
+    status.textContent = "Şifre en az 6 karakter olmalı.";
+    status.className = "form-status err";
+    return;
+  }
+  const res = await Store.adminCreateUser({
+    name: document.getElementById("nuName").value.trim(),
+    phone: document.getElementById("nuPhone").value.trim(),
+    email: document.getElementById("nuEmail").value.trim(),
+    pass,
+    role: document.getElementById("nuRole").value
+  });
+  if (!res.ok) {
+    status.textContent = res.error || "Kullanıcı oluşturulamadı.";
+    status.className = "form-status err";
+    return;
+  }
+  status.textContent = "Kullanıcı oluşturuldu.";
+  status.className = "form-status ok";
+  e.target.reset();
+  renderUsers();
+});
+
 // ---------- SİTE İÇERİĞİ ----------
 const CONTENT_FIELDS = {
   ctPhone: "phone",
@@ -696,6 +785,7 @@ function renderAll() {
   renderCategories();
   renderSlides();
   renderOrders();
+  renderUsers();
   renderLeads();
   renderUploadPreview();
 }

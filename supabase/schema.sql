@@ -38,8 +38,12 @@ create table if not exists public.leads (
 
 create table if not exists public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
-  email text, name text default '', phone text default '', role text default 'user'
+  email text, name text default '', phone text default '', role text default 'user',
+  blocked boolean default false, created bigint
 );
+-- Var olan tabloya (daha önce kurulduysa) eksik kolonları ekle
+alter table public.profiles add column if not exists blocked boolean default false;
+alter table public.profiles add column if not exists created bigint;
 
 -- ---------- YENİ KULLANICI -> PROFİL ----------
 create or replace function public.handle_new_user()
@@ -68,7 +72,7 @@ grant usage on schema public to anon, authenticated;
 grant select on public.products, public.categories, public.slides, public.kv to anon, authenticated;
 grant insert on public.orders, public.leads to anon, authenticated;
 grant all on public.products, public.categories, public.slides, public.kv, public.orders, public.leads to authenticated;
-grant select, update on public.profiles to authenticated;
+grant select, update, delete on public.profiles to authenticated;
 
 -- ---------- RLS (satır güvenliği) ----------
 alter table public.products   enable row level security;
@@ -115,7 +119,9 @@ create policy leads_del on public.leads for delete using (public.is_admin());
 drop policy if exists profiles_sel on public.profiles;
 create policy profiles_sel on public.profiles for select using (id = auth.uid() or public.is_admin());
 drop policy if exists profiles_upd on public.profiles;
-create policy profiles_upd on public.profiles for update using (id = auth.uid()) with check (id = auth.uid());
+create policy profiles_upd on public.profiles for update using (id = auth.uid() or public.is_admin()) with check (id = auth.uid() or public.is_admin());
+drop policy if exists profiles_del on public.profiles;
+create policy profiles_del on public.profiles for delete using (public.is_admin());
 
 -- ============ TOHUM VERİLERİ (varsayılan ürün/kategori/slayt/içerik) ============
 insert into public.categories (id,name,sort) values

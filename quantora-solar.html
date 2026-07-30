@@ -3193,11 +3193,6 @@ img, svg { max-width: 100%; }
       <p class="form-status" id="registerStatus" role="status"></p>
     </form>
 
-    <div class="auth-demo">
-      <strong>Demo yönetici girişi:</strong><br>
-      admin@quantorasolar.com.tr &nbsp;/&nbsp; admin123
-    </div>
-
     <a href="#" class="auth-back">← Siteye dön</a>
   </div>
 </div>
@@ -3303,6 +3298,7 @@ img, svg { max-width: 100%; }
       <button class="admin-nav-btn" data-view="categories">Kategoriler</button>
       <button class="admin-nav-btn" data-view="slides">Vitrin (Slider)</button>
       <button class="admin-nav-btn" data-view="orders">Siparişler</button>
+      <button class="admin-nav-btn" data-view="users">Kullanıcılar</button>
       <button class="admin-nav-btn" data-view="leads">İletişim Talepleri</button>
       <button class="admin-nav-btn" data-view="content">Site İçeriği</button>
       <button class="admin-nav-btn" data-view="settings">Ayarlar</button>
@@ -3506,6 +3502,53 @@ img, svg { max-width: 100%; }
       <div class="admin-panel">
         <p class="panel-hint">WhatsApp'a yönlendirilen sipariş talepleri burada listelenir.</p>
         <div id="orderList"></div>
+      </div>
+    </section>
+
+    <!-- KULLANICILAR -->
+    <section class="admin-view" id="view-users" hidden>
+      <div class="admin-panel settings-panel">
+        <h2>Yeni Kullanıcı / Yönetici Ekle</h2>
+        <form id="userForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="nuName">Ad Soyad</label>
+              <input type="text" id="nuName" placeholder="Adı Soyadı">
+            </div>
+            <div class="form-group">
+              <label for="nuPhone">Telefon</label>
+              <input type="text" id="nuPhone" placeholder="05__ ___ __ __">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="nuEmail">E-posta *</label>
+              <input type="email" id="nuEmail" required placeholder="ornek@eposta.com" autocomplete="off">
+            </div>
+            <div class="form-group">
+              <label for="nuPass">Şifre * <small>(en az 6 karakter)</small></label>
+              <input type="text" id="nuPass" required placeholder="••••••" autocomplete="off">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="nuRole">Yetki</label>
+            <select id="nuRole">
+              <option value="user">Müşteri (normal kullanıcı)</option>
+              <option value="admin">Yönetici (admin paneline girer)</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-small">Kullanıcı Oluştur</button>
+          <p class="form-status" id="userFormStatus" role="status"></p>
+        </form>
+      </div>
+      <div class="admin-panel">
+        <p class="panel-hint">Kayıtlı tüm kullanıcılar. Yönetici yapabilir, yetkisini geri alabilir, hesabı engelleyebilir (giriş yapamaz) veya silebilirsiniz. Kendi hesabınızı bu ekrandan değiştiremezsiniz.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Ad Soyad</th><th>E-posta</th><th>Telefon</th><th>Yetki</th><th>Durum</th><th></th></tr></thead>
+            <tbody id="userRows"></tbody>
+          </table>
+        </div>
       </div>
     </section>
 
@@ -3965,9 +4008,58 @@ const Store = (() => {
     }
     const user = getUsersLocal().find((u) => u.email === email && u.pass === hash(pass));
     if (!user) return { ok: false, error: "E-posta veya şifre hatalı." };
+    if (user.blocked) return { ok: false, error: "Bu hesap engellenmiş. Lütfen yöneticiyle iletişime geçin." };
     const s = { name: user.name, email: user.email, role: user.role };
     write("gp-session", s);
     return { ok: true, session: s };
+  }
+
+  // ===================== KULLANICI YÖNETİMİ (yalnızca admin) =====================
+  // Not: id = Supabase modunda kullanıcı uid'i, yerel modda e-posta adresidir.
+  async function listUsers() {
+    if (persist) {
+      const rows = await sbSelect("profiles", "select=*&order=created.desc").catch(() => []);
+      return rows.map((r) => ({ id: r.id, name: r.name || "", email: r.email || "", phone: r.phone || "", role: r.role || "user", blocked: !!r.blocked, created: r.created || 0 }));
+    }
+    return getUsersLocal()
+      .map((u) => ({ id: u.email, name: u.name || "", email: u.email, phone: u.phone || "", role: u.role || "user", blocked: !!u.blocked, created: u.created || 0 }))
+      .sort((a, b) => (b.created || 0) - (a.created || 0));
+  }
+  async function setUserRole(id, role) {
+    if (persist) { await sbWrite("PATCH", "profiles", "id=eq." + encodeURIComponent(id), { role }).catch(logErr); return { ok: true }; }
+    const users = getUsersLocal();
+    const u = users.find((x) => x.email === id);
+    if (u) { u.role = role; write("gp-users", users); }
+    return { ok: true };
+  }
+  async function setUserBlocked(id, blocked) {
+    if (persist) { await sbWrite("PATCH", "profiles", "id=eq." + encodeURIComponent(id), { blocked: !!blocked }).catch(logErr); return { ok: true }; }
+    const users = getUsersLocal();
+    const u = users.find((x) => x.email === id);
+    if (u) { u.blocked = !!blocked; write("gp-users", users); }
+    return { ok: true };
+  }
+  async function deleteUser(id) {
+    if (persist) { await sbWrite("DELETE", "profiles", "id=eq." + encodeURIComponent(id)).catch(logErr); return { ok: true }; }
+    write("gp-users", getUsersLocal().filter((x) => x.email !== id));
+    return { ok: true };
+  }
+  // Yönetici panelinden yeni kullanıcı/yönetici oluşturur.
+  async function adminCreateUser({ name, email, phone, pass, role }) {
+    email = (email || "").trim().toLowerCase();
+    if (!email || !pass || pass.length < 6) return { ok: false, error: "Geçerli e-posta ve en az 6 karakter şifre girin." };
+    if (persist) {
+      const r = await gotrue("signup", { email, password: pass, data: { name: (name || "").trim(), phone: (phone || "").trim() } });
+      if (!r.ok) return { ok: false, error: (r.data && (r.data.msg || r.data.error_description)) || "Kullanıcı oluşturulamadı." };
+      const uid = r.data && r.data.user && r.data.user.id;
+      if (role === "admin" && uid) await sbWrite("PATCH", "profiles", "id=eq." + uid, { role: "admin" }).catch(logErr);
+      return { ok: true };
+    }
+    const users = getUsersLocal();
+    if (users.some((u) => u.email === email)) return { ok: false, error: "Bu e-posta ile kayıtlı bir hesap zaten var." };
+    users.push({ name: (name || "").trim(), email, phone: (phone || "").trim(), pass: hash(pass), role: role === "admin" ? "admin" : "user", created: Date.now(), blocked: false });
+    write("gp-users", users);
+    return { ok: true };
   }
 
   function getUser(email) {
@@ -4069,6 +4161,7 @@ const Store = (() => {
     getSlides, saveSlide, deleteSlide, moveSlide,
     register, login, logout, session,
     getUser, updateProfile, changePassword,
+    listUsers, setUserRole, setUserBlocked, deleteUser, adminCreateUser,
     addLead, getLeads, deleteLead,
     addOrder, getOrders, getOrdersByEmail,
     startCardPayment,
@@ -5266,6 +5359,7 @@ const VIEW_TITLES = {
   categories: "Kategoriler",
   slides: "Vitrin (Slider)",
   orders: "Siparişler",
+  users: "Kullanıcılar",
   leads: "İletişim Talepleri",
   content: "Site İçeriği",
   settings: "Ayarlar"
@@ -5855,6 +5949,94 @@ document.getElementById("leadRows").addEventListener("click", (e) => {
   }
 });
 
+// ---------- KULLANICILAR ----------
+// Geçerli yöneticinin kimliği (kendini değiştirememesi için):
+// Supabase modunda uid, yerel modda e-posta.
+const selfUserId = adminSession
+  ? (Store.mode === "supabase" ? (adminSession.uid || "") : adminSession.email)
+  : "";
+
+async function renderUsers() {
+  const tbody = document.getElementById("userRows");
+  let users;
+  try { users = await Store.listUsers(); }
+  catch (err) {
+    tbody.innerHTML = '<tr><td colspan="6" class="empty-row">Kullanıcılar yüklenemedi.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = users.map((u) => {
+    const isSelf = String(u.id) === String(selfUserId);
+    return `
+      <tr>
+        <td class="cell-strong">${escHtml(u.name || "—")}${isSelf ? ' <span class="pill pill-ok">siz</span>' : ""}</td>
+        <td>${escHtml(u.email || "—")}</td>
+        <td>${escHtml(u.phone || "—")}</td>
+        <td>${u.role === "admin" ? '<span class="pill pill-warn">Yönetici</span>' : "Müşteri"}</td>
+        <td>${u.blocked ? '<span class="pill pill-warn">Engelli</span>' : '<span class="pill pill-ok">Aktif</span>'}</td>
+        <td class="cell-actions">${isSelf ? "—" : `
+          <button class="row-btn" data-act="role" data-id="${escHtml(u.id)}" data-role="${escHtml(u.role)}">${u.role === "admin" ? "Yetkiyi Al" : "Yönetici Yap"}</button>
+          <button class="row-btn" data-act="block" data-id="${escHtml(u.id)}" data-blocked="${u.blocked ? 1 : 0}">${u.blocked ? "Engeli Kaldır" : "Engelle"}</button>
+          <button class="row-btn row-btn-danger" data-act="deluser" data-id="${escHtml(u.id)}" data-name="${escHtml(u.name || u.email)}">Sil</button>`}
+        </td>
+      </tr>`;
+  }).join("") ||
+  '<tr><td colspan="6" class="empty-row">Henüz kayıtlı kullanıcı yok.</td></tr>';
+}
+
+document.getElementById("userRows").addEventListener("click", async (e) => {
+  const btn = e.target.closest(".row-btn");
+  if (!btn) return;
+  const { id, act } = btn.dataset;
+  if (act === "role") {
+    const makeAdmin = btn.dataset.role !== "admin";
+    if (!confirm(makeAdmin
+      ? "Bu kullanıcı yönetici yapılsın mı? Yönetim paneline erişebilecek."
+      : "Bu kullanıcının yönetici yetkisi kaldırılsın mı?")) return;
+    await Store.setUserRole(id, makeAdmin ? "admin" : "user");
+    renderUsers();
+  }
+  if (act === "block") {
+    const block = btn.dataset.blocked !== "1";
+    if (!confirm(block
+      ? "Bu hesap engellensin mi? Kullanıcı giriş yapamayacak."
+      : "Bu hesabın engeli kaldırılsın mı?")) return;
+    await Store.setUserBlocked(id, block);
+    renderUsers();
+  }
+  if (act === "deluser") {
+    if (!confirm('"' + (btn.dataset.name || "") + '" hesabı kalıcı olarak silinsin mi?')) return;
+    await Store.deleteUser(id);
+    renderUsers();
+  }
+});
+
+document.getElementById("userForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const status = document.getElementById("userFormStatus");
+  const pass = document.getElementById("nuPass").value;
+  if (pass.length < 6) {
+    status.textContent = "Şifre en az 6 karakter olmalı.";
+    status.className = "form-status err";
+    return;
+  }
+  const res = await Store.adminCreateUser({
+    name: document.getElementById("nuName").value.trim(),
+    phone: document.getElementById("nuPhone").value.trim(),
+    email: document.getElementById("nuEmail").value.trim(),
+    pass,
+    role: document.getElementById("nuRole").value
+  });
+  if (!res.ok) {
+    status.textContent = res.error || "Kullanıcı oluşturulamadı.";
+    status.className = "form-status err";
+    return;
+  }
+  status.textContent = "Kullanıcı oluşturuldu.";
+  status.className = "form-status ok";
+  e.target.reset();
+  renderUsers();
+});
+
 // ---------- SİTE İÇERİĞİ ----------
 const CONTENT_FIELDS = {
   ctPhone: "phone",
@@ -5914,6 +6096,7 @@ function renderAll() {
   renderCategories();
   renderSlides();
   renderOrders();
+  renderUsers();
   renderLeads();
   renderUploadPreview();
 }

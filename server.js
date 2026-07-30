@@ -83,7 +83,7 @@ function saveDB() {
 function makeUser(email, pass, name, phone, role) {
   const salt = crypto.randomBytes(16).toString("hex");
   const hash = crypto.scryptSync(pass, salt, 64).toString("hex");
-  return { id: "u" + crypto.randomBytes(8).toString("hex"), email: email.toLowerCase(), pass: salt + ":" + hash, name: name || "", phone: phone || "", role: role || "user" };
+  return { id: "u" + crypto.randomBytes(8).toString("hex"), email: email.toLowerCase(), pass: salt + ":" + hash, name: name || "", phone: phone || "", role: role || "user", blocked: false, created: Date.now() };
 }
 function checkPass(pass, stored) {
   const [salt, hash] = stored.split(":");
@@ -141,6 +141,7 @@ async function handleApi(req, res, u) {
     const b = await readBody(req);
     const usr = DB.users.find((x) => x.email === (b.email || "").toLowerCase());
     if (!usr || !checkPass(b.password || "", usr.pass)) return send(res, 400, { error: "invalid_grant", error_description: "Hatalı giriş" });
+    if (usr.blocked) return send(res, 400, { error: "blocked", error_description: "Bu hesap engellenmiş." });
     const tk = crypto.randomBytes(24).toString("hex");
     tokens.set(tk, usr.id);
     return send(res, 200, { access_token: tk, token_type: "bearer", user: { id: usr.id, email: usr.email, user_metadata: { name: usr.name, phone: usr.phone } } });
@@ -169,11 +170,13 @@ async function handleApi(req, res, u) {
 
   if (req.method === "GET") {
     if (table === "profiles") {
-      // kullanıcı profili (rol/isim/telefon) — kullanıcı tablosundan türetilir
-      let rows = DB.users.map((x) => ({ id: x.id, role: x.role, name: x.name, phone: x.phone }));
+      // kullanıcı profili — kullanıcı tablosundan türetilir.
+      // e-posta/engel/tarih yalnızca yöneticiye gösterilir.
+      let rows = DB.users.map((x) => ({ id: x.id, role: x.role, name: x.name, phone: x.phone, email: x.email, blocked: !!x.blocked, created: x.created || 0 }));
       rows = eqFilter(rows, params);
       if (!caller) return send(res, 200, []);
       if (!isAdmin) rows = rows.filter((r) => r.id === caller.id);
+      else rows.sort((a, b) => (b.created || 0) - (a.created || 0));
       return send(res, 200, rows);
     }
     if (!DB[table]) return send(res, 200, []);
@@ -221,6 +224,20 @@ async function handleApi(req, res, u) {
     const b = await readBody(req);
     if (table === "profiles") {
       if (!caller) return send(res, 401, {});
+      const idf = params.get("id");
+      // Yönetici, id ile başka bir kullanıcının rol/engel/bilgilerini değiştirebilir
+      if (idf && isAdmin) {
+        const id = decodeURIComponent(idf.replace(/^eq\./, ""));
+        const target = DB.users.find((x) => x.id === id);
+        if (target && target.id !== caller.id) {
+          if (b.role != null) target.role = b.role;
+          if (b.blocked != null) target.blocked = !!b.blocked;
+          if (b.name != null) target.name = b.name;
+          if (b.phone != null) target.phone = b.phone;
+        }
+        saveDB(); return send(res, 204, null);
+      }
+      // Aksi halde yalnızca kendi profilini günceller
       if (b.name != null) caller.name = b.name;
       if (b.phone != null) caller.phone = b.phone;
       saveDB(); return send(res, 204, null);
@@ -238,6 +255,11 @@ async function handleApi(req, res, u) {
   if (req.method === "DELETE") {
     if (!isAdmin) return send(res, 403, {});
     const idf = params.get("id"); const id = idf ? decodeURIComponent(idf.replace("eq.", "")) : null;
+    if (table === "profiles") {
+      // yönetici kendi hesabını silemez
+      if (id && id !== caller.id) DB.users = DB.users.filter((x) => x.id !== id);
+      saveDB(); return send(res, 204, null);
+    }
     if (DB[table]) DB[table] = DB[table].filter((r) => String(r.id) !== id);
     saveDB(); return send(res, 204, null);
   }

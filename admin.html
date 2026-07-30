@@ -26,6 +26,7 @@
       <button class="admin-nav-btn" data-view="categories">Kategoriler</button>
       <button class="admin-nav-btn" data-view="slides">Vitrin (Slider)</button>
       <button class="admin-nav-btn" data-view="orders">Siparişler</button>
+      <button class="admin-nav-btn" data-view="users">Kullanıcılar</button>
       <button class="admin-nav-btn" data-view="leads">İletişim Talepleri</button>
       <button class="admin-nav-btn" data-view="content">Site İçeriği</button>
       <button class="admin-nav-btn" data-view="settings">Ayarlar</button>
@@ -229,6 +230,53 @@
       <div class="admin-panel">
         <p class="panel-hint">WhatsApp'a yönlendirilen sipariş talepleri burada listelenir.</p>
         <div id="orderList"></div>
+      </div>
+    </section>
+
+    <!-- KULLANICILAR -->
+    <section class="admin-view" id="view-users" hidden>
+      <div class="admin-panel settings-panel">
+        <h2>Yeni Kullanıcı / Yönetici Ekle</h2>
+        <form id="userForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="nuName">Ad Soyad</label>
+              <input type="text" id="nuName" placeholder="Adı Soyadı">
+            </div>
+            <div class="form-group">
+              <label for="nuPhone">Telefon</label>
+              <input type="text" id="nuPhone" placeholder="05__ ___ __ __">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="nuEmail">E-posta *</label>
+              <input type="email" id="nuEmail" required placeholder="ornek@eposta.com" autocomplete="off">
+            </div>
+            <div class="form-group">
+              <label for="nuPass">Şifre * <small>(en az 6 karakter)</small></label>
+              <input type="text" id="nuPass" required placeholder="••••••" autocomplete="off">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="nuRole">Yetki</label>
+            <select id="nuRole">
+              <option value="user">Müşteri (normal kullanıcı)</option>
+              <option value="admin">Yönetici (admin paneline girer)</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-small">Kullanıcı Oluştur</button>
+          <p class="form-status" id="userFormStatus" role="status"></p>
+        </form>
+      </div>
+      <div class="admin-panel">
+        <p class="panel-hint">Kayıtlı tüm kullanıcılar. Yönetici yapabilir, yetkisini geri alabilir, hesabı engelleyebilir (giriş yapamaz) veya silebilirsiniz. Kendi hesabınızı bu ekrandan değiştiremezsiniz.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Ad Soyad</th><th>E-posta</th><th>Telefon</th><th>Yetki</th><th>Durum</th><th></th></tr></thead>
+            <tbody id="userRows"></tbody>
+          </table>
+        </div>
       </div>
     </section>
 

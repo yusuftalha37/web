@@ -275,9 +275,58 @@ const Store = (() => {
     }
     const user = getUsersLocal().find((u) => u.email === email && u.pass === hash(pass));
     if (!user) return { ok: false, error: "E-posta veya şifre hatalı." };
+    if (user.blocked) return { ok: false, error: "Bu hesap engellenmiş. Lütfen yöneticiyle iletişime geçin." };
     const s = { name: user.name, email: user.email, role: user.role };
     write("gp-session", s);
     return { ok: true, session: s };
+  }
+
+  // ===================== KULLANICI YÖNETİMİ (yalnızca admin) =====================
+  // Not: id = Supabase modunda kullanıcı uid'i, yerel modda e-posta adresidir.
+  async function listUsers() {
+    if (persist) {
+      const rows = await sbSelect("profiles", "select=*&order=created.desc").catch(() => []);
+      return rows.map((r) => ({ id: r.id, name: r.name || "", email: r.email || "", phone: r.phone || "", role: r.role || "user", blocked: !!r.blocked, created: r.created || 0 }));
+    }
+    return getUsersLocal()
+      .map((u) => ({ id: u.email, name: u.name || "", email: u.email, phone: u.phone || "", role: u.role || "user", blocked: !!u.blocked, created: u.created || 0 }))
+      .sort((a, b) => (b.created || 0) - (a.created || 0));
+  }
+  async function setUserRole(id, role) {
+    if (persist) { await sbWrite("PATCH", "profiles", "id=eq." + encodeURIComponent(id), { role }).catch(logErr); return { ok: true }; }
+    const users = getUsersLocal();
+    const u = users.find((x) => x.email === id);
+    if (u) { u.role = role; write("gp-users", users); }
+    return { ok: true };
+  }
+  async function setUserBlocked(id, blocked) {
+    if (persist) { await sbWrite("PATCH", "profiles", "id=eq." + encodeURIComponent(id), { blocked: !!blocked }).catch(logErr); return { ok: true }; }
+    const users = getUsersLocal();
+    const u = users.find((x) => x.email === id);
+    if (u) { u.blocked = !!blocked; write("gp-users", users); }
+    return { ok: true };
+  }
+  async function deleteUser(id) {
+    if (persist) { await sbWrite("DELETE", "profiles", "id=eq." + encodeURIComponent(id)).catch(logErr); return { ok: true }; }
+    write("gp-users", getUsersLocal().filter((x) => x.email !== id));
+    return { ok: true };
+  }
+  // Yönetici panelinden yeni kullanıcı/yönetici oluşturur.
+  async function adminCreateUser({ name, email, phone, pass, role }) {
+    email = (email || "").trim().toLowerCase();
+    if (!email || !pass || pass.length < 6) return { ok: false, error: "Geçerli e-posta ve en az 6 karakter şifre girin." };
+    if (persist) {
+      const r = await gotrue("signup", { email, password: pass, data: { name: (name || "").trim(), phone: (phone || "").trim() } });
+      if (!r.ok) return { ok: false, error: (r.data && (r.data.msg || r.data.error_description)) || "Kullanıcı oluşturulamadı." };
+      const uid = r.data && r.data.user && r.data.user.id;
+      if (role === "admin" && uid) await sbWrite("PATCH", "profiles", "id=eq." + uid, { role: "admin" }).catch(logErr);
+      return { ok: true };
+    }
+    const users = getUsersLocal();
+    if (users.some((u) => u.email === email)) return { ok: false, error: "Bu e-posta ile kayıtlı bir hesap zaten var." };
+    users.push({ name: (name || "").trim(), email, phone: (phone || "").trim(), pass: hash(pass), role: role === "admin" ? "admin" : "user", created: Date.now(), blocked: false });
+    write("gp-users", users);
+    return { ok: true };
   }
 
   function getUser(email) {
@@ -379,6 +428,7 @@ const Store = (() => {
     getSlides, saveSlide, deleteSlide, moveSlide,
     register, login, logout, session,
     getUser, updateProfile, changePassword,
+    listUsers, setUserRole, setUserBlocked, deleteUser, adminCreateUser,
     addLead, getLeads, deleteLead,
     addOrder, getOrders, getOrdersByEmail,
     startCardPayment,
