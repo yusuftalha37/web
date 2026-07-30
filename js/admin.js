@@ -645,12 +645,28 @@ const selfUserId = adminSession
   ? (Store.mode === "supabase" ? (adminSession.uid || "") : adminSession.email)
   : "";
 
+function renderUsersModeNote() {
+  const note = document.getElementById("usersModeNote");
+  if (!note) return;
+  if (Store.mode === "supabase") {
+    note.innerHTML = '<div class="mode-note mode-note-ok">🟢 <strong>Sunucu modu.</strong> Müşteri kayıtları sunucuda saklanır ve burada listelenir.</div>';
+  } else {
+    note.innerHTML = '<div class="mode-note mode-note-warn">🔴 <strong>Demo modu (yalnızca bu tarayıcı).</strong> Site şu an sunucuya bağlı değil; müşterilerin kayıtları başka cihazlarda/tarayıcılarda saklanır ve burada GÖRÜNMEZ. Çözüm: siteyi <code>https://alanadınız</code> üzerinden açın ve <code>js/config.js</code> ayarının doğru olduğundan emin olun.</div>';
+  }
+}
+
 async function renderUsers() {
   const tbody = document.getElementById("userRows");
+  renderUsersModeNote();
   let users;
   try { users = await Store.listUsers(); }
   catch (err) {
     tbody.innerHTML = '<tr><td colspan="6" class="empty-row">Kullanıcılar yüklenemedi.</td></tr>';
+    return;
+  }
+  if (users.length === 0 && Store.mode === "supabase") {
+    // Sunucu modunda liste boşsa (admin bile yoksa) oturum jetonu geçersizdir
+    tbody.innerHTML = '<tr><td colspan="6" class="empty-row">Oturumunuz sunucuda geçerli değil. Lütfen <strong>Çıkış Yap</strong> deyip yeniden giriş yapın.</td></tr>';
     return;
   }
   tbody.innerHTML = users.map((u) => {
@@ -698,6 +714,8 @@ document.getElementById("userRows").addEventListener("click", async (e) => {
     renderUsers();
   }
 });
+
+document.getElementById("usersRefreshBtn").addEventListener("click", () => renderUsers());
 
 document.getElementById("userForm").addEventListener("submit", async (e) => {
   e.preventDefault();

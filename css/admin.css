@@ -15,6 +15,23 @@
 }
 .content-group-title:first-child { margin-top: 0; }
 
+/* Kullanıcılar ekranı mod uyarısı */
+.mode-note {
+  border-radius: 6px;
+  padding: 10px 12px;
+  font-size: 13px;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+.mode-note code {
+  background: rgba(0, 0, 0, 0.06);
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 12px;
+}
+.mode-note-ok { background: #e8f6ec; border: 1px solid #b7e0c2; color: #1f6b3a; }
+.mode-note-warn { background: #fdeceb; border: 1px solid #f3b7b2; color: #9a2820; }
+
 /* ---- Kenar menü ---- */
 .admin-sidebar {
   width: 240px;

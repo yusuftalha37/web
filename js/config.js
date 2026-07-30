@@ -12,6 +12,8 @@
 // DEMO moduna dönmek isterseniz SUPABASE_URL'i "" (boş) yapın.
 // ============================================================
 window.QS_CONFIG = {
-  SUPABASE_URL: location.protocol + "//" + location.host,  // ör: https://solararena.store
+  // Yalnızca http/https ile açıldığında sunucu modu; dosyaya çift tıklayınca
+  // (file://) demo moduna düşer (aksi halde API çağrıları başarısız olurdu).
+  SUPABASE_URL: /^https?:$/.test(location.protocol) ? location.protocol + "//" + location.host : "",
   SUPABASE_ANON_KEY: "local"                               // self-host modunda herhangi bir metin
 };
