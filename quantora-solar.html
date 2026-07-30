@@ -1727,6 +1727,16 @@ img, svg { max-width: 100%; }
   background: #f1f5f9;
 }
 
+/* Site İçeriği editöründe bölüm başlıkları */
+.content-group-title {
+  font-size: 14px;
+  color: var(--navy);
+  margin: 22px 0 10px;
+  padding-bottom: 6px;
+  border-bottom: 2px solid #e2e8f0;
+}
+.content-group-title:first-child { margin-top: 0; }
+
 /* ---- Kenar menü ---- */
 .admin-sidebar {
   width: 240px;
@@ -2298,7 +2308,7 @@ img, svg { max-width: 100%; }
           <circle cx="12" cy="12" r="4"/>
           <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
         </svg>
-        <span class="logo-text">Quantora<span>Solar</span> <small>Enerji Sistemleri San. Tic. Ltd. Şti.</small></span>
+        <span class="logo-text">Quantora<span>Solar</span> <small data-site="brandTagline">Enerji Sistemleri San. Tic. Ltd. Şti.</small></span>
       </a>
       <form class="site-search" id="siteSearch" role="search">
         <input type="search" id="searchInput" placeholder="Ürün ara: güneş paneli, invertör, akü…" autocomplete="off" aria-label="Ürün ara">
@@ -2308,7 +2318,7 @@ img, svg { max-width: 100%; }
       </form>
       <div class="header-contact">
         <strong data-site="phone">0850 000 00 00</strong>
-        <span>Sipariş ve bilgi için hemen arayın</span>
+        <span data-site="headerContactNote">Sipariş ve bilgi için hemen arayın</span>
       </div>
     </div>
   </header>
@@ -2367,10 +2377,10 @@ img, svg { max-width: 100%; }
   <!-- AVANTAJLAR ŞERİDİ -->
   <section class="features-strip">
     <div class="container strip-inner">
-      <div class="strip-item"><span class="tick">✓</span> 25 Yıl Panel Garantisi</div>
-      <div class="strip-item"><span class="tick">✓</span> 36 Aya Varan Taksit</div>
-      <div class="strip-item"><span class="tick">✓</span> Türkiye'nin Her Yerine Gönderim</div>
-      <div class="strip-item"><span class="tick">✓</span> Aynı Gün Kargo (Stok Ürünlerde)</div>
+      <div class="strip-item"><span class="tick">✓</span> <span data-site="strip1">25 Yıl Panel Garantisi</span></div>
+      <div class="strip-item"><span class="tick">✓</span> <span data-site="strip2">36 Aya Varan Taksit</span></div>
+      <div class="strip-item"><span class="tick">✓</span> <span data-site="strip3">Türkiye'nin Her Yerine Gönderim</span></div>
+      <div class="strip-item"><span class="tick">✓</span> <span data-site="strip4">Aynı Gün Kargo (Stok Ürünlerde)</span></div>
     </div>
   </section>
 
@@ -2378,8 +2388,8 @@ img, svg { max-width: 100%; }
   <section class="section section-alt" id="urunler">
     <div class="container">
       <div class="section-head">
-        <h2>En Çok Satan Ürünler</h2>
-        <p>Müşterilerimizin en çok tercih ettiği ürünler. Tüm ürünlerimiz orijinal, faturalı ve garantilidir; stoktaki ürünler aynı gün kargoya verilir.</p>
+        <h2 data-site="bestTitle">En Çok Satan Ürünler</h2>
+        <p data-site="bestText">Müşterilerimizin en çok tercih ettiği ürünler. Tüm ürünlerimiz orijinal, faturalı ve garantilidir; stoktaki ürünler aynı gün kargoya verilir.</p>
       </div>
       <div class="shop-grid" id="shopGrid" data-mode="featured"></div>
       <p class="shop-more"><a href="#magaza" class="btn">Tüm Ürünleri İncele →</a></p>
@@ -2390,12 +2400,12 @@ img, svg { max-width: 100%; }
   <section class="section" id="hesaplayici">
     <div class="container calc-wrap">
       <div class="calc-info">
-        <h2>Güneş Size Ne Kazandırır?</h2>
-        <p>Aylık elektrik faturanızı girin, size uygun sistem gücünü ve yıllık tasarrufunuzu anında görün. Hesaplama Türkiye ortalama güneşlenme verilerine göre tahminidir.</p>
+        <h2 data-site="calcTitle">Güneş Size Ne Kazandırır?</h2>
+        <p data-site="calcText">Aylık elektrik faturanızı girin, size uygun sistem gücünü ve yıllık tasarrufunuzu anında görün. Hesaplama Türkiye ortalama güneşlenme verilerine göre tahminidir.</p>
         <ul class="calc-notes">
-          <li>Türkiye yıllık ortalama 2.740 saat güneşlenme süresine sahiptir</li>
-          <li>Elektrik faturanızda %90'a varan azalma sağlanır</li>
-          <li>Fazla üretiminizi şebekeye satabilirsiniz</li>
+          <li data-site="calcNote1">Türkiye yıllık ortalama 2.740 saat güneşlenme süresine sahiptir</li>
+          <li data-site="calcNote2">Elektrik faturanızda %90'a varan azalma sağlanır</li>
+          <li data-site="calcNote3">Fazla üretiminizi şebekeye satabilirsiniz</li>
         </ul>
       </div>
       <div class="calc-box">
@@ -2435,28 +2445,28 @@ img, svg { max-width: 100%; }
   <section class="section section-alt" id="surec">
     <div class="container">
       <div class="section-head">
-        <h2>Siparişiniz 4 Adımda Kapınızda</h2>
+        <h2 data-site="procTitle">Siparişiniz 4 Adımda Kapınızda</h2>
       </div>
       <div class="steps">
         <div class="step">
           <div class="step-num">1</div>
-          <h3>Siparişinizi Verin</h3>
-          <p>Ürünleri sepete ekleyin, WhatsApp üzerinden siparişinizi iletin.</p>
+          <h3 data-site="step1Title">Siparişinizi Verin</h3>
+          <p data-site="step1Text">Ürünleri sepete ekleyin, WhatsApp üzerinden siparişinizi iletin.</p>
         </div>
         <div class="step">
           <div class="step-num">2</div>
-          <h3>Onay &amp; Ödeme</h3>
-          <p>Siparişinizi onaylayıp güvenli ödeme seçeneklerini sunuyoruz.</p>
+          <h3 data-site="step2Title">Onay &amp; Ödeme</h3>
+          <p data-site="step2Text">Siparişinizi onaylayıp güvenli ödeme seçeneklerini sunuyoruz.</p>
         </div>
         <div class="step">
           <div class="step-num">3</div>
-          <h3>Aynı Gün Kargo</h3>
-          <p>Stok ürünler aynı gün sigortalı ve sağlam paketlenmiş şekilde yola çıkar.</p>
+          <h3 data-site="step3Title">Aynı Gün Kargo</h3>
+          <p data-site="step3Text">Stok ürünler aynı gün sigortalı ve sağlam paketlenmiş şekilde yola çıkar.</p>
         </div>
         <div class="step">
           <div class="step-num">4</div>
-          <h3>Teslimat &amp; Destek</h3>
-          <p>1-3 iş gününde kapınızda. Montajda telefonla ücretsiz destek veriyoruz.</p>
+          <h3 data-site="step4Title">Teslimat &amp; Destek</h3>
+          <p data-site="step4Text">1-3 iş gününde kapınızda. Montajda telefonla ücretsiz destek veriyoruz.</p>
         </div>
       </div>
     </div>
@@ -2466,8 +2476,8 @@ img, svg { max-width: 100%; }
   <section class="section" id="projeler">
     <div class="container">
       <div class="section-head">
-        <h2>Ürünlerimiz Sahada</h2>
-        <p>Ürünlerimizle kurulan sistemlerden örnekler — müşterilerimizin gönderdiği kareler.</p>
+        <h2 data-site="galTitle">Ürünlerimiz Sahada</h2>
+        <p data-site="galText">Ürünlerimizle kurulan sistemlerden örnekler — müşterilerimizin gönderdiği kareler.</p>
       </div>
       <div class="gallery">
         <figure class="gallery-item">
@@ -2486,7 +2496,7 @@ img, svg { max-width: 100%; }
               <rect x="184" y="86" width="38" height="26" fill="#164066" stroke="#0a2138" stroke-width="1.5"/>
             </g>
           </svg>
-          <figcaption class="gallery-caption">Antalya — 8 kW konut çatı GES</figcaption>
+          <figcaption class="gallery-caption" data-site="gal1">Antalya — 8 kW konut çatı GES</figcaption>
         </figure>
         <figure class="gallery-item">
           <svg viewBox="0 0 320 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Fabrika çatısı kurulumu">
@@ -2503,7 +2513,7 @@ img, svg { max-width: 100%; }
               <rect x="228" y="66" width="44" height="22" fill="#164066" stroke="#0a2138" stroke-width="1.5" transform="skewX(-14)"/>
             </g>
           </svg>
-          <figcaption class="gallery-caption">İzmir — 120 kW endüstriyel çatı GES</figcaption>
+          <figcaption class="gallery-caption" data-site="gal2">İzmir — 120 kW endüstriyel çatı GES</figcaption>
         </figure>
         <figure class="gallery-item">
           <svg viewBox="0 0 320 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Tarımsal sulama sistemi">
@@ -2528,7 +2538,7 @@ img, svg { max-width: 100%; }
               <path d="M252 128 q6 -16 12 0"/>
             </g>
           </svg>
-          <figcaption class="gallery-caption">Konya — şebekeden bağımsız sulama sistemi</figcaption>
+          <figcaption class="gallery-caption" data-site="gal3">Konya — şebekeden bağımsız sulama sistemi</figcaption>
         </figure>
         <figure class="gallery-item">
           <svg viewBox="0 0 320 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Arazi tipi güneş santrali">
@@ -2544,7 +2554,7 @@ img, svg { max-width: 100%; }
               <rect x="244" y="156" width="70" height="26" fill="#164066" stroke="#0a2138" stroke-width="2" transform="skewX(-16)"/>
             </g>
           </svg>
-          <figcaption class="gallery-caption">Ankara — 1,2 MW arazi tipi GES</figcaption>
+          <figcaption class="gallery-caption" data-site="gal4">Ankara — 1,2 MW arazi tipi GES</figcaption>
         </figure>
         <figure class="gallery-item">
           <svg viewBox="0 0 320 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Solar otopark kurulumu">
@@ -2577,7 +2587,7 @@ img, svg { max-width: 100%; }
               <circle cx="188" cy="142" r="4" fill="#8395a5"/>
             </g>
           </svg>
-          <figcaption class="gallery-caption">Bursa — solar otopark (carport) sistemi</figcaption>
+          <figcaption class="gallery-caption" data-site="gal5">Bursa — solar otopark (carport) sistemi</figcaption>
         </figure>
       </div>
     </div>
@@ -2587,23 +2597,23 @@ img, svg { max-width: 100%; }
   <section class="section section-alt" id="referanslar">
     <div class="container">
       <div class="section-head">
-        <h2>Müşterilerimiz Ne Diyor?</h2>
+        <h2 data-site="refTitle">Müşterilerimiz Ne Diyor?</h2>
       </div>
       <div class="testimonials">
         <blockquote class="testimonial">
           <div class="stars">★★★★★</div>
-          <p>"Panelleri öğlen sipariş verdim, ertesi gün elimdeydi. Paketleme çok sağlamdı, tek çizik bile yoktu. Faturam 3.500 TL'den 250 TL'ye düştü."</p>
-          <footer><strong>Mehmet K.</strong> — Antalya, 8 kW malzeme seti</footer>
+          <p data-site="testi1Text">"Panelleri öğlen sipariş verdim, ertesi gün elimdeydi. Paketleme çok sağlamdı, tek çizik bile yoktu. Faturam 3.500 TL'den 250 TL'ye düştü."</p>
+          <footer><strong data-site="testi1Name">Mehmet K.</strong> <span data-site="testi1Role">— Antalya, 8 kW malzeme seti</span></footer>
         </blockquote>
         <blockquote class="testimonial">
           <div class="stars">★★★★★</div>
-          <p>"Fabrikamız için toptan panel aldık; piyasadaki en iyi fiyatı verdiler, teslimat sözünde durdular. İkinci partiyi de buradan alacağız."</p>
-          <footer><strong>Ayşe T.</strong> — İzmir, toptan alım (120 kW)</footer>
+          <p data-site="testi2Text">"Fabrikamız için toptan panel aldık; piyasadaki en iyi fiyatı verdiler, teslimat sözünde durdular. İkinci partiyi de buradan alacağız."</p>
+          <footer><strong data-site="testi2Name">Ayşe T.</strong> <span data-site="testi2Role">— İzmir, toptan alım (120 kW)</span></footer>
         </blockquote>
         <blockquote class="testimonial">
           <div class="stars">★★★★★</div>
-          <p>"Bağ evi paketini kendim kurdum; gönderdikleri şema çok anlaşılırdı, takıldığım yerde telefonla adım adım yardımcı oldular."</p>
-          <footer><strong>Hüseyin D.</strong> — Konya, Bağ Evi Off-Grid Paketi</footer>
+          <p data-site="testi3Text">"Bağ evi paketini kendim kurdum; gönderdikleri şema çok anlaşılırdı, takıldığım yerde telefonla adım adım yardımcı oldular."</p>
+          <footer><strong data-site="testi3Name">Hüseyin D.</strong> <span data-site="testi3Role">— Konya, Bağ Evi Off-Grid Paketi</span></footer>
         </blockquote>
       </div>
     </div>
@@ -2613,35 +2623,35 @@ img, svg { max-width: 100%; }
   <section class="section" id="sss">
     <div class="container narrow">
       <div class="section-head">
-        <h2>Sık Sorulan Sorular</h2>
+        <h2 data-site="faqTitle">Sık Sorulan Sorular</h2>
       </div>
       <details class="faq">
-        <summary>Güneş paneli sistemi kendini ne kadar sürede amorti eder?</summary>
-        <p>Tüketiminize ve bulunduğunuz bölgeye göre değişmekle birlikte, konut sistemleri ortalama 4-6 yılda, ticari sistemler 3-5 yılda kendini amorti eder. Paneller 25+ yıl üretim yaptığı için kalan yıllar net kazançtır.</p>
+        <summary data-site="faqQ1">Güneş paneli sistemi kendini ne kadar sürede amorti eder?</summary>
+        <p data-site="faqA1">Tüketiminize ve bulunduğunuz bölgeye göre değişmekle birlikte, konut sistemleri ortalama 4-6 yılda, ticari sistemler 3-5 yılda kendini amorti eder. Paneller 25+ yıl üretim yaptığı için kalan yıllar net kazançtır.</p>
       </details>
       <details class="faq">
-        <summary>Elektrik kesildiğinde sistemim çalışır mı?</summary>
-        <p>Standart on-grid sistemler güvenlik gereği kesintide durur. Batarya destekli hibrit sistem tercih ederseniz kesintilerde de elektriğiniz olur.</p>
+        <summary data-site="faqQ2">Elektrik kesildiğinde sistemim çalışır mı?</summary>
+        <p data-site="faqA2">Standart on-grid sistemler güvenlik gereği kesintide durur. Batarya destekli hibrit sistem tercih ederseniz kesintilerde de elektriğiniz olur.</p>
       </details>
       <details class="faq">
-        <summary>Ürettiğim fazla elektriği satabilir miyim?</summary>
-        <p>Evet. Aylık mahsuplaşma modeliyle tükettiğinizden fazla ürettiğiniz elektrik şebekeye verilir ve dağıtım şirketi tarafından size ödeme yapılır.</p>
+        <summary data-site="faqQ3">Ürettiğim fazla elektriği satabilir miyim?</summary>
+        <p data-site="faqA3">Evet. Aylık mahsuplaşma modeliyle tükettiğinizden fazla ürettiğiniz elektrik şebekeye verilir ve dağıtım şirketi tarafından size ödeme yapılır.</p>
       </details>
       <details class="faq">
-        <summary>Çatım güneş enerjisi için uygun mu?</summary>
-        <p>Güney, güneydoğu veya güneybatı cepheli, gölgelenmesi az çatılar idealdir; doğu-batı yönlü çatılarda da verimli sistemler kurulabilir. Çatınızın fotoğrafını ve aylık faturanızı WhatsApp'tan gönderin, uzmanlarımız ücretsiz değerlendirsin.</p>
+        <summary data-site="faqQ4">Çatım güneş enerjisi için uygun mu?</summary>
+        <p data-site="faqA4">Güney, güneydoğu veya güneybatı cepheli, gölgelenmesi az çatılar idealdir; doğu-batı yönlü çatılarda da verimli sistemler kurulabilir. Çatınızın fotoğrafını ve aylık faturanızı WhatsApp'tan gönderin, uzmanlarımız ücretsiz değerlendirsin.</p>
       </details>
       <details class="faq">
-        <summary>Kargo ne kadar sürer, ücreti nedir?</summary>
-        <p>Stoktaki ürünler aynı gün kargoya verilir; teslimat Türkiye genelinde ortalama 1-3 iş günüdür. Tüm gönderiler sigortalıdır. Kargo ücreti sipariş onayında bildirilir; belirli tutarın üzerindeki siparişlerde gönderim ücretsizdir.</p>
+        <summary data-site="faqQ5">Kargo ne kadar sürer, ücreti nedir?</summary>
+        <p data-site="faqA5">Stoktaki ürünler aynı gün kargoya verilir; teslimat Türkiye genelinde ortalama 1-3 iş günüdür. Tüm gönderiler sigortalıdır. Kargo ücreti sipariş onayında bildirilir; belirli tutarın üzerindeki siparişlerde gönderim ücretsizdir.</p>
       </details>
       <details class="faq">
-        <summary>Kurulumu kendim yapabilir miyim?</summary>
-        <p>Evet. Tüm paketlerle birlikte adım adım montaj kılavuzu ve bağlantı şeması gönderiyoruz; kurulum sırasında telefonla ücretsiz teknik destek veriyoruz. Dilerseniz bulunduğunuz bölgedeki anlaşmalı ustaları da önerebiliriz.</p>
+        <summary data-site="faqQ6">Kurulumu kendim yapabilir miyim?</summary>
+        <p data-site="faqA6">Evet. Tüm paketlerle birlikte adım adım montaj kılavuzu ve bağlantı şeması gönderiyoruz; kurulum sırasında telefonla ücretsiz teknik destek veriyoruz. Dilerseniz bulunduğunuz bölgedeki anlaşmalı ustaları da önerebiliriz.</p>
       </details>
       <details class="faq">
-        <summary>Bakım masrafı var mı?</summary>
-        <p>Güneş panellerinin hareketli parçası olmadığı için bakım ihtiyacı minimumdur. Yılda 1-2 kez panel temizliği ve periyodik kontrol yeterlidir.</p>
+        <summary data-site="faqQ7">Bakım masrafı var mı?</summary>
+        <p data-site="faqA7">Güneş panellerinin hareketli parçası olmadığı için bakım ihtiyacı minimumdur. Yılda 1-2 kez panel temizliği ve periyodik kontrol yeterlidir.</p>
       </details>
     </div>
   </section>
@@ -2649,8 +2659,8 @@ img, svg { max-width: 100%; }
   <!-- CTA -->
   <section class="cta">
     <div class="container cta-inner">
-      <h2>Güneşten Kazanmaya Bugün Başlayın</h2>
-      <p>Siparişiniz aynı gün kargoda. Aradığınız ürünü bulamadıysanız veya toplu alım için bize yazın.</p>
+      <h2 data-site="ctaTitle">Güneşten Kazanmaya Bugün Başlayın</h2>
+      <p data-site="ctaText">Siparişiniz aynı gün kargoda. Aradığınız ürünü bulamadıysanız veya toplu alım için bize yazın.</p>
       <a href="#magaza" class="btn btn-light">Hemen Sipariş Ver</a>
     </div>
   </section>
@@ -2659,8 +2669,8 @@ img, svg { max-width: 100%; }
   <section class="section" id="iletisim">
     <div class="container contact-wrap">
       <div class="contact-info">
-        <h2>Bize Ulaşın</h2>
-        <p>Sorularınız, ücretsiz sistem planlama ve toptan alım için formu doldurun; 24 saat içinde dönüş yapalım.</p>
+        <h2 data-site="contactTitle">Bize Ulaşın</h2>
+        <p data-site="contactText">Sorularınız, ücretsiz sistem planlama ve toptan alım için formu doldurun; 24 saat içinde dönüş yapalım.</p>
         <ul class="contact-list">
           <li><strong>Adres:</strong> <span data-site="address">Örnek Mah. Enerji Cad. No:1, Ankara</span></li>
           <li><strong>Telefon:</strong> <span data-site="phone">0850 000 00 00</span></li>
@@ -2712,33 +2722,33 @@ img, svg { max-width: 100%; }
   <section class="section section-alt" id="hizmetler">
     <div class="container">
       <div class="section-head">
-        <h2>Neden Quantora Solar?</h2>
-        <p>Güneş paneli ve solar ürün alışverişinizi güvenle, kapınıza kadar getiriyoruz.</p>
+        <h2 data-site="whyTitle">Neden Quantora Solar?</h2>
+        <p data-site="whyText">Güneş paneli ve solar ürün alışverişinizi güvenle, kapınıza kadar getiriyoruz.</p>
       </div>
       <div class="cards">
         <article class="card">
-          <h3>Türkiye'nin Her Yerine Gönderim</h3>
-          <p>81 ilin tamamına sigortalı ve sağlam paketlenmiş kargo. Stoktaki ürünler aynı gün yola çıkar, 1-3 iş gününde teslim edilir.</p>
+          <h3 data-site="why1Title">Türkiye'nin Her Yerine Gönderim</h3>
+          <p data-site="why1Text">81 ilin tamamına sigortalı ve sağlam paketlenmiş kargo. Stoktaki ürünler aynı gün yola çıkar, 1-3 iş gününde teslim edilir.</p>
         </article>
         <article class="card">
-          <h3>Orijinal &amp; Garantili Ürünler</h3>
-          <p>Tüm ürünler faturalı ve distribütör garantilidir. Panellerde 25 yıla varan performans garantisi sunuyoruz.</p>
+          <h3 data-site="why2Title">Orijinal &amp; Garantili Ürünler</h3>
+          <p data-site="why2Text">Tüm ürünler faturalı ve distribütör garantilidir. Panellerde 25 yıla varan performans garantisi sunuyoruz.</p>
         </article>
         <article class="card">
-          <h3>Ücretsiz Sistem Planlama</h3>
-          <p>Fatura ve ihtiyaç bilginizi iletin; size uygun panel + invertör + akü kombinasyonunu uzmanlarımız ücretsiz planlasın.</p>
+          <h3 data-site="why3Title">Ücretsiz Sistem Planlama</h3>
+          <p data-site="why3Text">Fatura ve ihtiyaç bilginizi iletin; size uygun panel + invertör + akü kombinasyonunu uzmanlarımız ücretsiz planlasın.</p>
         </article>
         <article class="card">
-          <h3>Montaj Kılavuzu &amp; Teknik Destek</h3>
-          <p>Her paketle birlikte adım adım montaj şeması gönderiyoruz. Kurulum sırasında telefonla ücretsiz teknik destek alırsınız.</p>
+          <h3 data-site="why4Title">Montaj Kılavuzu &amp; Teknik Destek</h3>
+          <p data-site="why4Text">Her paketle birlikte adım adım montaj şeması gönderiyoruz. Kurulum sırasında telefonla ücretsiz teknik destek alırsınız.</p>
         </article>
         <article class="card">
-          <h3>Toptan Satış &amp; Bayilik</h3>
-          <p>Elektrikçiler, müteahhitler ve işletmeler için özel toptan fiyat listesi ve bayilik imkânı sunuyoruz.</p>
+          <h3 data-site="why5Title">Toptan Satış &amp; Bayilik</h3>
+          <p data-site="why5Text">Elektrikçiler, müteahhitler ve işletmeler için özel toptan fiyat listesi ve bayilik imkânı sunuyoruz.</p>
         </article>
         <article class="card">
-          <h3>Kolay İade &amp; Değişim</h3>
-          <p>Ürünler kapınıza sorunsuz ulaşmazsa veya vazgeçerseniz 14 gün içinde koşulsuz iade ve değişim hakkınız var.</p>
+          <h3 data-site="why6Title">Kolay İade &amp; Değişim</h3>
+          <p data-site="why6Text">Ürünler kapınıza sorunsuz ulaşmazsa veya vazgeçerseniz 14 gün içinde koşulsuz iade ve değişim hakkınız var.</p>
         </article>
       </div>
     </div>
@@ -3568,45 +3578,12 @@ img, svg { max-width: 100%; }
     <!-- SİTE İÇERİĞİ -->
     <section class="admin-view" id="view-content" hidden>
       <div class="admin-panel settings-panel">
-        <h2>İletişim Bilgileri</h2>
+        <p class="panel-hint">Ana sayfadaki neredeyse tüm metinleri buradan düzenleyebilirsiniz. Bir alanı değiştirip <strong>Tümünü Kaydet</strong>'e basın; site anında güncellenir. (Ürünler, kategoriler ve vitrin görselleri kendi menülerinden yönetilir.)</p>
         <form id="contentForm">
-          <div class="form-row">
-            <div class="form-group">
-              <label for="ctPhone">Telefon</label>
-              <input type="text" id="ctPhone" placeholder="0850 000 00 00">
-            </div>
-            <div class="form-group">
-              <label for="ctEmail">E-posta</label>
-              <input type="text" id="ctEmail" placeholder="info@firmaniz.com">
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="ctAddress">Adres</label>
-            <input type="text" id="ctAddress" placeholder="Mahalle, cadde, no, il">
-          </div>
-          <div class="form-group">
-            <label for="ctHours">Çalışma saatleri</label>
-            <input type="text" id="ctHours" placeholder="Hafta içi 09:00 - 18:00, Cumartesi 10:00 - 15:00">
-          </div>
-          <div class="form-group">
-            <label for="ctTopNote">Üst bar notu</label>
-            <input type="text" id="ctTopNote" placeholder="Türkiye'nin her yerine hızlı gönderim">
-          </div>
-
-          <h2 style="margin-top:22px">Footer (Sayfa Altı)</h2>
-          <div class="form-group">
-            <label for="ctFooterAbout">Footer açıklama metni</label>
-            <textarea id="ctFooterAbout" rows="2" placeholder="Firmanız hakkında kısa açıklama"></textarea>
-          </div>
-          <div class="form-group">
-            <label for="ctFooterCopyright">En alt satır (telif / marka)</label>
-            <input type="text" id="ctFooterCopyright" placeholder="© 2026 Firma Adınız — Tüm hakları saklıdır.">
-          </div>
-
-          <button type="submit" class="btn btn-small">Kaydet</button>
+          <div id="contentFields"></div>
+          <button type="submit" class="btn btn-small">Tümünü Kaydet</button>
           <p class="form-status" id="contentStatus" role="status"></p>
         </form>
-        <p class="panel-hint" style="margin-top:14px">Bu bilgiler sitenin üst çubuğunda, başlığında, iletişim bölümünde ve footer'ında otomatik güncellenir.</p>
       </div>
     </section>
 
@@ -3785,11 +3762,95 @@ const Store = (() => {
     { id: "sl3", image: "", art: "carport", title: "Karavan ve Bağ Evi Solar Paketleri", subtitle: "Şebekeden bağımsız, kur-kullan hazır sistemler. Montaj kılavuzu ve destek dahil.", btnText: "Paketleri Gör", btnLink: "urunler.html" }
   ];
   const DEFAULT_SITE = {
+    // ---- İletişim / genel ----
     phone: "0850 000 00 00",
     email: "info@quantorasolar.com.tr",
     address: "Örnek Mah. Enerji Cad. No:1, Ankara",
     hours: "Hafta içi 09:00 - 18:00, Cumartesi 10:00 - 15:00",
     topNote: "Türkiye'nin her yerine hızlı gönderim",
+    brandTagline: "Enerji Sistemleri San. Tic. Ltd. Şti.",
+    headerContactNote: "Sipariş ve bilgi için hemen arayın",
+    // ---- Avantaj şeridi ----
+    strip1: "25 Yıl Panel Garantisi",
+    strip2: "36 Aya Varan Taksit",
+    strip3: "Türkiye'nin Her Yerine Gönderim",
+    strip4: "Aynı Gün Kargo (Stok Ürünlerde)",
+    // ---- En çok satanlar ----
+    bestTitle: "En Çok Satan Ürünler",
+    bestText: "Müşterilerimizin en çok tercih ettiği ürünler. Tüm ürünlerimiz orijinal, faturalı ve garantilidir; stoktaki ürünler aynı gün kargoya verilir.",
+    // ---- Tasarruf hesaplayıcı ----
+    calcTitle: "Güneş Size Ne Kazandırır?",
+    calcText: "Aylık elektrik faturanızı girin, size uygun sistem gücünü ve yıllık tasarrufunuzu anında görün. Hesaplama Türkiye ortalama güneşlenme verilerine göre tahminidir.",
+    calcNote1: "Türkiye yıllık ortalama 2.740 saat güneşlenme süresine sahiptir",
+    calcNote2: "Elektrik faturanızda %90'a varan azalma sağlanır",
+    calcNote3: "Fazla üretiminizi şebekeye satabilirsiniz",
+    // ---- Süreç adımları ----
+    procTitle: "Siparişiniz 4 Adımda Kapınızda",
+    step1Title: "Siparişinizi Verin",
+    step1Text: "Ürünleri sepete ekleyin, WhatsApp üzerinden siparişinizi iletin.",
+    step2Title: "Onay & Ödeme",
+    step2Text: "Siparişinizi onaylayıp güvenli ödeme seçeneklerini sunuyoruz.",
+    step3Title: "Aynı Gün Kargo",
+    step3Text: "Stok ürünler aynı gün sigortalı ve sağlam paketlenmiş şekilde yola çıkar.",
+    step4Title: "Teslimat & Destek",
+    step4Text: "1-3 iş gününde kapınızda. Montajda telefonla ücretsiz destek veriyoruz.",
+    // ---- Proje galerisi ----
+    galTitle: "Ürünlerimiz Sahada",
+    galText: "Ürünlerimizle kurulan sistemlerden örnekler — müşterilerimizin gönderdiği kareler.",
+    gal1: "Antalya — 8 kW konut çatı GES",
+    gal2: "İzmir — 120 kW endüstriyel çatı GES",
+    gal3: "Konya — şebekeden bağımsız sulama sistemi",
+    gal4: "Ankara — 1,2 MW arazi tipi GES",
+    gal5: "Bursa — solar otopark (carport) sistemi",
+    // ---- Referanslar ----
+    refTitle: "Müşterilerimiz Ne Diyor?",
+    testi1Text: "\"Panelleri öğlen sipariş verdim, ertesi gün elimdeydi. Paketleme çok sağlamdı, tek çizik bile yoktu. Faturam 3.500 TL'den 250 TL'ye düştü.\"",
+    testi1Name: "Mehmet K.",
+    testi1Role: "— Antalya, 8 kW malzeme seti",
+    testi2Text: "\"Fabrikamız için toptan panel aldık; piyasadaki en iyi fiyatı verdiler, teslimat sözünde durdular. İkinci partiyi de buradan alacağız.\"",
+    testi2Name: "Ayşe T.",
+    testi2Role: "— İzmir, toptan alım (120 kW)",
+    testi3Text: "\"Bağ evi paketini kendim kurdum; gönderdikleri şema çok anlaşılırdı, takıldığım yerde telefonla adım adım yardımcı oldular.\"",
+    testi3Name: "Hüseyin D.",
+    testi3Role: "— Konya, Bağ Evi Off-Grid Paketi",
+    // ---- SSS ----
+    faqTitle: "Sık Sorulan Sorular",
+    faqQ1: "Güneş paneli sistemi kendini ne kadar sürede amorti eder?",
+    faqA1: "Tüketiminize ve bulunduğunuz bölgeye göre değişmekle birlikte, konut sistemleri ortalama 4-6 yılda, ticari sistemler 3-5 yılda kendini amorti eder. Paneller 25+ yıl üretim yaptığı için kalan yıllar net kazançtır.",
+    faqQ2: "Elektrik kesildiğinde sistemim çalışır mı?",
+    faqA2: "Standart on-grid sistemler güvenlik gereği kesintide durur. Batarya destekli hibrit sistem tercih ederseniz kesintilerde de elektriğiniz olur.",
+    faqQ3: "Ürettiğim fazla elektriği satabilir miyim?",
+    faqA3: "Evet. Aylık mahsuplaşma modeliyle tükettiğinizden fazla ürettiğiniz elektrik şebekeye verilir ve dağıtım şirketi tarafından size ödeme yapılır.",
+    faqQ4: "Çatım güneş enerjisi için uygun mu?",
+    faqA4: "Güney, güneydoğu veya güneybatı cepheli, gölgelenmesi az çatılar idealdir; doğu-batı yönlü çatılarda da verimli sistemler kurulabilir. Çatınızın fotoğrafını ve aylık faturanızı WhatsApp'tan gönderin, uzmanlarımız ücretsiz değerlendirsin.",
+    faqQ5: "Kargo ne kadar sürer, ücreti nedir?",
+    faqA5: "Stoktaki ürünler aynı gün kargoya verilir; teslimat Türkiye genelinde ortalama 1-3 iş günüdür. Tüm gönderiler sigortalıdır. Kargo ücreti sipariş onayında bildirilir; belirli tutarın üzerindeki siparişlerde gönderim ücretsizdir.",
+    faqQ6: "Kurulumu kendim yapabilir miyim?",
+    faqA6: "Evet. Tüm paketlerle birlikte adım adım montaj kılavuzu ve bağlantı şeması gönderiyoruz; kurulum sırasında telefonla ücretsiz teknik destek veriyoruz. Dilerseniz bulunduğunuz bölgedeki anlaşmalı ustaları da önerebiliriz.",
+    faqQ7: "Bakım masrafı var mı?",
+    faqA7: "Güneş panellerinin hareketli parçası olmadığı için bakım ihtiyacı minimumdur. Yılda 1-2 kez panel temizliği ve periyodik kontrol yeterlidir.",
+    // ---- CTA ----
+    ctaTitle: "Güneşten Kazanmaya Bugün Başlayın",
+    ctaText: "Siparişiniz aynı gün kargoda. Aradığınız ürünü bulamadıysanız veya toplu alım için bize yazın.",
+    // ---- İletişim bölümü ----
+    contactTitle: "Bize Ulaşın",
+    contactText: "Sorularınız, ücretsiz sistem planlama ve toptan alım için formu doldurun; 24 saat içinde dönüş yapalım.",
+    // ---- Neden biz ----
+    whyTitle: "Neden Quantora Solar?",
+    whyText: "Güneş paneli ve solar ürün alışverişinizi güvenle, kapınıza kadar getiriyoruz.",
+    why1Title: "Türkiye'nin Her Yerine Gönderim",
+    why1Text: "81 ilin tamamına sigortalı ve sağlam paketlenmiş kargo. Stoktaki ürünler aynı gün yola çıkar, 1-3 iş gününde teslim edilir.",
+    why2Title: "Orijinal & Garantili Ürünler",
+    why2Text: "Tüm ürünler faturalı ve distribütör garantilidir. Panellerde 25 yıla varan performans garantisi sunuyoruz.",
+    why3Title: "Ücretsiz Sistem Planlama",
+    why3Text: "Fatura ve ihtiyaç bilginizi iletin; size uygun panel + invertör + akü kombinasyonunu uzmanlarımız ücretsiz planlasın.",
+    why4Title: "Montaj Kılavuzu & Teknik Destek",
+    why4Text: "Her paketle birlikte adım adım montaj şeması gönderiyoruz. Kurulum sırasında telefonla ücretsiz teknik destek alırsınız.",
+    why5Title: "Toptan Satış & Bayilik",
+    why5Text: "Elektrikçiler, müteahhitler ve işletmeler için özel toptan fiyat listesi ve bayilik imkânı sunuyoruz.",
+    why6Title: "Kolay İade & Değişim",
+    why6Text: "Ürünler kapınıza sorunsuz ulaşmazsa veya vazgeçerseniz 14 gün içinde koşulsuz iade ve değişim hakkınız var.",
+    // ---- Footer ----
     footerAbout: "Temiz enerjiyle daha aydınlık bir gelecek için 12 yıldır çalışıyoruz.",
     footerCopyright: "© 2026 Quantora Solar Enerji — Bu site örnek/demo amaçlıdır."
   };
@@ -6037,34 +6098,102 @@ document.getElementById("userForm").addEventListener("submit", async (e) => {
   renderUsers();
 });
 
-// ---------- SİTE İÇERİĞİ ----------
-const CONTENT_FIELDS = {
-  ctPhone: "phone",
-  ctEmail: "email",
-  ctAddress: "address",
-  ctHours: "hours",
-  ctTopNote: "topNote",
-  ctFooterAbout: "footerAbout",
-  ctFooterCopyright: "footerCopyright"
-};
+// ---------- SİTE İÇERİĞİ (şema tabanlı editör) ----------
+// [anahtar, etiket, tip?] — tip "area" ise çok satırlı metin kutusu
+const CONTENT_SCHEMA = [
+  { group: "İletişim & Genel", fields: [
+    ["phone", "Telefon"], ["email", "E-posta"], ["address", "Adres"],
+    ["hours", "Çalışma saatleri"], ["topNote", "Üst bar notu"],
+    ["brandTagline", "Logo alt yazısı (ünvan)"], ["headerContactNote", "Başlıkta telefon altı not"]
+  ]},
+  { group: "Avantaj Şeridi", fields: [
+    ["strip1", "1. madde"], ["strip2", "2. madde"], ["strip3", "3. madde"], ["strip4", "4. madde"]
+  ]},
+  { group: "En Çok Satanlar Bölümü", fields: [
+    ["bestTitle", "Başlık"], ["bestText", "Açıklama", "area"]
+  ]},
+  { group: "Tasarruf Hesaplayıcı", fields: [
+    ["calcTitle", "Başlık"], ["calcText", "Açıklama", "area"],
+    ["calcNote1", "Madde 1"], ["calcNote2", "Madde 2"], ["calcNote3", "Madde 3"]
+  ]},
+  { group: "Süreç (4 Adım)", fields: [
+    ["procTitle", "Bölüm başlığı"],
+    ["step1Title", "1. adım başlık"], ["step1Text", "1. adım metin", "area"],
+    ["step2Title", "2. adım başlık"], ["step2Text", "2. adım metin", "area"],
+    ["step3Title", "3. adım başlık"], ["step3Text", "3. adım metin", "area"],
+    ["step4Title", "4. adım başlık"], ["step4Text", "4. adım metin", "area"]
+  ]},
+  { group: "Proje Galerisi", fields: [
+    ["galTitle", "Başlık"], ["galText", "Açıklama", "area"],
+    ["gal1", "1. görsel yazısı"], ["gal2", "2. görsel yazısı"], ["gal3", "3. görsel yazısı"],
+    ["gal4", "4. görsel yazısı"], ["gal5", "5. görsel yazısı"]
+  ]},
+  { group: "Referanslar (Yorumlar)", fields: [
+    ["refTitle", "Bölüm başlığı"],
+    ["testi1Text", "1. yorum", "area"], ["testi1Name", "1. isim"], ["testi1Role", "1. bilgi (şehir/sistem)"],
+    ["testi2Text", "2. yorum", "area"], ["testi2Name", "2. isim"], ["testi2Role", "2. bilgi"],
+    ["testi3Text", "3. yorum", "area"], ["testi3Name", "3. isim"], ["testi3Role", "3. bilgi"]
+  ]},
+  { group: "Sık Sorulan Sorular", fields: [
+    ["faqTitle", "Bölüm başlığı"],
+    ["faqQ1", "1. soru"], ["faqA1", "1. cevap", "area"],
+    ["faqQ2", "2. soru"], ["faqA2", "2. cevap", "area"],
+    ["faqQ3", "3. soru"], ["faqA3", "3. cevap", "area"],
+    ["faqQ4", "4. soru"], ["faqA4", "4. cevap", "area"],
+    ["faqQ5", "5. soru"], ["faqA5", "5. cevap", "area"],
+    ["faqQ6", "6. soru"], ["faqA6", "6. cevap", "area"],
+    ["faqQ7", "7. soru"], ["faqA7", "7. cevap", "area"]
+  ]},
+  { group: "Alt Çağrı (CTA)", fields: [
+    ["ctaTitle", "Başlık"], ["ctaText", "Açıklama", "area"]
+  ]},
+  { group: "İletişim Bölümü", fields: [
+    ["contactTitle", "Başlık"], ["contactText", "Açıklama", "area"]
+  ]},
+  { group: "Neden Biz (6 Kart)", fields: [
+    ["whyTitle", "Bölüm başlığı"], ["whyText", "Açıklama", "area"],
+    ["why1Title", "1. kart başlık"], ["why1Text", "1. kart metin", "area"],
+    ["why2Title", "2. kart başlık"], ["why2Text", "2. kart metin", "area"],
+    ["why3Title", "3. kart başlık"], ["why3Text", "3. kart metin", "area"],
+    ["why4Title", "4. kart başlık"], ["why4Text", "4. kart metin", "area"],
+    ["why5Title", "5. kart başlık"], ["why5Text", "5. kart metin", "area"],
+    ["why6Title", "6. kart başlık"], ["why6Text", "6. kart metin", "area"]
+  ]},
+  { group: "Footer (Sayfa Altı)", fields: [
+    ["footerAbout", "Açıklama metni", "area"], ["footerCopyright", "En alt satır (telif)"]
+  ]}
+];
+const CONTENT_KEYS = [];
 
 function loadContentForm() {
   const site = Store.getSiteContent();
-  Object.entries(CONTENT_FIELDS).forEach(([id, key]) => {
-    document.getElementById(id).value = site[key] || "";
-  });
+  CONTENT_KEYS.length = 0;
+  document.getElementById("contentFields").innerHTML = CONTENT_SCHEMA.map((sec) => {
+    const rows = sec.fields.map(([key, label, type]) => {
+      CONTENT_KEYS.push(key);
+      const val = escHtml(site[key] != null ? site[key] : "");
+      const input = type === "area"
+        ? `<textarea id="ct_${key}" rows="2">${val}</textarea>`
+        : `<input type="text" id="ct_${key}" value="${val}">`;
+      return `<div class="form-group"><label for="ct_${key}">${escHtml(label)}</label>${input}</div>`;
+    }).join("");
+    return `<h2 class="content-group-title">${escHtml(sec.group)}</h2>${rows}`;
+  }).join("");
 }
 
 document.getElementById("contentForm").addEventListener("submit", (e) => {
   e.preventDefault();
   const data = {};
-  Object.entries(CONTENT_FIELDS).forEach(([id, key]) => {
-    data[key] = document.getElementById(id).value.trim();
+  CONTENT_KEYS.forEach((key) => {
+    const el = document.getElementById("ct_" + key);
+    if (el) data[key] = el.value.trim();
   });
   Store.saveSiteContent(data);
+  applySiteContent(document); // admin sayfasındaki data-site öğeleri varsa güncelle
   const status = document.getElementById("contentStatus");
-  status.textContent = "Site içeriği kaydedildi. Sitede otomatik güncellenecektir.";
+  status.textContent = "Tüm site içeriği kaydedildi. Sitede otomatik güncellenecektir.";
   status.className = "form-status ok";
+  window.scrollTo(0, 0);
 });
 
 loadContentForm();

@@ -5,6 +5,16 @@
   background: #f1f5f9;
 }
 
+/* Site İçeriği editöründe bölüm başlıkları */
+.content-group-title {
+  font-size: 14px;
+  color: var(--navy);
+  margin: 22px 0 10px;
+  padding-bottom: 6px;
+  border-bottom: 2px solid #e2e8f0;
+}
+.content-group-title:first-child { margin-top: 0; }
+
 /* ---- Kenar menü ---- */
 .admin-sidebar {
   width: 240px;

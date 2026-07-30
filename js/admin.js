@@ -726,34 +726,102 @@ document.getElementById("userForm").addEventListener("submit", async (e) => {
   renderUsers();
 });
 
-// ---------- SİTE İÇERİĞİ ----------
-const CONTENT_FIELDS = {
-  ctPhone: "phone",
-  ctEmail: "email",
-  ctAddress: "address",
-  ctHours: "hours",
-  ctTopNote: "topNote",
-  ctFooterAbout: "footerAbout",
-  ctFooterCopyright: "footerCopyright"
-};
+// ---------- SİTE İÇERİĞİ (şema tabanlı editör) ----------
+// [anahtar, etiket, tip?] — tip "area" ise çok satırlı metin kutusu
+const CONTENT_SCHEMA = [
+  { group: "İletişim & Genel", fields: [
+    ["phone", "Telefon"], ["email", "E-posta"], ["address", "Adres"],
+    ["hours", "Çalışma saatleri"], ["topNote", "Üst bar notu"],
+    ["brandTagline", "Logo alt yazısı (ünvan)"], ["headerContactNote", "Başlıkta telefon altı not"]
+  ]},
+  { group: "Avantaj Şeridi", fields: [
+    ["strip1", "1. madde"], ["strip2", "2. madde"], ["strip3", "3. madde"], ["strip4", "4. madde"]
+  ]},
+  { group: "En Çok Satanlar Bölümü", fields: [
+    ["bestTitle", "Başlık"], ["bestText", "Açıklama", "area"]
+  ]},
+  { group: "Tasarruf Hesaplayıcı", fields: [
+    ["calcTitle", "Başlık"], ["calcText", "Açıklama", "area"],
+    ["calcNote1", "Madde 1"], ["calcNote2", "Madde 2"], ["calcNote3", "Madde 3"]
+  ]},
+  { group: "Süreç (4 Adım)", fields: [
+    ["procTitle", "Bölüm başlığı"],
+    ["step1Title", "1. adım başlık"], ["step1Text", "1. adım metin", "area"],
+    ["step2Title", "2. adım başlık"], ["step2Text", "2. adım metin", "area"],
+    ["step3Title", "3. adım başlık"], ["step3Text", "3. adım metin", "area"],
+    ["step4Title", "4. adım başlık"], ["step4Text", "4. adım metin", "area"]
+  ]},
+  { group: "Proje Galerisi", fields: [
+    ["galTitle", "Başlık"], ["galText", "Açıklama", "area"],
+    ["gal1", "1. görsel yazısı"], ["gal2", "2. görsel yazısı"], ["gal3", "3. görsel yazısı"],
+    ["gal4", "4. görsel yazısı"], ["gal5", "5. görsel yazısı"]
+  ]},
+  { group: "Referanslar (Yorumlar)", fields: [
+    ["refTitle", "Bölüm başlığı"],
+    ["testi1Text", "1. yorum", "area"], ["testi1Name", "1. isim"], ["testi1Role", "1. bilgi (şehir/sistem)"],
+    ["testi2Text", "2. yorum", "area"], ["testi2Name", "2. isim"], ["testi2Role", "2. bilgi"],
+    ["testi3Text", "3. yorum", "area"], ["testi3Name", "3. isim"], ["testi3Role", "3. bilgi"]
+  ]},
+  { group: "Sık Sorulan Sorular", fields: [
+    ["faqTitle", "Bölüm başlığı"],
+    ["faqQ1", "1. soru"], ["faqA1", "1. cevap", "area"],
+    ["faqQ2", "2. soru"], ["faqA2", "2. cevap", "area"],
+    ["faqQ3", "3. soru"], ["faqA3", "3. cevap", "area"],
+    ["faqQ4", "4. soru"], ["faqA4", "4. cevap", "area"],
+    ["faqQ5", "5. soru"], ["faqA5", "5. cevap", "area"],
+    ["faqQ6", "6. soru"], ["faqA6", "6. cevap", "area"],
+    ["faqQ7", "7. soru"], ["faqA7", "7. cevap", "area"]
+  ]},
+  { group: "Alt Çağrı (CTA)", fields: [
+    ["ctaTitle", "Başlık"], ["ctaText", "Açıklama", "area"]
+  ]},
+  { group: "İletişim Bölümü", fields: [
+    ["contactTitle", "Başlık"], ["contactText", "Açıklama", "area"]
+  ]},
+  { group: "Neden Biz (6 Kart)", fields: [
+    ["whyTitle", "Bölüm başlığı"], ["whyText", "Açıklama", "area"],
+    ["why1Title", "1. kart başlık"], ["why1Text", "1. kart metin", "area"],
+    ["why2Title", "2. kart başlık"], ["why2Text", "2. kart metin", "area"],
+    ["why3Title", "3. kart başlık"], ["why3Text", "3. kart metin", "area"],
+    ["why4Title", "4. kart başlık"], ["why4Text", "4. kart metin", "area"],
+    ["why5Title", "5. kart başlık"], ["why5Text", "5. kart metin", "area"],
+    ["why6Title", "6. kart başlık"], ["why6Text", "6. kart metin", "area"]
+  ]},
+  { group: "Footer (Sayfa Altı)", fields: [
+    ["footerAbout", "Açıklama metni", "area"], ["footerCopyright", "En alt satır (telif)"]
+  ]}
+];
+const CONTENT_KEYS = [];
 
 function loadContentForm() {
   const site = Store.getSiteContent();
-  Object.entries(CONTENT_FIELDS).forEach(([id, key]) => {
-    document.getElementById(id).value = site[key] || "";
-  });
+  CONTENT_KEYS.length = 0;
+  document.getElementById("contentFields").innerHTML = CONTENT_SCHEMA.map((sec) => {
+    const rows = sec.fields.map(([key, label, type]) => {
+      CONTENT_KEYS.push(key);
+      const val = escHtml(site[key] != null ? site[key] : "");
+      const input = type === "area"
+        ? `<textarea id="ct_${key}" rows="2">${val}</textarea>`
+        : `<input type="text" id="ct_${key}" value="${val}">`;
+      return `<div class="form-group"><label for="ct_${key}">${escHtml(label)}</label>${input}</div>`;
+    }).join("");
+    return `<h2 class="content-group-title">${escHtml(sec.group)}</h2>${rows}`;
+  }).join("");
 }
 
 document.getElementById("contentForm").addEventListener("submit", (e) => {
   e.preventDefault();
   const data = {};
-  Object.entries(CONTENT_FIELDS).forEach(([id, key]) => {
-    data[key] = document.getElementById(id).value.trim();
+  CONTENT_KEYS.forEach((key) => {
+    const el = document.getElementById("ct_" + key);
+    if (el) data[key] = el.value.trim();
   });
   Store.saveSiteContent(data);
+  applySiteContent(document); // admin sayfasındaki data-site öğeleri varsa güncelle
   const status = document.getElementById("contentStatus");
-  status.textContent = "Site içeriği kaydedildi. Sitede otomatik güncellenecektir.";
+  status.textContent = "Tüm site içeriği kaydedildi. Sitede otomatik güncellenecektir.";
   status.className = "form-status ok";
+  window.scrollTo(0, 0);
 });
 
 loadContentForm();

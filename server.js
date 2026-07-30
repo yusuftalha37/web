@@ -64,6 +64,11 @@ function loadDB() {
   catch (_) { DB = JSON.parse(JSON.stringify(SEED)); }
   ["products", "categories", "slides", "kv", "orders", "leads", "users"].forEach((t) => { if (!DB[t]) DB[t] = []; });
 
+  // Oturum jetonlarını yeniden başlatmada koru (yoksa admin her yeniden
+  // başlatmada oturumdan düşer ve kullanıcı/sipariş listeleri boş görünür).
+  if (!DB.tokens) DB.tokens = {};
+  Object.entries(DB.tokens).forEach(([tk, uid]) => tokens.set(tk, uid));
+
   // İlk kurulumda varsayılan yönetici hesabı
   if (!DB.users.some((u) => u.role === "admin")) {
     DB.users.push(makeUser("admin@quantorasolar.com.tr", "admin123", "Site Yöneticisi", "", "admin"));
@@ -144,6 +149,8 @@ async function handleApi(req, res, u) {
     if (usr.blocked) return send(res, 400, { error: "blocked", error_description: "Bu hesap engellenmiş." });
     const tk = crypto.randomBytes(24).toString("hex");
     tokens.set(tk, usr.id);
+    if (!DB.tokens) DB.tokens = {};
+    DB.tokens[tk] = usr.id; saveDB();  // yeniden başlatmada oturum korunur
     return send(res, 200, { access_token: tk, token_type: "bearer", user: { id: usr.id, email: usr.email, user_metadata: { name: usr.name, phone: usr.phone } } });
   }
   if (u.pathname === "/auth/v1/signup") {
