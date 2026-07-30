@@ -223,12 +223,16 @@ function initSite(root) {
 
     // ---- Sol kenar: kategori listesi + güç/kapasite facet'i (ürünler sayfası) ----
     function buildCatList() {
+      const item = (c) => {
+        const n = PRODUCTS.filter((p) => p.cat === c.id).length;
+        return `<li><button class="cat-link${currentCat === c.id ? " active" : ""}" data-cat="${c.id}">${escHtml(c.name)} <span>${n}</span></button></li>`;
+      };
+      const normal = CATEGORIES.filter((c) => c.kind !== "brand");
+      const brands = CATEGORIES.filter((c) => c.kind === "brand");
       catList.innerHTML =
         `<li><button class="cat-link${currentCat === "all" ? " active" : ""}" data-cat="all">Tüm Ürünler <span>${PRODUCTS.length}</span></button></li>` +
-        CATEGORIES.map((c) => {
-          const n = PRODUCTS.filter((p) => p.cat === c.id).length;
-          return `<li><button class="cat-link${currentCat === c.id ? " active" : ""}" data-cat="${c.id}">${escHtml(c.name)} <span>${n}</span></button></li>`;
-        }).join("");
+        normal.map(item).join("") +
+        (brands.length ? `<li class="cat-group-title">Markalar</li>` + brands.map(item).join("") : "");
     }
 
     function buildPowerFacet() {
@@ -358,17 +362,20 @@ function initSite(root) {
 
   if (catbarLinks || catbarDropdown) {
     const catIcon = (c) => c.image ? `<img class="catbar-ico" src="${escHtml(c.image)}" alt="">` : "";
+    const normalCats = CATEGORIES.filter((c) => c.kind !== "brand");
+    const brandCats = CATEGORIES.filter((c) => c.kind === "brand");
     if (catbarLinks) {
-      catbarLinks.innerHTML = CATEGORIES.map(
+      // Yatay çubukta ürün kategorileri; markalar açılır listede "Markalar" altında
+      catbarLinks.innerHTML = normalCats.map(
         (c) => `<a href="${pageLink("urunler.html")}" class="catbar-link" data-cat="${c.id}">${catIcon(c)}${escHtml(c.name)}</a>`
       ).join("");
     }
     if (catbarDropdown) {
+      const item = (c) => `<li><a href="${pageLink("urunler.html")}" data-cat="${c.id}">${catIcon(c)}${escHtml(c.name)}</a></li>`;
       catbarDropdown.innerHTML =
         `<li><a href="${pageLink("urunler.html")}" data-cat="all">Tüm Ürünler</a></li>` +
-        CATEGORIES.map(
-          (c) => `<li><a href="${pageLink("urunler.html")}" data-cat="${c.id}">${catIcon(c)}${escHtml(c.name)}</a></li>`
-        ).join("");
+        normalCats.map(item).join("") +
+        (brandCats.length ? `<li class="catbar-group">Markalar</li>` + brandCats.map(item).join("") : "");
     }
 
     const onProductsPage = !!$("#catList");

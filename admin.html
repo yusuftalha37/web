@@ -148,11 +148,20 @@
       <div class="admin-panel settings-panel">
         <h2>Yeni Kategori Ekle</h2>
         <form id="catForm">
-          <div class="form-group">
-            <label for="catNameInput">Kategori adı</label>
-            <input type="text" id="catNameInput" required placeholder="Örn. Şarj Kontrol Cihazları">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="catNameInput">Kategori / marka adı</label>
+              <input type="text" id="catNameInput" required placeholder="Örn. Şarj Kontrol Cihazları veya Lexron">
+            </div>
+            <div class="form-group">
+              <label for="catKind">Tür</label>
+              <select id="catKind">
+                <option value="">Ürün Kategorisi</option>
+                <option value="brand">Marka</option>
+              </select>
+            </div>
           </div>
-          <button type="submit" class="btn btn-small">Kategori Ekle</button>
+          <button type="submit" class="btn btn-small">Ekle</button>
           <p class="form-status" id="catStatus" role="status"></p>
         </form>
       </div>
@@ -161,7 +170,7 @@
         <input type="file" id="catImgFile" accept="image/*" hidden>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Görsel</th><th>Kategori</th><th>Ürün Sayısı</th><th></th></tr></thead>
+            <thead><tr><th>Görsel</th><th>Kategori / Marka</th><th>Tür</th><th>Ürün Sayısı</th><th></th></tr></thead>
             <tbody id="catRows"></tbody>
           </table>
         </div>

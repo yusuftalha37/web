@@ -400,20 +400,23 @@ function renderCategories() {
       const thumb = c.image
         ? `<img class="table-thumb" src="${escHtml(c.image)}" alt="">`
         : '<span class="table-thumb table-thumb-empty">—</span>';
+      const isBrand = c.kind === "brand";
       return `
       <tr>
         <td>${thumb}</td>
         <td class="cell-strong">${escHtml(c.name)}</td>
+        <td>${isBrand ? '<span class="pill pill-warn">Marka</span>' : "Kategori"}</td>
         <td>${count} ürün</td>
         <td class="cell-actions">
           <button class="row-btn" data-act="setimg" data-id="${c.id}">${c.image ? "Görseli Değiştir" : "Görsel Ekle"}</button>
           ${c.image ? `<button class="row-btn" data-act="rmimg" data-id="${c.id}">Görseli Kaldır</button>` : ""}
+          <button class="row-btn" data-act="togglekind" data-id="${c.id}">${isBrand ? "Kategoriye Çevir" : "Markaya Çevir"}</button>
           <button class="row-btn" data-act="rename" data-id="${c.id}">Yeniden Adlandır</button>
           <button class="row-btn row-btn-danger" data-act="delcat" data-id="${c.id}">Sil</button>
         </td>
       </tr>`;
     }).join("") ||
-    '<tr><td colspan="4" class="empty-row">Henüz kategori yok.</td></tr>';
+    '<tr><td colspan="5" class="empty-row">Henüz kategori yok.</td></tr>';
 }
 
 document.getElementById("catForm").addEventListener("submit", (e) => {
@@ -427,10 +430,12 @@ document.getElementById("catForm").addEventListener("submit", (e) => {
     status.className = "form-status err";
     return;
   }
-  Store.saveCategory({ name });
-  status.textContent = '"' + name + '" kategorisi eklendi.';
+  const kind = document.getElementById("catKind").value;
+  Store.saveCategory({ name, kind });
+  status.textContent = '"' + name + '" ' + (kind === "brand" ? "markası" : "kategorisi") + " eklendi.";
   status.className = "form-status ok";
   input.value = "";
+  document.getElementById("catKind").value = "";
   renderAll();
 });
 
@@ -464,6 +469,12 @@ document.getElementById("catRows").addEventListener("click", (e) => {
 
   if (act === "rmimg") {
     Store.saveCategory({ id, image: "" });
+    renderAll();
+    return;
+  }
+
+  if (act === "togglekind") {
+    Store.saveCategory({ id, kind: cat.kind === "brand" ? "" : "brand" });
     renderAll();
     return;
   }

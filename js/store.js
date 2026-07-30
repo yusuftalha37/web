@@ -199,7 +199,7 @@ const Store = (() => {
         sbSelect("kv", "select=*")
       ]);
       cache.products = products.map(fromDbProduct);
-      cache.categories = categories.map((c) => ({ id: c.id, name: c.name, image: c.image || "" }));
+      cache.categories = categories.map((c) => ({ id: c.id, name: c.name, image: c.image || "", kind: c.kind || "" }));
       cache.slides = slides.map(fromDbSlide);
       const kvMap = {};
       kv.forEach((row) => (kvMap[row.k] = row.v));
@@ -277,14 +277,16 @@ const Store = (() => {
       if (ex) {
         if (name) ex.name = name;
         if (cat.image !== undefined) ex.image = cat.image;
+        if (cat.kind !== undefined) ex.kind = cat.kind;
       }
       const row = { id: cat.id, name: ex ? ex.name : name };
       if (cat.image !== undefined) row.image = cat.image;
+      if (cat.kind !== undefined) row.kind = cat.kind;
       if (persist) return sbWrite("POST", "categories", "", row).catch(logErr);
     } else {
-      const nc = { id: "c-" + Date.now(), name, image: cat.image || "" };
+      const nc = { id: "c-" + Date.now(), name, image: cat.image || "", kind: cat.kind || "" };
       cache.categories.push(nc);
-      if (persist) return sbWrite("POST", "categories", "", { id: nc.id, name: nc.name, image: nc.image, sort: cache.categories.length }).catch(logErr);
+      if (persist) return sbWrite("POST", "categories", "", { id: nc.id, name: nc.name, image: nc.image, kind: nc.kind, sort: cache.categories.length }).catch(logErr);
     }
     write("gp-cats", cache.categories);
   }
