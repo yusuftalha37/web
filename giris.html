@@ -59,6 +59,11 @@
         <label for="regPass2">Şifre (tekrar)</label>
         <input type="password" id="regPass2" required placeholder="••••••••" autocomplete="new-password">
       </div>
+      <!-- Bot tuzağı: gerçek kullanıcılar göremez, boş kalmalıdır -->
+      <div class="hp-field" aria-hidden="true">
+        <label for="regWebsite">Web sitesi (boş bırakın)</label>
+        <input type="text" id="regWebsite" name="website" tabindex="-1" autocomplete="off">
+      </div>
       <button type="submit" class="btn btn-block">Hesap Oluştur</button>
       <p class="form-status" id="registerStatus" role="status"></p>
     </form>

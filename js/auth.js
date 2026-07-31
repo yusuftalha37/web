@@ -76,7 +76,8 @@ registerForm.addEventListener("submit", async (e) => {
     return;
   }
 
-  const result = await Store.register({ name, email, phone, pass });
+  const hp = document.getElementById("regWebsite");
+  const result = await Store.register({ name, email, phone, pass, website: hp ? hp.value : "" });
   if (!result.ok) {
     setStatus(status, result.error, false);
     return;

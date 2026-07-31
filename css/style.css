@@ -997,6 +997,19 @@ img, svg { max-width: 100%; }
 .blog-more { font-size: 13px; font-weight: bold; color: var(--orange-dark); text-decoration: none; }
 .blog-more:hover { text-decoration: underline; }
 
+/* Bot tuzağı alanı — ekranda görünmez ama botlar doldurur.
+   display:none yerine konumlandırma kullanılır (bazı botlar display:none'ı atlar). */
+.hp-field {
+  position: absolute !important;
+  left: -9999px !important;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
 .pd-notfound { text-align: center; padding: 40px 0; }
 .pd-notfound p { margin-bottom: 16px; color: var(--muted); }
 

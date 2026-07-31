@@ -497,6 +497,11 @@
           <label for="message">Mesajınız</label>
           <textarea id="message" name="message" rows="4" placeholder="Aylık fatura tutarınız, çatı tipiniz vb."></textarea>
         </div>
+        <!-- Bot tuzağı: gerçek kullanıcılar göremez, boş kalmalıdır -->
+        <div class="hp-field" aria-hidden="true">
+          <label for="website">Web sitesi (boş bırakın)</label>
+          <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+        </div>
         <button type="submit" class="btn btn-block">Mesaj Gönder</button>
         <p class="form-status" id="formStatus" role="status"></p>
         </div>

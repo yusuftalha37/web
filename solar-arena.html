@@ -1006,6 +1006,19 @@ img, svg { max-width: 100%; }
 .blog-more { font-size: 13px; font-weight: bold; color: var(--orange-dark); text-decoration: none; }
 .blog-more:hover { text-decoration: underline; }
 
+/* Bot tuzağı alanı — ekranda görünmez ama botlar doldurur.
+   display:none yerine konumlandırma kullanılır (bazı botlar display:none'ı atlar). */
+.hp-field {
+  position: absolute !important;
+  left: -9999px !important;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
 .pd-notfound { text-align: center; padding: 40px 0; }
 .pd-notfound p { margin-bottom: 16px; color: var(--muted); }
 
@@ -3035,6 +3048,11 @@ img, svg { max-width: 100%; }
           <label for="message">Mesajınız</label>
           <textarea id="message" name="message" rows="4" placeholder="Aylık fatura tutarınız, çatı tipiniz vb."></textarea>
         </div>
+        <!-- Bot tuzağı: gerçek kullanıcılar göremez, boş kalmalıdır -->
+        <div class="hp-field" aria-hidden="true">
+          <label for="website">Web sitesi (boş bırakın)</label>
+          <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+        </div>
         <button type="submit" class="btn btn-block">Mesaj Gönder</button>
         <p class="form-status" id="formStatus" role="status"></p>
         </div>
@@ -3611,6 +3629,11 @@ img, svg { max-width: 100%; }
       <div class="form-group">
         <label for="regPass2">Şifre (tekrar)</label>
         <input type="password" id="regPass2" required placeholder="••••••••" autocomplete="new-password">
+      </div>
+      <!-- Bot tuzağı: gerçek kullanıcılar göremez, boş kalmalıdır -->
+      <div class="hp-field" aria-hidden="true">
+        <label for="regWebsite">Web sitesi (boş bırakın)</label>
+        <input type="text" id="regWebsite" name="website" tabindex="-1" autocomplete="off">
       </div>
       <button type="submit" class="btn btn-block">Hesap Oluştur</button>
       <p class="form-status" id="registerStatus" role="status"></p>
@@ -4494,10 +4517,10 @@ const Store = (() => {
     return users;
   }
 
-  async function register({ name, email, phone, pass }) {
+  async function register({ name, email, phone, pass, website }) {
     email = (email || "").trim().toLowerCase();
     if (persist) {
-      const r = await gotrue("signup", { email, password: pass, data: { name: (name || "").trim(), phone: (phone || "").trim() } });
+      const r = await gotrue("signup", { email, password: pass, website: website || "", data: { name: (name || "").trim(), phone: (phone || "").trim() } });
       if (!r.ok) return { ok: false, error: (r.data && (r.data.msg || r.data.error_description)) || "Kayıt yapılamadı." };
       return { ok: true };
     }
@@ -4630,8 +4653,13 @@ const Store = (() => {
   // ===================== İLETİŞİM TALEPLERİ =====================
   function addLead(lead) {
     const row = { ...lead, date: Date.now() };
+    delete row.website;                       // bot tuzağı alanı yerelde saklanmaz
     cache.leads.unshift(row);
-    if (persist) return sbWrite("POST", "leads", "", { id: "l" + Date.now(), name: lead.name, phone: lead.phone, city: lead.city || "", type: lead.type || "", message: lead.message || "", created: row.date }).catch(logErr);
+    if (persist) return sbWrite("POST", "leads", "", {
+      name: lead.name, phone: lead.phone, city: lead.city || "",
+      type: lead.type || "", message: lead.message || "",
+      website: lead.website || ""             // sunucu bot tuzağını kontrol eder
+    }).catch(logErr);
     write("gp-leads", cache.leads);
   }
   function getLeads() { return cache.leads; }
@@ -5486,12 +5514,14 @@ function initSite(root) {
       }
 
       // Talep, admin panelinin "Talepler" bölümünde listelenmek üzere kaydedilir.
+      // website: bot tuzağı alanı (gerçek kullanıcıda daima boştur)
       Store.addLead({
         name: name.value.trim(),
         phone: phone.value.trim(),
         city: form.city.value.trim(),
         type: form.type.value,
-        message: form.message.value.trim()
+        message: form.message.value.trim(),
+        website: (form.website && form.website.value) || ""
       });
 
       formStatus.textContent =
@@ -5934,7 +5964,8 @@ registerForm.addEventListener("submit", async (e) => {
     return;
   }
 
-  const result = await Store.register({ name, email, phone, pass });
+  const hp = document.getElementById("regWebsite");
+  const result = await Store.register({ name, email, phone, pass, website: hp ? hp.value : "" });
   if (!result.ok) {
     setStatus(status, result.error, false);
     return;

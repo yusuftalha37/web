@@ -48,3 +48,22 @@ YONETICI GIRISI (ilk acilis):
   isterseniz KURULUM-WINDOWS.md (NSSM) ve KURULUM-CLOUDFLARE.md
   (cloudflared service install) adimlarini uygulayin.
 ========================================================
+
+--------------------------------------------------------
+
+GUVENLIK (onemli)
+
+  * Site yalnizca Cloudflare Tunnel uzerinden yayinlanir. Sunucu
+    disariya dogrudan acik degildir (yalnizca 127.0.0.1 dinlenir).
+    Bu bilincli bir guvenlik tercihidir.
+
+  * Bu yuzden siteyi YEREL AGDAKI baska bir bilgisayardan
+    http://192.168.x.x:3000 seklinde acamazsiniz. Test icin
+    sunucunun kendisinde http://localhost:3000 kullanin ya da
+    https://solararena.store adresinden girin.
+
+  * Ilk is: yonetici sifrenizi degistirin (Hesabim > Sifre Degistir).
+
+  * Ayrintili guvenlik rehberi ve Cloudflare ayarlari icin
+    GUVENLIK.md dosyasina bakin.
+========================================================

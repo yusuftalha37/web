@@ -15,6 +15,16 @@ const path = require("path");
 const crypto = require("crypto");
 
 const PORT = process.env.PORT || 3000;
+// GÜVENLİK: Varsayılan olarak yalnızca yerel arayüz dinlenir (127.0.0.1).
+// Cloudflare Tunnel sunucuya localhost üzerinden bağlandığı için bu yeterlidir
+// ve saldırganın tüneli atlayıp doğrudan sunucu IP'sine bağlanmasını önler.
+// Zorunlu hallerde: set HOST=0.0.0.0 (önerilmez, güvenlik duvarı şart).
+const HOST = process.env.HOST || "127.0.0.1";
+// Kabul edilen alan adları (Host başlığı doğrulaması — DNS rebinding ve
+// başka alan adından servis edilmeye karşı). Virgülle çoğaltılabilir:
+// set ALLOWED_HOSTS=solararena.store,www.solararena.store
+const ALLOWED_HOSTS = (process.env.ALLOWED_HOSTS || "solararena.store,www.solararena.store")
+  .split(",").map((h) => h.trim().toLowerCase()).filter(Boolean);
 const ROOT = __dirname;
 const DATA_FILE = path.join(ROOT, "data.json");
 
@@ -142,9 +152,24 @@ function revokeUserTokens(uid) {
 // -------------------- Kaba kuvvet (brute force) koruması --------------------
 const loginFails = new Map(); // ip -> { n, until }
 const MAX_FAILS = 8, LOCK_MS = 15 * 60 * 1000;
+// Bağlantının doğrudan geldiği adres (sahtelenemez)
+function socketIp(req) { return (req.socket && req.socket.remoteAddress) || "?"; }
+// Yerel/özel ağdan mı geliyor? (Cloudflare Tunnel localhost'tan bağlanır)
+function isLocalPeer(ip) {
+  return /^(::1|::ffff:127\.|127\.|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)/.test(String(ip));
+}
+// Gerçek ziyaretçi IP'si.
+// GÜVENLİK: cf-connecting-ip / x-forwarded-for başlıklarına YALNIZCA bağlantı
+// güvenilir bir kaynaktan (tünel = localhost) geliyorsa itibar edilir. Aksi
+// halde saldırgan bu başlığı uydurarak hız sınırını ve engelleri atlatabilirdi.
 function clientIp(req) {
-  // Cloudflare Tunnel arkasında gerçek IP bu başlıkta gelir
-  return (req.headers["cf-connecting-ip"] || String(req.headers["x-forwarded-for"] || "").split(",")[0].trim() || req.socket.remoteAddress || "?");
+  const peer = socketIp(req);
+  if (isLocalPeer(peer)) {
+    const fwd = req.headers["cf-connecting-ip"] ||
+      String(req.headers["x-forwarded-for"] || "").split(",")[0].trim();
+    if (fwd) return fwd;
+  }
+  return peer;
 }
 function isLocked(ip) {
   const f = loginFails.get(ip);
@@ -160,6 +185,95 @@ function noteFail(ip) {
   loginFails.set(ip, f);
 }
 function clearFails(ip) { loginFails.delete(ip); }
+
+// ============================================================
+//                  BOT / SALDIRI KORUMASI
+// ============================================================
+// Arama motoru botları (Google, Bing, Yandex...) ASLA engellenmez;
+// yalnızca saldırı araçları ve aşırı istek yapan kaynaklar sınırlanır.
+
+// Geçici yasaklı IP'ler: ip -> bitiş zamanı
+const banned = new Map();
+const BAN_MS = 60 * 60 * 1000; // 1 saat
+function isBanned(ip) {
+  const until = banned.get(ip);
+  if (!until) return false;
+  if (until > Date.now()) return true;
+  banned.delete(ip);
+  return false;
+}
+function banIp(ip, reason) {
+  banned.set(ip, Date.now() + BAN_MS);
+  if (banned.size > 10000) banned.clear();
+  console.warn("[GÜVENLİK] IP geçici engellendi: " + ip + " — " + reason);
+}
+
+// Saldırı araçları ve zararlı tarayıcılar (meşru botlar listede yok)
+const BAD_AGENT_RE = /(sqlmap|nikto|nmap|masscan|nessus|acunetix|havij|zgrab|dirbuster|gobuster|wpscan|hydra|metasploit|libwww-perl|python-requests\/|curl\/7\.(?:[0-9]|[1-4][0-9])\b.*scan)/i;
+// İyi niyetli arama motorları — hız sınırından muaf
+const GOOD_BOT_RE = /(googlebot|bingbot|slurp|duckduckbot|yandex(bot|images)|baiduspider|applebot|facebookexternalhit|twitterbot|linkedinbot|telegrambot|whatsapp|ahrefsbot|semrushbot|petalbot|uptimerobot)/i;
+
+// Sitede olmayan, tipik olarak zafiyet taranan yollar (WordPress, PHP, yedek, .env…)
+const PROBE_RE = /(\.php\b|\/wp-(admin|login|content|includes|json)|\/xmlrpc|\/phpmyadmin|\/pma\b|\/administrator\b|\/\.env|\/\.git|\/\.aws|\/config\.(php|json|bak)|\/backup|\/dump\.sql|\/shell|\/cgi-bin|\/vendor\/|\/\.well-known\/(?!acme)|\/solr|\/jenkins|\/actuator|\/console\b|\/telescope|\/eval-stdin)/i;
+const probeHits = new Map(); // ip -> tarama sayısı
+
+// IP başına genel istek sayacı (kayan pencere)
+const reqHits = new Map();
+function generalRateExceeded(ip, limit, windowMs) {
+  const now = Date.now();
+  const arr = (reqHits.get(ip) || []).filter((t) => now - t < windowMs);
+  arr.push(now);
+  reqHits.set(ip, arr);
+  if (reqHits.size > 20000) reqHits.clear();
+  return arr.length > limit;
+}
+
+// Her isteğin geçtiği kapı. İzin verilmiyorsa true döner (yanıt yazılmıştır).
+function botGate(req, res, u) {
+  const ip = clientIp(req);
+  const ua = String(req.headers["user-agent"] || "");
+  const p = u.pathname;
+
+  // 0) Host başlığı doğrulaması — DNS rebinding, alan adı ele geçirme ve
+  //    tüneli atlayarak IP'den doğrudan erişim denemelerine karşı.
+  const host = String(req.headers.host || "").toLowerCase().split(":")[0].replace(/^\[|\]$/g, "");
+  const LOCAL_HOSTS = ["localhost", "127.0.0.1", "::1"];
+  const hostOk = !!host && (ALLOWED_HOSTS.includes(host) || LOCAL_HOSTS.includes(host));
+  if (!hostOk) {
+    send(res, 421, { error: "misdirected_request", error_description: "Bu alan adı bu sunucuda yayınlanmıyor." });
+    return true;
+  }
+
+  if (isBanned(ip)) { send(res, 429, { error: "banned", error_description: "Çok fazla şüpheli istek. Bir süre sonra tekrar deneyin." }); return true; }
+
+  // 1) Saldırı aracı imzası → anında engelle
+  if (BAD_AGENT_RE.test(ua)) { banIp(ip, "saldırı aracı: " + ua.slice(0, 60)); send(res, 403, { error: "forbidden" }); return true; }
+
+  // 2) User-Agent'sız yazma isteği (basit botlar) → reddet (okuma serbest)
+  if (!ua && req.method !== "GET" && req.method !== "HEAD") { send(res, 403, { error: "forbidden" }); return true; }
+
+  // 3) Zafiyet taraması: 5 farklı denemeden sonra engelle
+  if (PROBE_RE.test(p)) {
+    const n = (probeHits.get(ip) || 0) + 1;
+    probeHits.set(ip, n);
+    if (probeHits.size > 10000) probeHits.clear();
+    if (n >= 5) banIp(ip, "zafiyet taraması (" + n + " deneme, son: " + p.slice(0, 60) + ")");
+    send(res, 404, { error: "not found" });
+    return true;
+  }
+
+  // 4) Genel hız sınırı — arama motoru botları muaf
+  if (!GOOD_BOT_RE.test(ua)) {
+    const isApi = p.startsWith("/rest/v1/") || p.startsWith("/auth/v1/");
+    // Sayfa+varlık yüklemeleri doğal olarak çok olur; API daha sıkı
+    const limit = isApi ? 120 : 300;
+    if (generalRateExceeded(ip, limit, 60 * 1000)) {
+      send(res, 429, { error: "rate_limited", error_description: "Çok fazla istek. Lütfen biraz yavaşlayın." }, { "Retry-After": "60" });
+      return true;
+    }
+  }
+  return false;
+}
 
 // -------------------- Basit istek hız sınırı (spam/DoS) --------------------
 const rateHits = new Map(); // ip -> [zaman damgaları]
@@ -283,6 +397,11 @@ async function handleApi(req, res, u) {
     if (tooManyRequests("signup:" + ip, 5, 60 * 60 * 1000)) return send(res, 429, { msg: "Çok fazla kayıt denemesi. Daha sonra tekrar deneyin." });
     const b = await readBody(req, MAX_BODY_SMALL);
     if (b.__tooLarge) return send(res, 413, { msg: "İstek çok büyük." });
+    // Bal küpü: bot kaydını sessizce düşür
+    if (String(b.website || b.hp_field || "").trim() !== "") {
+      console.warn("[BOT] honeypot doldurulmuş kayıt düşürüldü (ip " + ip + ")");
+      return send(res, 200, { user: { id: "u000000" } });
+    }
     const email = String(b.email || "").toLowerCase().trim();
     const pass = String(b.password || "");
     if (!EMAIL_RE.test(email) || email.length > 190) return send(res, 400, { msg: "Geçerli bir e-posta adresi girin." });
@@ -371,6 +490,13 @@ async function handleApi(req, res, u) {
       // Anonim yazılabilen tablolar: hız sınırı + katı doğrulama
       if (tooManyRequests(table + ":" + ip, table === "orders" ? 10 : 5, 10 * 60 * 1000)) {
         return send(res, 429, { error: "too_many", error_description: "Çok fazla istek gönderdiniz. Lütfen biraz sonra tekrar deneyin." });
+      }
+      // Bal küpü (honeypot): gerçek kullanıcıya görünmeyen alan doldurulmuşsa
+      // gönderen bir bottur. Anladığını belli etmemek için başarılı yanıt
+      // döneriz ama kaydetmeyiz.
+      if (String(b.website || b.hp_field || "").trim() !== "") {
+        console.warn("[BOT] honeypot doldurulmuş istek düşürüldü (" + table + ", ip " + ip + ")");
+        return send(res, 201, table === "orders" ? { id: "SA000000", total: 0 } : null);
       }
       const S = (v, n) => String(v == null ? "" : v).slice(0, n);
       if (table === "orders") {
@@ -468,15 +594,58 @@ async function handleApi(req, res, u) {
 
 // -------------------- Sunucu --------------------
 loadDB();
-http.createServer(async (req, res) => {
-  const u = new URL(req.url, "http://x");
+const server = http.createServer({
+  // Zaman aşımı denetimi sık yapılsın (varsayılan 30 sn çok geç kalıyor)
+  connectionsCheckingInterval: 2 * 1000,
+  headersTimeout: 10 * 1000,
+  requestTimeout: 60 * 1000,
+  keepAliveTimeout: 15 * 1000,
+  maxHeaderSize: 16 * 1024
+}, async (req, res) => {
+  let u;
+  try { u = new URL(req.url, "http://x"); }
+  catch (_) { send(res, 400, { error: "bad request" }); return; }
+
+  // Yalnızca beklenen HTTP metotları
+  if (!["GET", "HEAD", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"].includes(req.method)) {
+    send(res, 405, { error: "method" }); return;
+  }
+  // Bot / saldırı filtresi
+  if (botGate(req, res, u)) return;
+
   if (u.pathname.startsWith("/rest/v1/") || u.pathname.startsWith("/auth/v1/")) {
     try { await handleApi(req, res, u); }
     catch (e) { console.error(e); send(res, 500, { error: "server" }); }
   } else {
     serveStatic(req, res);
   }
-}).listen(PORT, () => {
+});
+
+// Yavaş bağlantı (slowloris) ve takılı soket koruması
+server.headersTimeout = 10 * 1000;   // başlıklar 10 sn içinde tamamlanmalı
+server.requestTimeout = 60 * 1000;   // istek en fazla 60 sn sürebilir
+server.keepAliveTimeout = 15 * 1000;
+server.timeout = 90 * 1000;          // hareketsiz soketi kapat
+server.maxHeadersCount = 100;
+// Node zaman aşımlarını varsayılan 30 sn yerine 2 sn'de bir denetlesin,
+// böylece yarım bırakılmış bağlantılar hızla düşer.
+server.connectionsCheckingInterval = 2 * 1000;
+// Eşzamanlı bağlantı tavanı (bağlantı taşırma saldırısı)
+server.maxConnections = 512;
+server.on("clientError", (err, socket) => {
+  if (socket.writable) socket.end("HTTP/1.1 400 Bad Request\r\nConnection: close\r\n\r\n");
+});
+
+// Beklenmedik hata sunucuyu düşürmesin
+process.on("uncaughtException", (e) => console.error("[HATA]", e && e.message ? e.message : e));
+process.on("unhandledRejection", (e) => console.error("[HATA]", e && e.message ? e.message : e));
+
+server.listen(PORT, HOST, () => {
   console.log("Solar Arena sunucusu çalışıyor:  http://localhost:" + PORT);
   console.log("Veri dosyası: " + DATA_FILE);
+  console.log("Bot koruması: AÇIK (hız sınırı, tarama tespiti, saldırı aracı filtresi, bal küpü)");
+  console.log("Dinlenen adres: " + HOST + (HOST === "127.0.0.1"
+    ? "  (yalnızca yerel — dışarıya Cloudflare Tunnel üzerinden açılır)"
+    : "  ⚠ TÜM AĞ ARAYÜZLERİ — güvenlik duvarı kurallarınızı kontrol edin!"));
+  console.log("İzin verilen alan adları: " + ALLOWED_HOSTS.join(", ") + ", localhost");
 });

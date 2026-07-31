@@ -551,12 +551,14 @@ function initSite(root) {
       }
 
       // Talep, admin panelinin "Talepler" bölümünde listelenmek üzere kaydedilir.
+      // website: bot tuzağı alanı (gerçek kullanıcıda daima boştur)
       Store.addLead({
         name: name.value.trim(),
         phone: phone.value.trim(),
         city: form.city.value.trim(),
         type: form.type.value,
-        message: form.message.value.trim()
+        message: form.message.value.trim(),
+        website: (form.website && form.website.value) || ""
       });
 
       formStatus.textContent =

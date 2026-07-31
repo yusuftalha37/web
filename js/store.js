@@ -333,10 +333,10 @@ const Store = (() => {
     return users;
   }
 
-  async function register({ name, email, phone, pass }) {
+  async function register({ name, email, phone, pass, website }) {
     email = (email || "").trim().toLowerCase();
     if (persist) {
-      const r = await gotrue("signup", { email, password: pass, data: { name: (name || "").trim(), phone: (phone || "").trim() } });
+      const r = await gotrue("signup", { email, password: pass, website: website || "", data: { name: (name || "").trim(), phone: (phone || "").trim() } });
       if (!r.ok) return { ok: false, error: (r.data && (r.data.msg || r.data.error_description)) || "Kayıt yapılamadı." };
       return { ok: true };
     }
@@ -469,8 +469,13 @@ const Store = (() => {
   // ===================== İLETİŞİM TALEPLERİ =====================
   function addLead(lead) {
     const row = { ...lead, date: Date.now() };
+    delete row.website;                       // bot tuzağı alanı yerelde saklanmaz
     cache.leads.unshift(row);
-    if (persist) return sbWrite("POST", "leads", "", { id: "l" + Date.now(), name: lead.name, phone: lead.phone, city: lead.city || "", type: lead.type || "", message: lead.message || "", created: row.date }).catch(logErr);
+    if (persist) return sbWrite("POST", "leads", "", {
+      name: lead.name, phone: lead.phone, city: lead.city || "",
+      type: lead.type || "", message: lead.message || "",
+      website: lead.website || ""             // sunucu bot tuzağını kontrol eder
+    }).catch(logErr);
     write("gp-leads", cache.leads);
   }
   function getLeads() { return cache.leads; }
