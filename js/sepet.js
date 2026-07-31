@@ -105,7 +105,7 @@ function initCartPage() {
   });
 
   // ---- Siparişi tamamla ----
-  document.getElementById("checkoutBtn").addEventListener("click", () => {
+  document.getElementById("checkoutBtn").addEventListener("click", async () => {
     const list = entries();
     if (list.length === 0) return;
 
@@ -133,9 +133,8 @@ function initCartPage() {
 
     const session = Store.session();
     const total = list.reduce((s, e) => s + e.product.price * e.qty, 0);
-    const orderId = "SA" + Date.now().toString().slice(-8);
     const order = {
-      id: orderId,
+      id: "SA" + Date.now().toString().slice(-8),
       customer: name.value.trim(),
       phone: phone.value.trim(),
       email: (email.value.trim() || (session ? session.email : "")),
@@ -143,11 +142,19 @@ function initCartPage() {
       address: address.value.trim(),
       payment: "eft",
       status: "Havale/EFT bekleniyor",
-      items: list.map((e) => ({ name: e.product.name, qty: e.qty, price: e.product.price })),
+      // Ürün kimliği gönderilir; tutarı sunucu kendi kataloğundan hesaplar
+      items: list.map((e) => ({ id: e.product.id, name: e.product.name, qty: e.qty, price: e.product.price })),
       total
     };
 
-    Store.addOrder(order);
+    const saved = await Store.addOrder(order);
+    if (saved && saved.ok === false) {
+      checkoutStatus.textContent = saved.error || "Sipariş oluşturulamadı, lütfen tekrar deneyin.";
+      checkoutStatus.className = "form-status err";
+      return;
+    }
+    const orderId = (saved && saved.id) || order.id;
+    const finalTotal = (saved && saved.total != null) ? saved.total : total;
 
     const s = Store.getSettings();
     const bankLines = [];
@@ -159,9 +166,9 @@ function initCartPage() {
       : "";
 
     showSuccess(
-      "<strong>Sipariş No: " + orderId + "</strong><br>" +
-      "Toplam <strong>" + money(total) + "</strong> tutarını aşağıdaki hesaba havale/EFT ile gönderin. " +
-      "Açıklamaya <strong>" + orderId + "</strong> yazmayı unutmayın." +
+      "<strong>Sipariş No: " + escHtml(orderId) + "</strong><br>" +
+      "Toplam <strong>" + money(finalTotal) + "</strong> tutarını aşağıdaki hesaba havale/EFT ile gönderin. " +
+      "Açıklamaya <strong>" + escHtml(orderId) + "</strong> yazmayı unutmayın." +
       bankHtml +
       "<span class='success-sub'>Ödemeniz görüldüğünde siparişiniz hazırlanıp kargolanır. Dilerseniz dekontu WhatsApp/e-posta ile iletebilirsiniz.</span>"
     );

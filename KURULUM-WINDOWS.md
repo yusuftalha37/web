@@ -46,15 +46,20 @@ node server.js
 Şunu görürsünüz:
 ```
 Solar Arena sunucusu çalışıyor:  http://localhost:3000
-→ Varsayılan yönetici: admin@solararena.store / admin123
+→ İLK KURULUM — YÖNETİCİ HESABI OLUŞTURULDU
+   E-posta: admin@solararena.store
+   Şifre  : (size özel rastgele şifre burada yazar)
 ```
 Tarayıcıda `http://localhost:3000` → site açılır. 🎉
 
 İlk açılışta `data.json` otomatik oluşur ve varsayılan ürünlerle,
 bir **yönetici hesabıyla** gelir:
 - E-posta: `admin@solararena.store`
-- Şifre: `admin123`
-- **Giriş yaptıktan sonra Hesabım > Şifre Değiştir ile mutlaka değiştirin.**
+- Şifre: **ilk çalıştırmada konsolda gösterilen rastgele şifre** (not alın, bir daha gösterilmez)
+- **Giriş yaptıktan sonra Hesabım > Şifre Değiştir ile kendi şifrenizi belirleyin.**
+
+> Güvenlik: sabit/tahmin edilebilir bir varsayılan şifre kullanılmaz; her
+> kurulum kendi rastgele şifresini üretir.
 
 ## 5) Sürekli çalışsın (Windows servisi)
 

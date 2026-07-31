@@ -69,11 +69,30 @@ function loadDB() {
   if (!DB.tokens) DB.tokens = {};
   Object.entries(DB.tokens).forEach(([tk, uid]) => tokens.set(tk, uid));
 
-  // İlk kurulumda varsayılan yönetici hesabı
+  // Süresi dolmuş oturum jetonlarını temizle
+  const now = Date.now();
+  let cleaned = false;
+  Object.entries(DB.tokens).forEach(([tk, v]) => {
+    const uid = typeof v === "string" ? v : v.uid;
+    const exp = typeof v === "string" ? now + TOKEN_TTL : v.exp;
+    if (exp > now) tokens.set(tk, { uid, exp });
+    else { delete DB.tokens[tk]; cleaned = true; }
+  });
+  if (cleaned) saveDB();
+
+  // İlk kurulumda yönetici hesabı — şifre RASTGELE üretilir ve konsola yazılır.
+  // (Sabit "admin123" herkesçe bilinebileceği için kullanılmaz.)
   if (!DB.users.some((u) => u.role === "admin")) {
-    DB.users.push(makeUser("admin@solararena.store", "admin123", "Site Yöneticisi", "", "admin"));
+    const pass = crypto.randomBytes(9).toString("base64").replace(/[+/=]/g, "").slice(0, 12);
+    DB.users.push(makeUser("admin@solararena.store", pass, "Site Yöneticisi", "", "admin"));
     saveDB();
-    console.log("→ Varsayılan yönetici: admin@solararena.store / admin123 (giriş sonrası şifreyi değiştirin)");
+    console.log("\n============================================================");
+    console.log("  İLK KURULUM — YÖNETİCİ HESABI OLUŞTURULDU");
+    console.log("  E-posta: admin@solararena.store");
+    console.log("  Şifre  : " + pass);
+    console.log("  Bu şifreyi bir yere not edin; bu ekran bir daha gösterilmez.");
+    console.log("  Giriş yaptıktan sonra Hesabım > Şifre Değiştir ile değiştirin.");
+    console.log("============================================================\n");
   }
 }
 let saveTimer = null;
@@ -95,22 +114,105 @@ function checkPass(pass, stored) {
   const h = crypto.scryptSync(pass, salt, 64).toString("hex");
   return crypto.timingSafeEqual(Buffer.from(hash), Buffer.from(h));
 }
-const tokens = new Map(); // token -> userId
+const TOKEN_TTL = 7 * 24 * 60 * 60 * 1000; // oturum ömrü: 7 gün
+const tokens = new Map(); // token -> { uid, exp }
 function userFromReq(req) {
   const auth = req.headers["authorization"] || "";
   const tk = auth.replace(/^Bearer\s+/i, "");
-  const uid = tokens.get(tk);
-  return uid ? DB.users.find((u) => u.id === uid) : null;
+  const rec = tokens.get(tk);
+  if (!rec) return null;
+  if (rec.exp <= Date.now()) {           // süresi dolmuş jetonu düşür
+    tokens.delete(tk);
+    if (DB.tokens) { delete DB.tokens[tk]; saveDB(); }
+    return null;
+  }
+  const usr = DB.users.find((u) => u.id === rec.uid) || null;
+  // Engellenen hesabın mevcut oturumu da geçersizdir
+  if (usr && usr.blocked) return null;
+  return usr;
+}
+// Bir kullanıcının tüm oturumlarını sonlandırır (engelleme/silme/şifre değişimi)
+function revokeUserTokens(uid) {
+  Object.entries(DB.tokens || {}).forEach(([tk, v]) => {
+    const id = typeof v === "string" ? v : v.uid;
+    if (id === uid) { delete DB.tokens[tk]; tokens.delete(tk); }
+  });
+}
+
+// -------------------- Kaba kuvvet (brute force) koruması --------------------
+const loginFails = new Map(); // ip -> { n, until }
+const MAX_FAILS = 8, LOCK_MS = 15 * 60 * 1000;
+function clientIp(req) {
+  // Cloudflare Tunnel arkasında gerçek IP bu başlıkta gelir
+  return (req.headers["cf-connecting-ip"] || String(req.headers["x-forwarded-for"] || "").split(",")[0].trim() || req.socket.remoteAddress || "?");
+}
+function isLocked(ip) {
+  const f = loginFails.get(ip);
+  if (!f) return false;
+  if (f.until && f.until > Date.now()) return true;
+  if (f.until && f.until <= Date.now()) { loginFails.delete(ip); }
+  return false;
+}
+function noteFail(ip) {
+  const f = loginFails.get(ip) || { n: 0, until: 0 };
+  f.n++;
+  if (f.n >= MAX_FAILS) { f.until = Date.now() + LOCK_MS; f.n = 0; }
+  loginFails.set(ip, f);
+}
+function clearFails(ip) { loginFails.delete(ip); }
+
+// -------------------- Basit istek hız sınırı (spam/DoS) --------------------
+const rateHits = new Map(); // ip -> [zaman damgaları]
+function tooManyRequests(ip, limit, windowMs) {
+  const now = Date.now();
+  const arr = (rateHits.get(ip) || []).filter((t) => now - t < windowMs);
+  arr.push(now);
+  rateHits.set(ip, arr);
+  if (rateHits.size > 5000) rateHits.clear(); // bellek koruması
+  return arr.length > limit;
 }
 
 // -------------------- Yardımcılar --------------------
 function send(res, code, obj, headers) {
-  res.writeHead(code, Object.assign({ "Content-Type": "application/json; charset=utf-8" }, headers || {}));
+  res.writeHead(code, Object.assign({ "Content-Type": "application/json; charset=utf-8" }, SECURITY_HEADERS, headers || {}));
   res.end(obj == null ? "" : JSON.stringify(obj));
 }
-function readBody(req) {
-  return new Promise((r) => { let d = ""; req.on("data", (c) => (d += c)); req.on("end", () => { try { r(d ? JSON.parse(d) : {}); } catch (_) { r({}); } }); });
+// Gövde okuma — boyut sınırlı (aşılırsa bağlantı kapatılır: bellek tüketimi DoS'u önler)
+const MAX_BODY = 8 * 1024 * 1024;   // 8 MB (ürün/slayt fotoğrafları base64 gelebilir)
+const MAX_BODY_SMALL = 256 * 1024;  // 256 KB (sipariş, form, giriş)
+function readBody(req, limit) {
+  const max = limit || MAX_BODY;
+  return new Promise((resolve) => {
+    let d = "", size = 0, done = false;
+    req.on("data", (c) => {
+      if (done) return;
+      size += c.length;
+      if (size > max) { done = true; resolve({ __tooLarge: true }); try { req.destroy(); } catch (_) {} return; }
+      d += c;
+    });
+    req.on("end", () => { if (done) return; done = true; try { resolve(d ? JSON.parse(d) : {}); } catch (_) { resolve({}); } });
+    req.on("error", () => { if (!done) { done = true; resolve({}); } });
+  });
 }
+const SECURITY_HEADERS = {
+  "X-Content-Type-Options": "nosniff",
+  "X-Frame-Options": "SAMEORIGIN",
+  "Referrer-Policy": "strict-origin-when-cross-origin",
+  "Permissions-Policy": "geolocation=(), microphone=(), camera=()",
+  // Dış kaynaklı script/çerçeve yüklenmesini engeller. Ürün görselleri
+  // data: (yüklenen fotoğraf) veya https: (bağlantı) olabildiği için img gevşek.
+  "Content-Security-Policy": [
+    "default-src 'self'",
+    "img-src 'self' data: https:",
+    "style-src 'self' 'unsafe-inline'",
+    "script-src 'self' 'unsafe-inline'",
+    "connect-src 'self'",
+    "frame-ancestors 'self'",
+    "base-uri 'self'",
+    "form-action 'self'",
+    "object-src 'none'"
+  ].join("; ")
+};
 function eqFilter(rows, params) {
   for (const [k, val] of params) {
     if (k === "select" || k === "order") continue;
@@ -122,16 +224,30 @@ function eqFilter(rows, params) {
 
 // -------------------- Statik dosya sunumu --------------------
 const MIME = { ".html": "text/html; charset=utf-8", ".css": "text/css; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".json": "application/json; charset=utf-8", ".svg": "image/svg+xml", ".png": "image/png", ".jpg": "image/jpeg", ".webp": "image/webp", ".ico": "image/x-icon", ".txt": "text/plain; charset=utf-8", ".xml": "application/xml" };
-const BLOCKED = new Set(["/data.json", "/server.js"]);
+// Hassas dosyalar: veri tabanı, kaynak kod, ayarlar, yedekler
+const BLOCKED_RE = /(^|\/)(data\.json|server\.js|mail-ayarlari\.json|config\.yml|baslat\.bat|package(-lock)?\.json)($|\.)|\.(tmp|bak|log|env|old|orig|save|swp)$|(^|\/)\.[^/]/i;
 function serveStatic(req, res) {
-  let p = decodeURIComponent(new URL(req.url, "http://x").pathname);
+  let p;
+  try { p = decodeURIComponent(new URL(req.url, "http://x").pathname); }
+  catch (_) { send(res, 400, { error: "bad request" }); return; }
   if (p === "/") p = "/index.html";
-  if (BLOCKED.has(p) || p.includes("..")) { send(res, 403, { error: "forbidden" }); return; }
+  p = p.replace(/\\/g, "/");                     // Windows ters bölü kaçışını engelle
+  if (p.includes("..") || p.includes("\0") || BLOCKED_RE.test(p)) { send(res, 403, { error: "forbidden" }); return; }
+
   const file = path.join(ROOT, p);
-  fs.readFile(file, (err, data) => {
-    if (err) { send(res, 404, { error: "not found" }); return; }
-    res.writeHead(200, { "Content-Type": MIME[path.extname(file).toLowerCase()] || "application/octet-stream" });
-    res.end(data);
+  // Yol normalize edildikten sonra hâlâ site klasörünün içinde mi? (traversal son savunma)
+  const rel = path.relative(ROOT, file);
+  if (rel.startsWith("..") || path.isAbsolute(rel)) { send(res, 403, { error: "forbidden" }); return; }
+
+  fs.stat(file, (err, st) => {
+    if (err || !st.isFile()) { send(res, 404, { error: "not found" }); return; }
+    fs.readFile(file, (err2, data) => {
+      if (err2) { send(res, 404, { error: "not found" }); return; }
+      res.writeHead(200, Object.assign({
+        "Content-Type": MIME[path.extname(file).toLowerCase()] || "application/octet-stream"
+      }, SECURITY_HEADERS));
+      res.end(data);
+    });
   });
 }
 
@@ -141,30 +257,58 @@ async function handleApi(req, res, u) {
   const caller = userFromReq(req);
   const isAdmin = caller && caller.role === "admin";
 
+  const ip = clientIp(req);
+  const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
   // ---- Kimlik doğrulama ----
   if (u.pathname === "/auth/v1/token") {
-    const b = await readBody(req);
-    const usr = DB.users.find((x) => x.email === (b.email || "").toLowerCase());
-    if (!usr || !checkPass(b.password || "", usr.pass)) return send(res, 400, { error: "invalid_grant", error_description: "Hatalı giriş" });
-    if (usr.blocked) return send(res, 400, { error: "blocked", error_description: "Bu hesap engellenmiş." });
-    const tk = crypto.randomBytes(24).toString("hex");
-    tokens.set(tk, usr.id);
+    if (isLocked(ip)) return send(res, 429, { error: "too_many", error_description: "Çok fazla hatalı deneme. 15 dakika sonra tekrar deneyin." });
+    const b = await readBody(req, MAX_BODY_SMALL);
+    if (b.__tooLarge) return send(res, 413, { error: "too_large" });
+    const usr = DB.users.find((x) => x.email === String(b.email || "").toLowerCase());
+    let okPass = false;
+    try { okPass = !!usr && checkPass(String(b.password || ""), usr.pass); } catch (_) { okPass = false; }
+    if (!okPass) { noteFail(ip); return send(res, 400, { error: "invalid_grant", error_description: "Hatalı giriş" }); }
+    if (usr.blocked) { noteFail(ip); return send(res, 400, { error: "blocked", error_description: "Bu hesap engellenmiş." }); }
+    clearFails(ip);
+    const tk = crypto.randomBytes(32).toString("hex");
+    const exp = Date.now() + TOKEN_TTL;
+    tokens.set(tk, { uid: usr.id, exp });
     if (!DB.tokens) DB.tokens = {};
-    DB.tokens[tk] = usr.id; saveDB();  // yeniden başlatmada oturum korunur
-    return send(res, 200, { access_token: tk, token_type: "bearer", user: { id: usr.id, email: usr.email, user_metadata: { name: usr.name, phone: usr.phone } } });
+    DB.tokens[tk] = { uid: usr.id, exp }; saveDB();  // yeniden başlatmada oturum korunur
+    return send(res, 200, { access_token: tk, token_type: "bearer", expires_in: Math.floor(TOKEN_TTL / 1000), user: { id: usr.id, email: usr.email, user_metadata: { name: usr.name, phone: usr.phone } } });
   }
   if (u.pathname === "/auth/v1/signup") {
-    const b = await readBody(req);
-    const email = (b.email || "").toLowerCase();
+    // Aynı IP'den seri hesap açmayı sınırla (spam kayıt)
+    if (tooManyRequests("signup:" + ip, 5, 60 * 60 * 1000)) return send(res, 429, { msg: "Çok fazla kayıt denemesi. Daha sonra tekrar deneyin." });
+    const b = await readBody(req, MAX_BODY_SMALL);
+    if (b.__tooLarge) return send(res, 413, { msg: "İstek çok büyük." });
+    const email = String(b.email || "").toLowerCase().trim();
+    const pass = String(b.password || "");
+    if (!EMAIL_RE.test(email) || email.length > 190) return send(res, 400, { msg: "Geçerli bir e-posta adresi girin." });
+    if (pass.length < 6 || pass.length > 200) return send(res, 400, { msg: "Şifre en az 6 karakter olmalıdır." });
     if (DB.users.some((x) => x.email === email)) return send(res, 400, { msg: "Bu e-posta zaten kayıtlı." });
-    const usr = makeUser(email, b.password || "", (b.data && b.data.name) || "", (b.data && b.data.phone) || "", "user");
+    // Rol daima "user" — istemci gövdesindeki role/blocked alanları yok sayılır
+    const usr = makeUser(email, pass, String((b.data && b.data.name) || "").slice(0, 120), String((b.data && b.data.phone) || "").slice(0, 40), "user");
     DB.users.push(usr); saveDB();
     return send(res, 200, { user: { id: usr.id } });
   }
   if (u.pathname === "/auth/v1/user" && req.method === "PUT") {
     if (!caller) return send(res, 401, { error: "unauthorized" });
-    const b = await readBody(req);
-    if (b.password) { const nu = makeUser(caller.email, b.password, caller.name, caller.phone, caller.role); caller.pass = nu.pass; saveDB(); }
+    const b = await readBody(req, MAX_BODY_SMALL);
+    if (b.__tooLarge) return send(res, 413, { error: "too_large" });
+    if (b.password) {
+      const np = String(b.password);
+      if (np.length < 6 || np.length > 200) return send(res, 400, { error: "weak_password", error_description: "Şifre en az 6 karakter olmalıdır." });
+      const nu = makeUser(caller.email, np, caller.name, caller.phone, caller.role);
+      caller.pass = nu.pass;
+      // Şifre değişince bu kullanıcının diğer oturumlarını düşür
+      Object.entries(DB.tokens || {}).forEach(([tk, v]) => {
+        const uid = typeof v === "string" ? v : v.uid;
+        if (uid === caller.id) { delete DB.tokens[tk]; tokens.delete(tk); }
+      });
+      saveDB();
+    }
     return send(res, 200, {});
   }
 
@@ -174,6 +318,9 @@ async function handleApi(req, res, u) {
   const table = m[1];
   const PUBLIC_READ = ["products", "categories", "slides", "kv"];
   const PUBLIC_INSERT = ["orders", "leads"];
+  // API üzerinden erişilebilecek tablolar (tokens/users gibi iç veriler dışarıda)
+  const ALLOWED_TABLES = ["products", "categories", "slides", "kv", "orders", "leads", "profiles"];
+  if (!ALLOWED_TABLES.includes(table)) return send(res, 404, { error: "not found" });
 
   if (req.method === "GET") {
     if (table === "profiles") {
@@ -208,7 +355,10 @@ async function handleApi(req, res, u) {
   }
 
   if (req.method === "POST") {
-    const b = await readBody(req);
+    // Yalnızca yöneticinin yazdığı tablolarda büyük gövdeye (fotoğraf) izin ver
+    const bodyLimit = (isAdmin && PUBLIC_READ.includes(table)) ? MAX_BODY : MAX_BODY_SMALL;
+    const b = await readBody(req, bodyLimit);
+    if (b.__tooLarge) return send(res, 413, { error: "too_large", error_description: "İstek çok büyük." });
     if (PUBLIC_READ.includes(table)) {
       if (!isAdmin) return send(res, 403, { error: "yalnızca yönetici" });
       const key = table === "kv" ? "k" : "id";
@@ -218,7 +368,47 @@ async function handleApi(req, res, u) {
       saveDB(); return send(res, 201, null);
     }
     if (PUBLIC_INSERT.includes(table)) {
-      DB[table].push(b); saveDB(); return send(res, 201, null);
+      // Anonim yazılabilen tablolar: hız sınırı + katı doğrulama
+      if (tooManyRequests(table + ":" + ip, table === "orders" ? 10 : 5, 10 * 60 * 1000)) {
+        return send(res, 429, { error: "too_many", error_description: "Çok fazla istek gönderdiniz. Lütfen biraz sonra tekrar deneyin." });
+      }
+      const S = (v, n) => String(v == null ? "" : v).slice(0, n);
+      if (table === "orders") {
+        // FİYAT SUNUCUDA HESAPLANIR — istemciden gelen price/total'a güvenilmez
+        const items = Array.isArray(b.items) ? b.items.slice(0, 50) : [];
+        if (!items.length) return send(res, 400, { error: "empty_order" });
+        let total = 0;
+        const safeItems = [];
+        for (const it of items) {
+          const qty = Math.min(Math.max(parseInt(it.qty, 10) || 0, 1), 999);
+          // Ürünü id ile, yoksa adıyla bul; fiyatı DAİMA kendi kataloğumuzdan al
+          const prod = DB.products.find((p) => (it.id && p.id === it.id)) ||
+                       DB.products.find((p) => p.name === it.name);
+          if (!prod) return send(res, 400, { error: "unknown_product", error_description: "Sepette geçersiz ürün var." });
+          const price = Number(prod.price) || 0;
+          total += price * qty;
+          safeItems.push({ id: prod.id, name: prod.name, qty, price });
+        }
+        const row = {
+          id: "SA" + crypto.randomBytes(5).toString("hex").toUpperCase(), // sipariş no sunucuda üretilir
+          customer: S(b.customer, 120), phone: S(b.phone, 40),
+          email: caller ? caller.email : S(b.email, 190),   // giriş yapılmışsa oturum e-postası esas
+          city: S(b.city, 80), address: S(b.address, 400),
+          payment: "eft", status: "Havale/EFT bekleniyor",
+          items: safeItems, total, created: Date.now()
+        };
+        if (!row.customer || !row.phone || !row.address) return send(res, 400, { error: "missing_fields", error_description: "Ad, telefon ve adres zorunludur." });
+        DB.orders.push(row); saveDB();
+        return send(res, 201, { id: row.id, total: row.total });
+      }
+      // leads (iletişim formu)
+      const lead = {
+        id: "l" + crypto.randomBytes(5).toString("hex"),
+        name: S(b.name, 120), phone: S(b.phone, 40), city: S(b.city, 80),
+        type: S(b.type, 80), message: S(b.message, 2000), created: Date.now()
+      };
+      if (!lead.name || !lead.phone) return send(res, 400, { error: "missing_fields" });
+      DB.leads.push(lead); saveDB(); return send(res, 201, null);
     }
     if (table === "profiles") {
       if (!caller) return send(res, 401, {});
@@ -229,7 +419,8 @@ async function handleApi(req, res, u) {
   }
 
   if (req.method === "PATCH") {
-    const b = await readBody(req);
+    const b = await readBody(req, isAdmin ? MAX_BODY : MAX_BODY_SMALL);
+    if (b.__tooLarge) return send(res, 413, { error: "too_large" });
     if (table === "profiles") {
       if (!caller) return send(res, 401, {});
       const idf = params.get("id");
@@ -238,16 +429,16 @@ async function handleApi(req, res, u) {
         const id = decodeURIComponent(idf.replace(/^eq\./, ""));
         const target = DB.users.find((x) => x.id === id);
         if (target && target.id !== caller.id) {
-          if (b.role != null) target.role = b.role;
-          if (b.blocked != null) target.blocked = !!b.blocked;
-          if (b.name != null) target.name = b.name;
-          if (b.phone != null) target.phone = b.phone;
+          if (b.role != null) { target.role = b.role === "admin" ? "admin" : "user"; revokeUserTokens(target.id); }
+          if (b.blocked != null) { target.blocked = !!b.blocked; if (target.blocked) revokeUserTokens(target.id); }
+          if (b.name != null) target.name = String(b.name).slice(0, 120);
+          if (b.phone != null) target.phone = String(b.phone).slice(0, 40);
         }
         saveDB(); return send(res, 204, null);
       }
-      // Aksi halde yalnızca kendi profilini günceller
-      if (b.name != null) caller.name = b.name;
-      if (b.phone != null) caller.phone = b.phone;
+      // Aksi halde yalnızca kendi profilini günceller (rol/engel değiştirilemez)
+      if (b.name != null) caller.name = String(b.name).slice(0, 120);
+      if (b.phone != null) caller.phone = String(b.phone).slice(0, 40);
       saveDB(); return send(res, 204, null);
     }
     if (PUBLIC_READ.includes(table)) {
@@ -265,7 +456,7 @@ async function handleApi(req, res, u) {
     const idf = params.get("id"); const id = idf ? decodeURIComponent(idf.replace("eq.", "")) : null;
     if (table === "profiles") {
       // yönetici kendi hesabını silemez
-      if (id && id !== caller.id) DB.users = DB.users.filter((x) => x.id !== id);
+      if (id && id !== caller.id) { DB.users = DB.users.filter((x) => x.id !== id); revokeUserTokens(id); }
       saveDB(); return send(res, 204, null);
     }
     if (DB[table]) DB[table] = DB[table].filter((r) => String(r.id) !== id);

@@ -34,8 +34,12 @@ NOT: Bu iki pencere ACIK KALMALI. Kapatirsaniz site kapanir.
 
 YONETICI GIRISI (ilk acilis):
   E-posta: admin@solararena.store
-  Sifre:   admin123
-  (Girdikten sonra Hesabim > Sifre Degistir ile mutlaka degistirin.)
+  Sifre  : ILK CALISTIRMADA SUNUCU PENCERESINDE YAZAR!
+
+  Ilk kez baslattiginizda "Quantora/Solar Arena Sunucu" penceresinde
+  size ozel rastgele bir sifre gosterilir. Onu not alin; bir daha
+  gosterilmez. Giris yaptiktan sonra Hesabim > Sifre Degistir ile
+  kendi sifrenizle degistirin.
 
 --------------------------------------------------------
 

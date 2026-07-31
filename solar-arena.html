@@ -4643,15 +4643,32 @@ const Store = (() => {
   }
 
   // ===================== SİPARİŞLER =====================
-  function addOrder(order) {
+  // Sipariş oluşturur. Sunucu modunda tutar ve sipariş numarası SUNUCUDA
+  // hesaplanır/üretilir (istemciden gelen fiyata güvenilmez); sunucunun
+  // döndürdüğü gerçek numara ve toplam geri verilir.
+  async function addOrder(order) {
     const row = { ...order, id: order.id || ("o" + Date.now()), date: Date.now() };
+    if (persist) {
+      try {
+        const r = await fetch(SB_URL + "/rest/v1/orders", {
+          method: "POST",
+          headers: { apikey: SB_KEY, Authorization: "Bearer " + token(), "Content-Type": "application/json", Prefer: "return=representation" },
+          body: JSON.stringify({
+            customer: order.customer, phone: order.phone || "", email: order.email || "",
+            city: order.city || "", address: order.address || "",
+            items: (order.items || []).map((i) => ({ id: i.id, name: i.name, qty: i.qty }))
+          })
+        });
+        const data = await r.json().catch(() => ({}));
+        if (!r.ok) return { ok: false, error: (data && data.error_description) || "Sipariş oluşturulamadı." };
+        if (data && data.id) { row.id = data.id; if (data.total != null) row.total = data.total; }
+        cache.orders.unshift(row);
+        return { ok: true, id: row.id, total: row.total };
+      } catch (e) { logErr(e); return { ok: false, error: "Sunucuya ulaşılamadı." }; }
+    }
     cache.orders.unshift(row);
-    if (persist) return sbWrite("POST", "orders", "", {
-      id: row.id, customer: order.customer, phone: order.phone || "", email: order.email || "",
-      city: order.city || "", address: order.address || "", payment: order.payment || "",
-      status: order.status || "", items: order.items || [], total: order.total, created: row.date
-    }).catch(logErr);
     write("gp-orders", cache.orders);
+    return { ok: true, id: row.id, total: row.total };
   }
   function getOrders() { return cache.orders; }
   function getOrdersByEmail(email) { return cache.orders.filter((o) => o.email === email); }
@@ -5745,7 +5762,7 @@ function initCartPage() {
   });
 
   // ---- Siparişi tamamla ----
-  document.getElementById("checkoutBtn").addEventListener("click", () => {
+  document.getElementById("checkoutBtn").addEventListener("click", async () => {
     const list = entries();
     if (list.length === 0) return;
 
@@ -5773,9 +5790,8 @@ function initCartPage() {
 
     const session = Store.session();
     const total = list.reduce((s, e) => s + e.product.price * e.qty, 0);
-    const orderId = "SA" + Date.now().toString().slice(-8);
     const order = {
-      id: orderId,
+      id: "SA" + Date.now().toString().slice(-8),
       customer: name.value.trim(),
       phone: phone.value.trim(),
       email: (email.value.trim() || (session ? session.email : "")),
@@ -5783,11 +5799,19 @@ function initCartPage() {
       address: address.value.trim(),
       payment: "eft",
       status: "Havale/EFT bekleniyor",
-      items: list.map((e) => ({ name: e.product.name, qty: e.qty, price: e.product.price })),
+      // Ürün kimliği gönderilir; tutarı sunucu kendi kataloğundan hesaplar
+      items: list.map((e) => ({ id: e.product.id, name: e.product.name, qty: e.qty, price: e.product.price })),
       total
     };
 
-    Store.addOrder(order);
+    const saved = await Store.addOrder(order);
+    if (saved && saved.ok === false) {
+      checkoutStatus.textContent = saved.error || "Sipariş oluşturulamadı, lütfen tekrar deneyin.";
+      checkoutStatus.className = "form-status err";
+      return;
+    }
+    const orderId = (saved && saved.id) || order.id;
+    const finalTotal = (saved && saved.total != null) ? saved.total : total;
 
     const s = Store.getSettings();
     const bankLines = [];
@@ -5799,9 +5823,9 @@ function initCartPage() {
       : "";
 
     showSuccess(
-      "<strong>Sipariş No: " + orderId + "</strong><br>" +
-      "Toplam <strong>" + money(total) + "</strong> tutarını aşağıdaki hesaba havale/EFT ile gönderin. " +
-      "Açıklamaya <strong>" + orderId + "</strong> yazmayı unutmayın." +
+      "<strong>Sipariş No: " + escHtml(orderId) + "</strong><br>" +
+      "Toplam <strong>" + money(finalTotal) + "</strong> tutarını aşağıdaki hesaba havale/EFT ile gönderin. " +
+      "Açıklamaya <strong>" + escHtml(orderId) + "</strong> yazmayı unutmayın." +
       bankHtml +
       "<span class='success-sub'>Ödemeniz görüldüğünde siparişiniz hazırlanıp kargolanır. Dilerseniz dekontu WhatsApp/e-posta ile iletebilirsiniz.</span>"
     );
