@@ -3885,7 +3885,10 @@ img, svg { max-width: 100%; }
     <!-- SİPARİŞLER -->
     <section class="admin-view" id="view-orders" hidden>
       <div class="admin-panel">
-        <p class="panel-hint">WhatsApp'a yönlendirilen sipariş talepleri burada listelenir.</p>
+        <div class="view-actions">
+          <button class="btn btn-small" id="ordersRefreshBtn">↻ Siparişleri Yenile</button>
+        </div>
+        <p class="panel-hint">Müşterilerin oluşturduğu Havale/EFT siparişleri burada listelenir. Yeni siparişler için "Siparişleri Yenile"ye tıklayın.</p>
         <div id="orderList"></div>
       </div>
     </section>
@@ -4604,6 +4607,27 @@ const Store = (() => {
   function getOrders() { return cache.orders; }
   function getOrdersByEmail(email) { return cache.orders.filter((o) => o.email === email); }
 
+  // Sipariş/talep listelerini sunucudan tazeler (admin Siparişler ekranı ve
+  // Hesabım açıldığında çağrılır; sayfa yenilemeye gerek kalmaz).
+  async function refreshOrders() {
+    if (!persist) return cache.orders;
+    const s = session();
+    try {
+      if (s && s.role === "admin") {
+        const [orders, leads] = await Promise.all([
+          sbSelect("orders", "select=*&order=created.desc"),
+          sbSelect("leads", "select=*&order=created.desc")
+        ]);
+        cache.orders = orders.map(fromDbOrder);
+        cache.leads = leads.map(fromDbLead);
+      } else if (s && s.email) {
+        const orders = await sbSelect("orders", "select=*&email=eq." + encodeURIComponent(s.email) + "&order=created.desc");
+        cache.orders = orders.map(fromDbOrder);
+      }
+    } catch (e) { logErr(e); }
+    return cache.orders;
+  }
+
   // ===================== ÖDEME (PayTR) =====================
   function startCardPayment(order) {
     return { ok: true, message: "Kart ödeme sayfası PayTR entegrasyonu tamamlandığında burada açılacaktır." };
@@ -4632,7 +4656,7 @@ const Store = (() => {
     getUser, updateProfile, changePassword,
     listUsers, setUserRole, setUserBlocked, deleteUser, adminCreateUser,
     addLead, getLeads, deleteLead,
-    addOrder, getOrders, getOrdersByEmail,
+    addOrder, getOrders, getOrdersByEmail, refreshOrders,
     startCardPayment,
     getSettings, saveSettings,
     getSiteContent, saveSiteContent
@@ -5911,7 +5935,11 @@ function renderMyOrders() {
     '<p class="account-empty">Henüz bir sipariş talebiniz bulunmuyor.<br><a href="#urunler">Mağazamıza göz atın →</a></p>';
 }
 
-Store.ready(renderMyOrders);
+// Önce eldeki veriyle çiz, sonra sunucudan tazeleyip yeniden çiz
+Store.ready(() => {
+  renderMyOrders();
+  Store.refreshOrders().then(renderMyOrders);
+});
 
 })();
 
@@ -6000,6 +6028,10 @@ document.querySelectorAll(".admin-nav-btn").forEach((btn) => {
     document.getElementById("view-" + view).hidden = false;
     document.getElementById("viewTitle").textContent = VIEW_TITLES[view];
     renderAll();
+    // Sipariş/talep ekranlarına girildiğinde sunucudan taze veri çek
+    if (view === "orders" || view === "leads" || view === "dashboard") {
+      Store.refreshOrders().then(() => { renderOrders(); renderLeads(); renderDashboard(); });
+    }
   });
 });
 
@@ -6582,6 +6614,10 @@ function renderOrders() {
       </div>`).join("") ||
     '<p class="empty-row">Henüz sipariş talebi yok.</p>';
 }
+
+document.getElementById("ordersRefreshBtn").addEventListener("click", () => {
+  Store.refreshOrders().then(() => { renderOrders(); renderDashboard(); });
+});
 
 // ---------- KEŞİF TALEPLERİ ----------
 function renderLeads() {

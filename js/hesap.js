@@ -88,4 +88,8 @@ function renderMyOrders() {
     '<p class="account-empty">Henüz bir sipariş talebiniz bulunmuyor.<br><a href="index.html#urunler">Mağazamıza göz atın →</a></p>';
 }
 
-Store.ready(renderMyOrders);
+// Önce eldeki veriyle çiz, sonra sunucudan tazeleyip yeniden çiz
+Store.ready(() => {
+  renderMyOrders();
+  Store.refreshOrders().then(renderMyOrders);
+});

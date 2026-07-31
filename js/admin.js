@@ -81,6 +81,10 @@ document.querySelectorAll(".admin-nav-btn").forEach((btn) => {
     document.getElementById("view-" + view).hidden = false;
     document.getElementById("viewTitle").textContent = VIEW_TITLES[view];
     renderAll();
+    // Sipariş/talep ekranlarına girildiğinde sunucudan taze veri çek
+    if (view === "orders" || view === "leads" || view === "dashboard") {
+      Store.refreshOrders().then(() => { renderOrders(); renderLeads(); renderDashboard(); });
+    }
   });
 });
 
@@ -663,6 +667,10 @@ function renderOrders() {
       </div>`).join("") ||
     '<p class="empty-row">Henüz sipariş talebi yok.</p>';
 }
+
+document.getElementById("ordersRefreshBtn").addEventListener("click", () => {
+  Store.refreshOrders().then(() => { renderOrders(); renderDashboard(); });
+});
 
 // ---------- KEŞİF TALEPLERİ ----------
 function renderLeads() {

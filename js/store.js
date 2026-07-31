@@ -495,6 +495,27 @@ const Store = (() => {
   function getOrders() { return cache.orders; }
   function getOrdersByEmail(email) { return cache.orders.filter((o) => o.email === email); }
 
+  // Sipariş/talep listelerini sunucudan tazeler (admin Siparişler ekranı ve
+  // Hesabım açıldığında çağrılır; sayfa yenilemeye gerek kalmaz).
+  async function refreshOrders() {
+    if (!persist) return cache.orders;
+    const s = session();
+    try {
+      if (s && s.role === "admin") {
+        const [orders, leads] = await Promise.all([
+          sbSelect("orders", "select=*&order=created.desc"),
+          sbSelect("leads", "select=*&order=created.desc")
+        ]);
+        cache.orders = orders.map(fromDbOrder);
+        cache.leads = leads.map(fromDbLead);
+      } else if (s && s.email) {
+        const orders = await sbSelect("orders", "select=*&email=eq." + encodeURIComponent(s.email) + "&order=created.desc");
+        cache.orders = orders.map(fromDbOrder);
+      }
+    } catch (e) { logErr(e); }
+    return cache.orders;
+  }
+
   // ===================== ÖDEME (PayTR) =====================
   function startCardPayment(order) {
     return { ok: true, message: "Kart ödeme sayfası PayTR entegrasyonu tamamlandığında burada açılacaktır." };
@@ -523,7 +544,7 @@ const Store = (() => {
     getUser, updateProfile, changePassword,
     listUsers, setUserRole, setUserBlocked, deleteUser, adminCreateUser,
     addLead, getLeads, deleteLead,
-    addOrder, getOrders, getOrdersByEmail,
+    addOrder, getOrders, getOrdersByEmail, refreshOrders,
     startCardPayment,
     getSettings, saveSettings,
     getSiteContent, saveSiteContent
