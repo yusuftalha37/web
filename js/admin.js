@@ -651,7 +651,7 @@ function renderOrders() {
           <span>${dateFmt(o.date)}</span>
         </div>
         <div class="order-meta">
-          <span class="pill ${o.payment === "card" ? "pill-warn" : "pill-ok"}">${o.payment === "card" ? "Kredi Kartı — ödeme bekliyor (PayTR)" : "WhatsApp siparişi"}</span>
+          <span class="pill ${o.payment === "eft" || o.payment === "card" ? "pill-warn" : "pill-ok"}">${o.payment === "eft" ? "Havale/EFT — ödeme bekleniyor" : o.payment === "card" ? "Kredi Kartı" : "WhatsApp siparişi"}${o.id ? " · No: " + escHtml(o.id) : ""}</span>
           ${o.phone ? " · Tel: " + escHtml(o.phone) : ""}
           ${o.city ? " · " + escHtml(o.city) : ""}
         </div>
@@ -898,20 +898,33 @@ document.getElementById("contentForm").addEventListener("submit", (e) => {
 loadContentForm();
 
 // ---------- AYARLAR ----------
-const waNumberInput = document.getElementById("waNumber");
-waNumberInput.value = Store.getSettings().whatsapp;
+function loadSettingsForm() {
+  const s = Store.getSettings();
+  document.getElementById("waNumber").value = s.whatsapp || "";
+  document.getElementById("bankName").value = s.bankName || "";
+  document.getElementById("bankHolder").value = s.bankHolder || "";
+  document.getElementById("iban").value = s.iban || "";
+  document.getElementById("bankNote").value = s.bankNote || "";
+}
+loadSettingsForm();
 
 document.getElementById("settingsForm").addEventListener("submit", (e) => {
   e.preventDefault();
   const status = document.getElementById("settingsStatus");
-  const num = waNumberInput.value.replace(/\D/g, "");
-  if (num.length < 11) {
-    status.textContent = "Geçerli bir numara girin (örn. 905321234567).";
+  const num = document.getElementById("waNumber").value.replace(/\D/g, "");
+  if (num && num.length < 11) {
+    status.textContent = "WhatsApp numarası geçersiz (örn. 905321234567) — boş bırakabilirsiniz.";
     status.className = "form-status err";
     return;
   }
-  Store.saveSettings({ whatsapp: num });
-  waNumberInput.value = num;
+  Store.saveSettings({
+    whatsapp: num,
+    bankName: document.getElementById("bankName").value.trim(),
+    bankHolder: document.getElementById("bankHolder").value.trim(),
+    iban: document.getElementById("iban").value.trim(),
+    bankNote: document.getElementById("bankNote").value.trim()
+  });
+  document.getElementById("waNumber").value = num;
   status.textContent = "Kaydedildi.";
   status.className = "form-status ok";
 });

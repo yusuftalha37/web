@@ -36,6 +36,7 @@ def rewrite_links(html):
 # ---- sayfa gövdeleri ----
 index_body = rewrite_links(body_of("index.html"))
 urunler_body = rewrite_links(body_of("urunler.html"))
+urun_body = rewrite_links(body_of("urun.html"))
 sepet_body = rewrite_links(body_of("sepet.html"))
 giris_body = rewrite_links(body_of("giris.html"))
 hesap_body = rewrite_links(body_of("hesap.html"))
@@ -53,8 +54,10 @@ main_js = main_js.replace('href="hesap.html"', 'href="#hesap"')
 main_js = main_js.replace('href="giris.html"', 'href="#giris"')
 main_js = main_js.replace(
     '// BUILD:init — tek dosya derlemesi bu satırı sayfa kapsayıcılarıyla değiştirir\nStore.ready(() => initSite(document));',
-    'Store.ready(() => {\n  initSite(document.getElementById("page-index"));\n  initSite(document.getElementById("page-urunler"));\n  initSite(document.getElementById("page-sepet"));\n});'
+    'Store.ready(() => {\n  initSite(document.getElementById("page-index"));\n  initSite(document.getElementById("page-urunler"));\n  initSite(document.getElementById("page-urun"));\n  initSite(document.getElementById("page-sepet"));\n});'
 )
+
+urun_js = (ROOT / "js/urun.js").read_text()
 
 auth_js = (ROOT / "js/auth.js").read_text()
 auth_js = auth_js.replace(
@@ -94,7 +97,7 @@ router_js = """
 const PAGE_IDS = { "#magaza": "page-urunler", "#sepet": "page-sepet", "#giris": "page-giris", "#hesap": "page-hesap", "#admin": "page-admin" };
 
 function route() {
-  let target = PAGE_IDS[location.hash] || "page-index";
+  let target = PAGE_IDS[location.hash] || (location.hash.indexOf("#urun/") === 0 ? "page-urun" : "page-index");
   // Sayfa açıkken elle #admin yazılırsa da yetki kontrolü yap
   if (target === "page-admin" && typeof Store !== "undefined") {
     const s = Store.session();
@@ -106,7 +109,7 @@ function route() {
   document.querySelectorAll(".single-page").forEach((d) => {
     d.style.display = d.id === target ? "" : "none";
   });
-  if (PAGE_IDS[location.hash]) window.scrollTo(0, 0);
+  if (PAGE_IDS[location.hash] || location.hash.indexOf("#urun/") === 0) window.scrollTo(0, 0);
 }
 
 // Oturum durumu değiştiğinde sayfayı hedef rotayla yeniden yükler
@@ -140,6 +143,10 @@ single = f"""<!DOCTYPE html>
 {urunler_body}
 </div>
 
+<div id="page-urun" class="single-page" style="display:none">
+{urun_body}
+</div>
+
 <div id="page-sepet" class="single-page" style="display:none">
 {sepet_body}
 </div>
@@ -166,6 +173,11 @@ route();
 // ---- ANA SAYFA ----
 (() => {{
 {main_js}
+}})();
+
+// ---- ÜRÜN DETAY SAYFASI ----
+(() => {{
+{urun_js}
 }})();
 
 // ---- SEPET SAYFASI ----

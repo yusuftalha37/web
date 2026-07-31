@@ -71,6 +71,24 @@ function initCartPage() {
 
     sumSub.textContent = money(total);
     sumTotal.textContent = money(total);
+    renderEftInfo();
+  }
+
+  // Banka/IBAN bilgilerini ayarlardan sepete yazar
+  function renderEftInfo() {
+    const el = document.getElementById("eftInfo");
+    if (!el) return;
+    const s = Store.getSettings();
+    if (!s.iban && !s.bankName) {
+      el.innerHTML = '<p class="eft-empty">Banka hesap bilgileri henüz girilmemiş. Yönetici, panelden (Ayarlar) IBAN bilgisini ekleyebilir; siparişinizi yine de oluşturabilirsiniz, ekibimiz ödeme bilgilerini iletir.</p>';
+      return;
+    }
+    const row = (label, val) => val ? `<div class="eft-row"><span>${label}</span><strong>${escHtml(val)}</strong></div>` : "";
+    el.innerHTML =
+      row("Banka", s.bankName) +
+      row("Hesap Sahibi", s.bankHolder) +
+      (s.iban ? `<div class="eft-row eft-iban"><span>IBAN</span><strong>${escHtml(s.iban)}</strong></div>` : "") +
+      (s.bankNote ? `<p class="eft-note">${escHtml(s.bankNote)}</p>` : "");
   }
 
   cartRows.addEventListener("click", (e) => {
@@ -96,7 +114,6 @@ function initCartPage() {
     const email = document.getElementById("coEmail");
     const city = document.getElementById("coCity");
     const address = document.getElementById("coAddress");
-    const method = document.querySelector('input[name="payMethod"]:checked').value;
 
     let valid = true;
     [name, phone, city, address].forEach((f) => {
@@ -116,52 +133,45 @@ function initCartPage() {
 
     const session = Store.session();
     const total = list.reduce((s, e) => s + e.product.price * e.qty, 0);
+    const orderId = "SA" + Date.now().toString().slice(-8);
     const order = {
+      id: orderId,
       customer: name.value.trim(),
       phone: phone.value.trim(),
       email: (email.value.trim() || (session ? session.email : "")),
       city: city.value.trim(),
       address: address.value.trim(),
-      payment: method,
-      status: method === "card" ? "Ödeme bekliyor (PayTR)" : "WhatsApp siparişi",
+      payment: "eft",
+      status: "Havale/EFT bekleniyor",
       items: list.map((e) => ({ name: e.product.name, qty: e.qty, price: e.product.price })),
       total
     };
 
     Store.addOrder(order);
 
-    if (method === "card") {
-      // PayTR bağlandığında müşteri burada ödeme sayfasına yönlendirilecek
-      const result = Store.startCardPayment(order);
-      showSuccess(
-        "Siparişiniz kaydedildi (Toplam: " + money(total) + "). " + result.message +
-        " Ekibimiz ödeme için sizinle iletişime geçecek."
-      );
-    } else {
-      const lines = order.items.map((i) => `• ${i.qty} × ${i.name} — ${money(i.price * i.qty)}`);
-      const msg =
-        "Merhaba, sipariş vermek istiyorum:\n\n" + lines.join("\n") +
-        "\n\nToplam: " + money(total) +
-        "\n\nAd Soyad: " + order.customer +
-        "\nTelefon: " + order.phone +
-        "\nİl: " + order.city +
-        "\nAdres: " + order.address;
-      window.open(
-        "https://wa.me/" + Store.getSettings().whatsapp + "?text=" + encodeURIComponent(msg),
-        "_blank"
-      );
-      showSuccess(
-        "Siparişiniz kaydedildi (Toplam: " + money(total) + "). " +
-        "Açılan WhatsApp penceresindeki mesajı göndermeyi unutmayın; ekibimiz sizi arayarak onaylayacak."
-      );
-    }
+    const s = Store.getSettings();
+    const bankLines = [];
+    if (s.bankName) bankLines.push("Banka: " + s.bankName);
+    if (s.bankHolder) bankLines.push("Hesap Sahibi: " + s.bankHolder);
+    if (s.iban) bankLines.push("IBAN: " + s.iban);
+    const bankHtml = bankLines.length
+      ? "<div class='success-bank'>" + bankLines.map((l) => "<div>" + escHtml(l) + "</div>").join("") + "</div>"
+      : "";
+
+    showSuccess(
+      "<strong>Sipariş No: " + orderId + "</strong><br>" +
+      "Toplam <strong>" + money(total) + "</strong> tutarını aşağıdaki hesaba havale/EFT ile gönderin. " +
+      "Açıklamaya <strong>" + orderId + "</strong> yazmayı unutmayın." +
+      bankHtml +
+      "<span class='success-sub'>Ödemeniz görüldüğünde siparişiniz hazırlanıp kargolanır. Dilerseniz dekontu WhatsApp/e-posta ile iletebilirsiniz.</span>"
+    );
 
     writeCart({});
     refreshBadge();
   });
 
   function showSuccess(msg) {
-    document.getElementById("successMsg").textContent = msg;
+    document.getElementById("successMsg").innerHTML = msg;
     cartLayout.hidden = true;
     cartEmptyEl.hidden = true;
     orderSuccessEl.hidden = false;

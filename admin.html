@@ -323,16 +323,35 @@
     <!-- AYARLAR -->
     <section class="admin-view" id="view-settings" hidden>
       <div class="admin-panel settings-panel">
-        <h2>Sipariş Ayarları</h2>
+        <h2>Ödeme (Havale / EFT) Bilgileri</h2>
         <form id="settingsForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="bankName">Banka adı</label>
+              <input type="text" id="bankName" placeholder="Örn. Ziraat Bankası">
+            </div>
+            <div class="form-group">
+              <label for="bankHolder">Hesap sahibi</label>
+              <input type="text" id="bankHolder" placeholder="Örn. Solar Arena Enerji Ltd. Şti.">
+            </div>
+          </div>
           <div class="form-group">
-            <label for="waNumber">WhatsApp sipariş numarası</label>
+            <label for="iban">IBAN</label>
+            <input type="text" id="iban" placeholder="TR00 0000 0000 0000 0000 0000 00">
+          </div>
+          <div class="form-group">
+            <label for="bankNote">Ek not <small>(opsiyonel)</small></label>
+            <input type="text" id="bankNote" placeholder="Örn. Açıklamaya sipariş numaranızı yazınız.">
+          </div>
+          <div class="form-group">
+            <label for="waNumber">WhatsApp iletişim numarası <small>(opsiyonel)</small></label>
             <input type="text" id="waNumber" placeholder="905xxxxxxxxx">
-            <small>Uluslararası formatta, başında + olmadan yazın. Örn: 905321234567</small>
+            <small>Uluslararası formatta, başında + olmadan. Dekont göndermek için müşterilere gösterilebilir.</small>
           </div>
           <button type="submit" class="btn btn-small">Kaydet</button>
           <p class="form-status" id="settingsStatus" role="status"></p>
         </form>
+        <p class="panel-hint" style="margin-top:12px">Bu bilgiler sepet sayfasındaki ödeme bölümünde ve sipariş onayında müşteriye gösterilir.</p>
       </div>
       <div class="admin-panel settings-panel">
         <h2>Sunucu Bağlantısı</h2>

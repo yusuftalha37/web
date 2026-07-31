@@ -128,23 +128,26 @@ function initSite(root) {
     return norm(q).split(/\s+/).filter(Boolean).every((w) => hay.includes(w));
   }
 
+  const productHref = (id) => (typeof goPage === "function") ? "#urun/" + id : "urun.html?id=" + encodeURIComponent(id);
+
   function productCard(p) {
     const low = p.stock <= 5;
     const authLabel = (Store.getSiteContent().authorizedLabel || "Yetkili Satıcı");
     const authBadge = p.authorized
       ? `<span class="auth-badge" title="${escHtml(authLabel)}"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>${escHtml(authLabel)}</span>`
       : "";
+    const href = productHref(p.id);
     return `
       <article class="product">
         <div class="product-img${p.photo ? " has-photo" : ""}">
           <span class="stock-badge${low ? " low" : ""}">${low ? "Son " + p.stock + " adet" : "Stokta"}</span>
           ${p.authorized ? `<span class="auth-ribbon">${escHtml(authLabel)}</span>` : ""}
-          ${productMedia(p)}
+          <a href="${href}" class="product-medialink" aria-label="${escHtml(p.name)}">${productMedia(p)}</a>
         </div>
         <div class="product-body">
           <span class="product-cat">${escHtml(catName(p.cat))}</span>
           ${authBadge}
-          <h3>${escHtml(p.name)}</h3>
+          <h3><a href="${href}" class="product-titlelink">${escHtml(p.name)}</a></h3>
           <ul class="product-specs">${p.specs.map((s) => `<li>${escHtml(s)}</li>`).join("")}</ul>
           <div class="product-foot">
             <div class="product-price">${tlFmt(p.price)}<span>KDV dahil</span></div>

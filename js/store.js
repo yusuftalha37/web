@@ -145,7 +145,7 @@ const Store = (() => {
     footerAbout: "Temiz enerjiyle daha aydınlık bir gelecek için 12 yıldır çalışıyoruz.",
     footerCopyright: "© 2026 Solar Arena Enerji — Bu site örnek/demo amaçlıdır."
   };
-  const DEFAULT_SETTINGS = { whatsapp: "908500000000" };
+  const DEFAULT_SETTINGS = { whatsapp: "908500000000", bankName: "", bankHolder: "", iban: "", bankNote: "" };
   const SEED_VERSION = 3;
 
   // ===================== BELLEK ÖNBELLEĞİ =====================

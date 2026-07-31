@@ -826,6 +826,150 @@ img, svg { max-width: 100%; }
 }
 .auth-badge svg { color: #1a9c54; }
 
+/* Ürün kartı bağlantıları (görsel + başlık tıklanabilir) */
+.product-medialink { display: block; width: 100%; height: 100%; }
+.product-titlelink { color: inherit; text-decoration: none; }
+.product-titlelink:hover { color: var(--blue); }
+
+/* ============ ÜRÜN DETAY SAYFASI ============ */
+.breadcrumb {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 16px;
+}
+.breadcrumb a { color: var(--muted); text-decoration: none; }
+.breadcrumb a:hover { color: var(--blue); text-decoration: underline; }
+.breadcrumb span { margin: 0 2px; }
+.breadcrumb .crumb-current { color: var(--text); font-weight: bold; }
+
+.pd-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+  gap: 30px;
+  align-items: start;
+}
+.pd-media {
+  position: relative;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: #fff;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 320px;
+}
+.pd-media img { max-height: 420px; width: auto; object-fit: contain; }
+.pd-media svg { width: 80%; height: auto; }
+
+.pd-cat {
+  font-size: 11px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+}
+.pd-title { font-size: 22px; margin: 6px 0 10px; color: var(--text); }
+.pd-info .auth-badge { margin: 0 0 12px; }
+.pd-price {
+  font-size: 28px;
+  font-weight: bold;
+  color: #c0392b;
+  margin: 10px 0;
+}
+.pd-price span { font-size: 12px; font-weight: normal; color: var(--muted); }
+.pd-stock {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 3px 10px;
+  border-radius: var(--radius);
+  margin-bottom: 14px;
+}
+.pd-stock.ok { background: #e6f4e6; color: #1e7a1e; border: 1px solid #bfdebf; }
+.pd-stock.low { background: #fdf0d7; color: #a3660a; border: 1px solid #ead196; }
+.pd-stock.out { background: #f4d7d7; color: #a12a2a; border: 1px solid #e0aeae; }
+
+.pd-specs {
+  list-style: none;
+  margin: 0 0 18px;
+  padding: 14px 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.pd-specs li {
+  position: relative;
+  padding: 3px 0 3px 20px;
+  font-size: 13.5px;
+}
+.pd-specs li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: var(--orange);
+  font-weight: bold;
+}
+
+.pd-buy { display: flex; gap: 12px; align-items: stretch; margin-bottom: 10px; }
+.pd-qty {
+  display: flex;
+  align-items: stretch;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.pd-qty button {
+  width: 38px;
+  border: none;
+  background: var(--bg-alt);
+  font-size: 18px;
+  cursor: pointer;
+  color: var(--text);
+}
+.pd-qty button:hover { background: #e6e6e6; }
+.pd-qty input {
+  width: 52px;
+  text-align: center;
+  border: none;
+  border-left: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  font-size: 15px;
+  font-family: inherit;
+  -moz-appearance: textfield;
+}
+.pd-qty input::-webkit-outer-spin-button,
+.pd-qty input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.pd-add { flex: 1; font-size: 15px; }
+.pd-add[disabled] { opacity: 0.6; cursor: not-allowed; }
+
+.pd-gocart {
+  display: inline-block;
+  margin-bottom: 14px;
+  font-size: 13px;
+  font-weight: bold;
+  color: var(--blue);
+  text-decoration: none;
+}
+.pd-gocart:hover { text-decoration: underline; }
+
+.pd-trust {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border-top: 1px solid var(--border);
+  padding-top: 14px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.pd-notfound { text-align: center; padding: 40px 0; }
+.pd-notfound p { margin-bottom: 16px; color: var(--muted); }
+
+@media (max-width: 760px) {
+  .pd-grid { grid-template-columns: 1fr; gap: 18px; }
+  .pd-media { min-height: 240px; padding: 16px; }
+}
+
 .product-body {
   padding: 12px 14px 14px;
   display: flex;
@@ -1548,6 +1692,52 @@ img, svg { max-width: 100%; }
 .sum-total strong { font-size: 19px; color: #c0392b; }
 
 /* Ödeme seçenekleri */
+/* ---- Havale / EFT ödeme kutusu ---- */
+.pay-eft {
+  margin: 6px 0 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.pay-eft-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--blue-darker);
+  color: #fff;
+  font-weight: bold;
+  font-size: 13px;
+  padding: 9px 12px;
+}
+.eft-info { padding: 10px 12px; background: #f7fafc; }
+.eft-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 4px 0;
+  font-size: 13px;
+  border-bottom: 1px dashed #e2e8f0;
+}
+.eft-row:last-child { border-bottom: none; }
+.eft-row span { color: var(--muted); }
+.eft-iban strong { font-family: monospace; letter-spacing: 0.02em; }
+.eft-note { margin-top: 6px; font-size: 12px; color: var(--muted); }
+.eft-empty { font-size: 12.5px; color: var(--muted); margin: 0; }
+.eft-hint { font-size: 12px; color: var(--muted); padding: 8px 12px 10px; margin: 0; }
+
+.success-bank {
+  text-align: left;
+  display: inline-block;
+  margin: 12px auto;
+  padding: 10px 14px;
+  background: #f4f4f4;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 14px;
+  font-family: monospace;
+}
+.success-sub { display: block; margin-top: 10px; font-size: 12.5px; color: var(--muted); }
+
 .pay-options { margin-bottom: 14px; }
 
 .pay-opt {
@@ -3039,6 +3229,99 @@ img, svg { max-width: 100%; }
   </footer>
 </div>
 
+<div id="page-urun" class="single-page" style="display:none">
+<!-- ÜST BİLGİ ÇUBUĞU -->
+  <div class="topbar">
+    <div class="container topbar-inner">
+      <span>Tel: <span data-site="phone">0850 000 00 00</span></span>
+      <span>E-posta: <span data-site="email">info@solararena.store</span></span>
+      <span class="topbar-right" data-site="topNote">Türkiye'nin her yerine hızlı gönderim</span>
+    </div>
+  </div>
+
+  <!-- BAŞLIK -->
+  <header class="siteheader">
+    <div class="container header-row">
+      <a href="#" class="logo">
+        <svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <circle cx="12" cy="12" r="4"/>
+          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+        </svg>
+        <span class="logo-text">Solar<span>Arena</span> <small data-site="brandTagline">Enerji Sistemleri San. Tic. Ltd. Şti.</small></span>
+      </a>
+      <form class="site-search" id="siteSearch" role="search">
+        <input type="search" id="searchInput" placeholder="Ürün ara: güneş paneli, invertör, akü…" autocomplete="off" aria-label="Ürün ara">
+        <button type="submit" aria-label="Ara">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        </button>
+      </form>
+      <div class="header-contact">
+        <strong data-site="phone">0850 000 00 00</strong>
+        <span data-site="headerContactNote">Sipariş ve bilgi için hemen arayın</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ANA MENÜ -->
+  <nav class="mainmenu">
+    <div class="container mainmenu-inner">
+      <button class="hamburger" id="hamburger" aria-label="Menüyü aç">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="nav-links" id="navLinks">
+        <a href="#">ANA SAYFA</a>
+        <a href="#hizmetler">HİZMETLERİMİZ</a>
+        <a href="#magaza">ÜRÜNLER</a>
+        <a href="#hesaplayici">TASARRUF HESAPLA</a>
+        <a href="#projeler">PROJELERİMİZ</a>
+        <a href="#referanslar">REFERANSLAR</a>
+        <a href="#iletisim">İLETİŞİM</a>
+        <span class="nav-account" id="navAccount"></span>
+      </div>
+      <a class="cart-btn" id="cartBtn" href="#sepet" aria-label="Sepete git">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="9" cy="21" r="1.6"/>
+          <circle cx="19" cy="21" r="1.6"/>
+          <path d="M2.5 3h3l2.6 12.5a2 2 0 0 0 2 1.5h8.7a2 2 0 0 0 2-1.6L22.5 8H6.2"/>
+        </svg>
+        SEPET
+        <span class="cart-count" id="cartCount" hidden>0</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- KATEGORİ ÇUBUĞU -->
+  <nav class="catbar">
+    <div class="container catbar-inner">
+      <div class="catbar-all" id="catbarAll">
+        <button type="button" class="catbar-all-btn">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          TÜM KATEGORİLER
+        </button>
+        <ul class="catbar-dropdown" id="catbarDropdown"></ul>
+      </div>
+      <div class="catbar-links" id="catbarLinks"></div>
+    </div>
+  </nav>
+
+  <!-- ÜRÜN DETAYI -->
+  <section class="section">
+    <div class="container">
+      <nav class="breadcrumb" id="pBreadcrumb"></nav>
+      <div id="productDetail"></div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-bottom">
+      <div class="container">
+        <span data-site="footerCopyright">© 2026 Solar Arena Enerji — Bu site örnek/demo amaçlıdır.</span>
+      </div>
+    </div>
+  </footer>
+</div>
+
 <div id="page-sepet" class="single-page" style="display:none">
 <!-- ÜST BİLGİ ÇUBUĞU -->
   <div class="topbar">
@@ -3199,24 +3482,16 @@ img, svg { max-width: 100%; }
               <div class="sum-row"><span>Kargo</span><span>Sipariş onayında</span></div>
               <div class="sum-row sum-total"><span>Toplam</span><strong id="sumTotal">₺0</strong></div>
 
-              <div class="pay-options">
-                <label class="pay-opt">
-                  <input type="radio" name="payMethod" value="card" checked>
-                  <span class="pay-opt-body">
-                    <strong>Kredi Kartı ile Öde</strong>
-                    <small>PayTR güvenli ödeme — Visa, Mastercard, Troy · Taksit imkânı</small>
-                  </span>
-                </label>
-                <label class="pay-opt">
-                  <input type="radio" name="payMethod" value="whatsapp">
-                  <span class="pay-opt-body">
-                    <strong>WhatsApp ile Sipariş</strong>
-                    <small>Siparişiniz WhatsApp'tan iletilir, ödemeyi görüşerek yaparsınız</small>
-                  </span>
-                </label>
+              <div class="pay-eft">
+                <div class="pay-eft-head">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+                  Havale / EFT ile Ödeme
+                </div>
+                <div id="eftInfo" class="eft-info"></div>
+                <p class="eft-hint">Siparişi tamamladıktan sonra toplam tutarı yukarıdaki hesaba gönderin; açıklama kısmına <strong>sipariş numaranızı</strong> yazın. Ödemeniz görüldüğünde siparişiniz hazırlanıp kargolanır.</p>
               </div>
 
-              <button type="button" class="btn btn-block" id="checkoutBtn">Siparişi Tamamla</button>
+              <button type="button" class="btn btn-block" id="checkoutBtn">Siparişi Oluştur</button>
               <p class="form-status" id="checkoutStatus" role="status"></p>
               <p class="cart-note">Fiyatlara KDV dahildir. Kargo ücreti sipariş onayında bildirilir; tüm gönderiler sigortalıdır.</p>
             </div>
@@ -3694,16 +3969,35 @@ img, svg { max-width: 100%; }
     <!-- AYARLAR -->
     <section class="admin-view" id="view-settings" hidden>
       <div class="admin-panel settings-panel">
-        <h2>Sipariş Ayarları</h2>
+        <h2>Ödeme (Havale / EFT) Bilgileri</h2>
         <form id="settingsForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="bankName">Banka adı</label>
+              <input type="text" id="bankName" placeholder="Örn. Ziraat Bankası">
+            </div>
+            <div class="form-group">
+              <label for="bankHolder">Hesap sahibi</label>
+              <input type="text" id="bankHolder" placeholder="Örn. Solar Arena Enerji Ltd. Şti.">
+            </div>
+          </div>
           <div class="form-group">
-            <label for="waNumber">WhatsApp sipariş numarası</label>
+            <label for="iban">IBAN</label>
+            <input type="text" id="iban" placeholder="TR00 0000 0000 0000 0000 0000 00">
+          </div>
+          <div class="form-group">
+            <label for="bankNote">Ek not <small>(opsiyonel)</small></label>
+            <input type="text" id="bankNote" placeholder="Örn. Açıklamaya sipariş numaranızı yazınız.">
+          </div>
+          <div class="form-group">
+            <label for="waNumber">WhatsApp iletişim numarası <small>(opsiyonel)</small></label>
             <input type="text" id="waNumber" placeholder="905xxxxxxxxx">
-            <small>Uluslararası formatta, başında + olmadan yazın. Örn: 905321234567</small>
+            <small>Uluslararası formatta, başında + olmadan. Dekont göndermek için müşterilere gösterilebilir.</small>
           </div>
           <button type="submit" class="btn btn-small">Kaydet</button>
           <p class="form-status" id="settingsStatus" role="status"></p>
         </form>
+        <p class="panel-hint" style="margin-top:12px">Bu bilgiler sepet sayfasındaki ödeme bölümünde ve sipariş onayında müşteriye gösterilir.</p>
       </div>
       <div class="admin-panel settings-panel">
         <h2>Sunucu Bağlantısı</h2>
@@ -3789,7 +4083,7 @@ img, svg { max-width: 100%; }
 const PAGE_IDS = { "#magaza": "page-urunler", "#sepet": "page-sepet", "#giris": "page-giris", "#hesap": "page-hesap", "#admin": "page-admin" };
 
 function route() {
-  let target = PAGE_IDS[location.hash] || "page-index";
+  let target = PAGE_IDS[location.hash] || (location.hash.indexOf("#urun/") === 0 ? "page-urun" : "page-index");
   // Sayfa açıkken elle #admin yazılırsa da yetki kontrolü yap
   if (target === "page-admin" && typeof Store !== "undefined") {
     const s = Store.session();
@@ -3801,7 +4095,7 @@ function route() {
   document.querySelectorAll(".single-page").forEach((d) => {
     d.style.display = d.id === target ? "" : "none";
   });
-  if (PAGE_IDS[location.hash]) window.scrollTo(0, 0);
+  if (PAGE_IDS[location.hash] || location.hash.indexOf("#urun/") === 0) window.scrollTo(0, 0);
 }
 
 // Oturum durumu değiştiğinde sayfayı hedef rotayla yeniden yükler
@@ -3960,7 +4254,7 @@ const Store = (() => {
     footerAbout: "Temiz enerjiyle daha aydınlık bir gelecek için 12 yıldır çalışıyoruz.",
     footerCopyright: "© 2026 Solar Arena Enerji — Bu site örnek/demo amaçlıdır."
   };
-  const DEFAULT_SETTINGS = { whatsapp: "908500000000" };
+  const DEFAULT_SETTINGS = { whatsapp: "908500000000", bankName: "", bankHolder: "", iban: "", bankNote: "" };
   const SEED_VERSION = 3;
 
   // ===================== BELLEK ÖNBELLEĞİ =====================
@@ -4679,23 +4973,26 @@ function initSite(root) {
     return norm(q).split(/\s+/).filter(Boolean).every((w) => hay.includes(w));
   }
 
+  const productHref = (id) => (typeof goPage === "function") ? "#urun/" + id : "urun.html?id=" + encodeURIComponent(id);
+
   function productCard(p) {
     const low = p.stock <= 5;
     const authLabel = (Store.getSiteContent().authorizedLabel || "Yetkili Satıcı");
     const authBadge = p.authorized
       ? `<span class="auth-badge" title="${escHtml(authLabel)}"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>${escHtml(authLabel)}</span>`
       : "";
+    const href = productHref(p.id);
     return `
       <article class="product">
         <div class="product-img${p.photo ? " has-photo" : ""}">
           <span class="stock-badge${low ? " low" : ""}">${low ? "Son " + p.stock + " adet" : "Stokta"}</span>
           ${p.authorized ? `<span class="auth-ribbon">${escHtml(authLabel)}</span>` : ""}
-          ${productMedia(p)}
+          <a href="${href}" class="product-medialink" aria-label="${escHtml(p.name)}">${productMedia(p)}</a>
         </div>
         <div class="product-body">
           <span class="product-cat">${escHtml(catName(p.cat))}</span>
           ${authBadge}
-          <h3>${escHtml(p.name)}</h3>
+          <h3><a href="${href}" class="product-titlelink">${escHtml(p.name)}</a></h3>
           <ul class="product-specs">${p.specs.map((s) => `<li>${escHtml(s)}</li>`).join("")}</ul>
           <div class="product-foot">
             <div class="product-price">${tlFmt(p.price)}<span>KDV dahil</span></div>
@@ -5118,8 +5415,120 @@ function initSite(root) {
 Store.ready(() => {
   initSite(document.getElementById("page-index"));
   initSite(document.getElementById("page-urunler"));
+  initSite(document.getElementById("page-urun"));
   initSite(document.getElementById("page-sepet"));
 });
+
+})();
+
+// ---- ÜRÜN DETAY SAYFASI ----
+(() => {
+// ============ ÜRÜN DETAY SAYFASI ============
+// Çok sayfalı: urun.html?id=XXX   ·   Tek dosya: #urun/XXX
+function initProductPage(root) {
+  root = root || document;
+  const wrap = root.querySelector("#productDetail");
+  if (!wrap) return;
+  const crumb = root.querySelector("#pBreadcrumb");
+
+  const money = (n) => "₺" + Math.round(n).toLocaleString("tr-TR");
+  const catName = (id) => { const c = Store.getCategories().find((x) => x.id === id); return c ? c.name : ""; };
+  const link = (href) => (typeof goPage === "function"
+    ? ({ "urunler.html": "#magaza", "index.html": "#", "sepet.html": "#sepet" }[href] || href)
+    : href);
+
+  // Ürün kimliği
+  let id = new URLSearchParams(location.search).get("id");
+  if (!id && location.hash.indexOf("#urun/") === 0) id = decodeURIComponent(location.hash.slice(6));
+
+  const p = Store.getProducts().find((x) => x.id === id);
+  try { document.title = (p ? p.name : "Ürün bulunamadı") + " | Solar Arena"; } catch (_) {}
+
+  if (!p) {
+    if (crumb) crumb.innerHTML = "";
+    wrap.innerHTML = '<div class="pd-notfound"><p>Aradığınız ürün bulunamadı veya kaldırılmış olabilir.</p><a href="' + link("urunler.html") + '" class="btn">Mağazaya Dön</a></div>';
+    return;
+  }
+
+  const media = p.photo ? `<img src="${escHtml(p.photo)}" alt="${escHtml(p.name)}">` : (PRODUCT_ART[p.img] || PRODUCT_ART.panel);
+  const low = p.stock <= 5;
+  const inStock = p.stock > 0;
+  const authLabel = Store.getSiteContent().authorizedLabel || "Yetkili Satıcı";
+
+  if (crumb) {
+    crumb.innerHTML =
+      `<a href="${link("index.html")}">Ana Sayfa</a> <span>›</span> ` +
+      `<a href="${link("urunler.html")}">Ürünler</a>` +
+      (p.cat ? ` <span>›</span> <span class="crumb-cat">${escHtml(catName(p.cat))}</span>` : "") +
+      ` <span>›</span> <span class="crumb-current">${escHtml(p.name)}</span>`;
+  }
+
+  wrap.innerHTML = `
+    <div class="pd-grid">
+      <div class="pd-media${p.photo ? " has-photo" : ""}">
+        ${p.authorized ? `<span class="auth-ribbon">${escHtml(authLabel)}</span>` : ""}
+        ${media}
+      </div>
+      <div class="pd-info">
+        <span class="pd-cat">${escHtml(catName(p.cat))}</span>
+        <h1 class="pd-title">${escHtml(p.name)}</h1>
+        ${p.authorized ? `<span class="auth-badge"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>${escHtml(authLabel)}</span>` : ""}
+        <div class="pd-price">${money(p.price)} <span>KDV dahil</span></div>
+        <div class="pd-stock ${inStock ? (low ? "low" : "ok") : "out"}">${inStock ? (low ? "Son " + p.stock + " adet" : "Stokta var") : "Stokta yok"}</div>
+        ${p.specs && p.specs.length ? `<ul class="pd-specs">${p.specs.map((s) => `<li>${escHtml(s)}</li>`).join("")}</ul>` : ""}
+        <div class="pd-buy">
+          <div class="pd-qty">
+            <button type="button" id="pdDec" aria-label="Azalt">−</button>
+            <input type="number" id="pdQty" value="1" min="1"${p.stock > 0 ? ` max="${p.stock}"` : ""}>
+            <button type="button" id="pdInc" aria-label="Artır">+</button>
+          </div>
+          <button type="button" class="btn pd-add" id="pdAdd"${inStock ? "" : " disabled"}>${inStock ? "Sepete Ekle" : "Stokta Yok"}</button>
+        </div>
+        <a href="${link("sepet.html")}" class="pd-gocart" id="pdGoCart" hidden>Sepete git →</a>
+        <div class="pd-trust">
+          <span>✓ Türkiye'nin her yerine gönderim</span>
+          <span>✓ Orijinal &amp; faturalı ürün</span>
+          <span>✓ Havale / EFT ile güvenli ödeme</span>
+        </div>
+      </div>
+    </div>`;
+
+  const qtyEl = root.querySelector("#pdQty");
+  const clampQty = () => {
+    let v = parseInt(qtyEl.value, 10);
+    if (isNaN(v) || v < 1) v = 1;
+    if (p.stock > 0 && v > p.stock) v = p.stock;
+    qtyEl.value = v;
+    return v;
+  };
+  root.querySelector("#pdDec").addEventListener("click", () => { qtyEl.value = Math.max(1, (parseInt(qtyEl.value, 10) || 1) - 1); });
+  root.querySelector("#pdInc").addEventListener("click", () => { qtyEl.value = (parseInt(qtyEl.value, 10) || 1) + 1; clampQty(); });
+  qtyEl.addEventListener("change", clampQty);
+
+  const addBtn = root.querySelector("#pdAdd");
+  if (inStock) {
+    addBtn.addEventListener("click", () => {
+      const qty = clampQty();
+      let cart;
+      try { cart = JSON.parse(localStorage.getItem("gp-cart")) || {}; } catch (_) { cart = {}; }
+      cart[p.id] = (cart[p.id] || 0) + qty;
+      localStorage.setItem("gp-cart", JSON.stringify(cart));
+      window.dispatchEvent(new Event("hashchange")); // sepet rozetini tazele
+      addBtn.textContent = "Sepete Eklendi ✓";
+      root.querySelector("#pdGoCart").hidden = false;
+      setTimeout(() => { addBtn.textContent = "Sepete Ekle"; }, 1500);
+    });
+  }
+}
+
+if (typeof goPage === "function") {
+  // Tek dosya: hash rotası (#urun/ID) değişince yeniden çiz
+  const run = () => { if (location.hash.indexOf("#urun/") === 0) Store.ready(() => initProductPage(document.getElementById("page-urun"))); };
+  window.addEventListener("hashchange", run);
+  run();
+} else {
+  Store.ready(() => initProductPage(document));
+}
 
 })();
 
@@ -5198,6 +5607,24 @@ function initCartPage() {
 
     sumSub.textContent = money(total);
     sumTotal.textContent = money(total);
+    renderEftInfo();
+  }
+
+  // Banka/IBAN bilgilerini ayarlardan sepete yazar
+  function renderEftInfo() {
+    const el = document.getElementById("eftInfo");
+    if (!el) return;
+    const s = Store.getSettings();
+    if (!s.iban && !s.bankName) {
+      el.innerHTML = '<p class="eft-empty">Banka hesap bilgileri henüz girilmemiş. Yönetici, panelden (Ayarlar) IBAN bilgisini ekleyebilir; siparişinizi yine de oluşturabilirsiniz, ekibimiz ödeme bilgilerini iletir.</p>';
+      return;
+    }
+    const row = (label, val) => val ? `<div class="eft-row"><span>${label}</span><strong>${escHtml(val)}</strong></div>` : "";
+    el.innerHTML =
+      row("Banka", s.bankName) +
+      row("Hesap Sahibi", s.bankHolder) +
+      (s.iban ? `<div class="eft-row eft-iban"><span>IBAN</span><strong>${escHtml(s.iban)}</strong></div>` : "") +
+      (s.bankNote ? `<p class="eft-note">${escHtml(s.bankNote)}</p>` : "");
   }
 
   cartRows.addEventListener("click", (e) => {
@@ -5223,7 +5650,6 @@ function initCartPage() {
     const email = document.getElementById("coEmail");
     const city = document.getElementById("coCity");
     const address = document.getElementById("coAddress");
-    const method = document.querySelector('input[name="payMethod"]:checked').value;
 
     let valid = true;
     [name, phone, city, address].forEach((f) => {
@@ -5243,52 +5669,45 @@ function initCartPage() {
 
     const session = Store.session();
     const total = list.reduce((s, e) => s + e.product.price * e.qty, 0);
+    const orderId = "SA" + Date.now().toString().slice(-8);
     const order = {
+      id: orderId,
       customer: name.value.trim(),
       phone: phone.value.trim(),
       email: (email.value.trim() || (session ? session.email : "")),
       city: city.value.trim(),
       address: address.value.trim(),
-      payment: method,
-      status: method === "card" ? "Ödeme bekliyor (PayTR)" : "WhatsApp siparişi",
+      payment: "eft",
+      status: "Havale/EFT bekleniyor",
       items: list.map((e) => ({ name: e.product.name, qty: e.qty, price: e.product.price })),
       total
     };
 
     Store.addOrder(order);
 
-    if (method === "card") {
-      // PayTR bağlandığında müşteri burada ödeme sayfasına yönlendirilecek
-      const result = Store.startCardPayment(order);
-      showSuccess(
-        "Siparişiniz kaydedildi (Toplam: " + money(total) + "). " + result.message +
-        " Ekibimiz ödeme için sizinle iletişime geçecek."
-      );
-    } else {
-      const lines = order.items.map((i) => `• ${i.qty} × ${i.name} — ${money(i.price * i.qty)}`);
-      const msg =
-        "Merhaba, sipariş vermek istiyorum:\n\n" + lines.join("\n") +
-        "\n\nToplam: " + money(total) +
-        "\n\nAd Soyad: " + order.customer +
-        "\nTelefon: " + order.phone +
-        "\nİl: " + order.city +
-        "\nAdres: " + order.address;
-      window.open(
-        "https://wa.me/" + Store.getSettings().whatsapp + "?text=" + encodeURIComponent(msg),
-        "_blank"
-      );
-      showSuccess(
-        "Siparişiniz kaydedildi (Toplam: " + money(total) + "). " +
-        "Açılan WhatsApp penceresindeki mesajı göndermeyi unutmayın; ekibimiz sizi arayarak onaylayacak."
-      );
-    }
+    const s = Store.getSettings();
+    const bankLines = [];
+    if (s.bankName) bankLines.push("Banka: " + s.bankName);
+    if (s.bankHolder) bankLines.push("Hesap Sahibi: " + s.bankHolder);
+    if (s.iban) bankLines.push("IBAN: " + s.iban);
+    const bankHtml = bankLines.length
+      ? "<div class='success-bank'>" + bankLines.map((l) => "<div>" + escHtml(l) + "</div>").join("") + "</div>"
+      : "";
+
+    showSuccess(
+      "<strong>Sipariş No: " + orderId + "</strong><br>" +
+      "Toplam <strong>" + money(total) + "</strong> tutarını aşağıdaki hesaba havale/EFT ile gönderin. " +
+      "Açıklamaya <strong>" + orderId + "</strong> yazmayı unutmayın." +
+      bankHtml +
+      "<span class='success-sub'>Ödemeniz görüldüğünde siparişiniz hazırlanıp kargolanır. Dilerseniz dekontu WhatsApp/e-posta ile iletebilirsiniz.</span>"
+    );
 
     writeCart({});
     refreshBadge();
   });
 
   function showSuccess(msg) {
-    document.getElementById("successMsg").textContent = msg;
+    document.getElementById("successMsg").innerHTML = msg;
     cartLayout.hidden = true;
     cartEmptyEl.hidden = true;
     orderSuccessEl.hidden = false;
@@ -6151,7 +6570,7 @@ function renderOrders() {
           <span>${dateFmt(o.date)}</span>
         </div>
         <div class="order-meta">
-          <span class="pill ${o.payment === "card" ? "pill-warn" : "pill-ok"}">${o.payment === "card" ? "Kredi Kartı — ödeme bekliyor (PayTR)" : "WhatsApp siparişi"}</span>
+          <span class="pill ${o.payment === "eft" || o.payment === "card" ? "pill-warn" : "pill-ok"}">${o.payment === "eft" ? "Havale/EFT — ödeme bekleniyor" : o.payment === "card" ? "Kredi Kartı" : "WhatsApp siparişi"}${o.id ? " · No: " + escHtml(o.id) : ""}</span>
           ${o.phone ? " · Tel: " + escHtml(o.phone) : ""}
           ${o.city ? " · " + escHtml(o.city) : ""}
         </div>
@@ -6398,20 +6817,33 @@ document.getElementById("contentForm").addEventListener("submit", (e) => {
 loadContentForm();
 
 // ---------- AYARLAR ----------
-const waNumberInput = document.getElementById("waNumber");
-waNumberInput.value = Store.getSettings().whatsapp;
+function loadSettingsForm() {
+  const s = Store.getSettings();
+  document.getElementById("waNumber").value = s.whatsapp || "";
+  document.getElementById("bankName").value = s.bankName || "";
+  document.getElementById("bankHolder").value = s.bankHolder || "";
+  document.getElementById("iban").value = s.iban || "";
+  document.getElementById("bankNote").value = s.bankNote || "";
+}
+loadSettingsForm();
 
 document.getElementById("settingsForm").addEventListener("submit", (e) => {
   e.preventDefault();
   const status = document.getElementById("settingsStatus");
-  const num = waNumberInput.value.replace(/\D/g, "");
-  if (num.length < 11) {
-    status.textContent = "Geçerli bir numara girin (örn. 905321234567).";
+  const num = document.getElementById("waNumber").value.replace(/\D/g, "");
+  if (num && num.length < 11) {
+    status.textContent = "WhatsApp numarası geçersiz (örn. 905321234567) — boş bırakabilirsiniz.";
     status.className = "form-status err";
     return;
   }
-  Store.saveSettings({ whatsapp: num });
-  waNumberInput.value = num;
+  Store.saveSettings({
+    whatsapp: num,
+    bankName: document.getElementById("bankName").value.trim(),
+    bankHolder: document.getElementById("bankHolder").value.trim(),
+    iban: document.getElementById("iban").value.trim(),
+    bankNote: document.getElementById("bankNote").value.trim()
+  });
+  document.getElementById("waNumber").value = num;
   status.textContent = "Kaydedildi.";
   status.className = "form-status ok";
 });
