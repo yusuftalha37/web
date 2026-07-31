@@ -30,6 +30,8 @@ def rewrite_links(html):
     html = html.replace('href="admin.html"', 'href="#admin"')
     html = html.replace('href="urunler.html"', 'href="#magaza"')
     html = html.replace('href="sepet.html"', 'href="#sepet"')
+    # Blog sayfaları tek dosya sürümüne dahil değil; ana sayfaya yönlendir
+    html = html.replace('href="blog.html"', 'href="#"')
     return html
 
 

@@ -17,7 +17,38 @@ function initProductPage(root) {
   if (!id && location.hash.indexOf("#urun/") === 0) id = decodeURIComponent(location.hash.slice(6));
 
   const p = Store.getProducts().find((x) => x.id === id);
-  try { document.title = (p ? p.name : "Ürün bulunamadı") + " | Solar Arena"; } catch (_) {}
+  try { document.title = (p ? p.name + " Fiyatı ve Özellikleri" : "Ürün bulunamadı") + " | Solar Arena"; } catch (_) {}
+
+  // ---- Dinamik SEO: meta açıklama + canonical + ürün yapılandırılmış verisi ----
+  if (p && typeof goPage !== "function") {
+    try {
+      let md = document.querySelector('meta[name="description"]');
+      if (!md) { md = document.createElement("meta"); md.name = "description"; document.head.appendChild(md); }
+      md.content = p.name + " uygun fiyat ve stoktan aynı gün kargo ile. " + (p.specs || []).slice(0, 2).join(" · ") + " — Türkiye'nin her yerine gönderim.";
+      let cn = document.querySelector('link[rel="canonical"]');
+      if (!cn) { cn = document.createElement("link"); cn.rel = "canonical"; document.head.appendChild(cn); }
+      cn.href = "https://solararena.store/urun.html?id=" + encodeURIComponent(p.id);
+      const ld = document.createElement("script");
+      ld.type = "application/ld+json";
+      ld.textContent = JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "Product",
+        "name": p.name,
+        "description": (p.specs || []).join(" · "),
+        "image": p.photo || undefined,
+        "brand": { "@type": "Brand", "name": "Solar Arena" },
+        "offers": {
+          "@type": "Offer",
+          "url": "https://solararena.store/urun.html?id=" + encodeURIComponent(p.id),
+          "priceCurrency": "TRY",
+          "price": p.price,
+          "availability": p.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+          "itemCondition": "https://schema.org/NewCondition"
+        }
+      });
+      document.head.appendChild(ld);
+    } catch (_) {}
+  }
 
   if (!p) {
     if (crumb) crumb.innerHTML = "";

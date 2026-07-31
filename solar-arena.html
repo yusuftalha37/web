@@ -962,6 +962,50 @@ img, svg { max-width: 100%; }
   color: var(--muted);
 }
 
+/* ============ BİLGİ MERKEZİ / MAKALELER ============ */
+.article-body h2 {
+  font-size: 17px;
+  margin: 26px 0 10px;
+  padding-bottom: 6px;
+  border-bottom: 2px solid var(--bg-alt);
+}
+.article-body p { margin-bottom: 12px; font-size: 14px; }
+.article-lead {
+  font-size: 15px;
+  color: var(--text);
+  background: #eef4f9;
+  border-left: 4px solid var(--blue);
+  padding: 12px 16px;
+  margin: 14px 0 8px;
+}
+.article-cta {
+  margin: 26px 0;
+  padding: 16px 18px;
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  text-align: center;
+}
+.article-cta p { margin-bottom: 12px; }
+.article-related { list-style: none; padding: 0; }
+.article-related li { padding: 6px 0; border-bottom: 1px dashed var(--border); }
+.article-related a { color: var(--blue); text-decoration: none; font-size: 14px; }
+.article-related a:hover { text-decoration: underline; }
+
+.blog-list { display: flex; flex-direction: column; gap: 16px; }
+.blog-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  background: #fff;
+}
+.blog-card h2 { font-size: 17px; margin-bottom: 8px; }
+.blog-card h2 a { color: var(--blue); text-decoration: none; }
+.blog-card h2 a:hover { text-decoration: underline; }
+.blog-card p { font-size: 13.5px; color: var(--muted); margin-bottom: 10px; }
+.blog-more { font-size: 13px; font-weight: bold; color: var(--orange-dark); text-decoration: none; }
+.blog-more:hover { text-decoration: underline; }
+
 .pd-notfound { text-align: center; padding: 40px 0; }
 .pd-notfound p { margin-bottom: 16px; color: var(--muted); }
 
@@ -2612,6 +2656,7 @@ img, svg { max-width: 100%; }
         <a href="#anasayfa">ANA SAYFA</a>
         <a href="#hizmetler">HİZMETLERİMİZ</a>
         <a href="#magaza">ÜRÜNLER</a>
+        <a href="#">BİLGİ MERKEZİ</a>
         <a href="#hesaplayici">TASARRUF HESAPLA</a>
         <a href="#projeler">PROJELERİMİZ</a>
         <a href="#referanslar">REFERANSLAR</a>
@@ -2646,7 +2691,7 @@ img, svg { max-width: 100%; }
 
   <!-- VİTRİN / SHOWROOM SLIDER -->
   <section class="showroom" id="anasayfa" aria-label="Vitrin">
-    <h1 class="visually-hidden">Güneş Paneli ve Solar Enerji Ürünleri — Türkiye'nin Her Yerine Gönderim</h1>
+    <h1 class="visually-hidden">Güneş Enerjisi Sistemleri, Solar Paketler ve Güneş Paneli Fiyatları — Türkiye'nin Her Yerine Gönderim</h1>
     <div class="showroom-track" id="showroomTrack"></div>
     <button class="showroom-nav prev" id="showroomPrev" aria-label="Önceki slayt">‹</button>
     <button class="showroom-nav next" id="showroomNext" aria-label="Sonraki slayt">›</button>
@@ -3050,6 +3095,7 @@ img, svg { max-width: 100%; }
         <h4>Hızlı Erişim</h4>
         <a href="#hizmetler">Hizmetler</a>
         <a href="#magaza">Mağaza</a>
+        <a href="#">Bilgi Merkezi</a>
         <a href="#hesaplayici">Tasarruf Hesapla</a>
         <a href="#sss">S.S.S.</a>
       </div>
@@ -3118,6 +3164,7 @@ img, svg { max-width: 100%; }
         <a href="#">ANA SAYFA</a>
         <a href="#hizmetler">HİZMETLERİMİZ</a>
         <a href="#magaza">ÜRÜNLER</a>
+        <a href="#">BİLGİ MERKEZİ</a>
         <a href="#hesaplayici">TASARRUF HESAPLA</a>
         <a href="#projeler">PROJELERİMİZ</a>
         <a href="#referanslar">REFERANSLAR</a>
@@ -3272,6 +3319,7 @@ img, svg { max-width: 100%; }
         <a href="#">ANA SAYFA</a>
         <a href="#hizmetler">HİZMETLERİMİZ</a>
         <a href="#magaza">ÜRÜNLER</a>
+        <a href="#">BİLGİ MERKEZİ</a>
         <a href="#hesaplayici">TASARRUF HESAPLA</a>
         <a href="#projeler">PROJELERİMİZ</a>
         <a href="#referanslar">REFERANSLAR</a>
@@ -3365,6 +3413,7 @@ img, svg { max-width: 100%; }
         <a href="#">ANA SAYFA</a>
         <a href="#hizmetler">HİZMETLERİMİZ</a>
         <a href="#magaza">ÜRÜNLER</a>
+        <a href="#">BİLGİ MERKEZİ</a>
         <a href="#hesaplayici">TASARRUF HESAPLA</a>
         <a href="#projeler">PROJELERİMİZ</a>
         <a href="#referanslar">REFERANSLAR</a>
@@ -5466,7 +5515,38 @@ function initProductPage(root) {
   if (!id && location.hash.indexOf("#urun/") === 0) id = decodeURIComponent(location.hash.slice(6));
 
   const p = Store.getProducts().find((x) => x.id === id);
-  try { document.title = (p ? p.name : "Ürün bulunamadı") + " | Solar Arena"; } catch (_) {}
+  try { document.title = (p ? p.name + " Fiyatı ve Özellikleri" : "Ürün bulunamadı") + " | Solar Arena"; } catch (_) {}
+
+  // ---- Dinamik SEO: meta açıklama + canonical + ürün yapılandırılmış verisi ----
+  if (p && typeof goPage !== "function") {
+    try {
+      let md = document.querySelector('meta[name="description"]');
+      if (!md) { md = document.createElement("meta"); md.name = "description"; document.head.appendChild(md); }
+      md.content = p.name + " uygun fiyat ve stoktan aynı gün kargo ile. " + (p.specs || []).slice(0, 2).join(" · ") + " — Türkiye'nin her yerine gönderim.";
+      let cn = document.querySelector('link[rel="canonical"]');
+      if (!cn) { cn = document.createElement("link"); cn.rel = "canonical"; document.head.appendChild(cn); }
+      cn.href = "https://solararena.store/urun.html?id=" + encodeURIComponent(p.id);
+      const ld = document.createElement("script");
+      ld.type = "application/ld+json";
+      ld.textContent = JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "Product",
+        "name": p.name,
+        "description": (p.specs || []).join(" · "),
+        "image": p.photo || undefined,
+        "brand": { "@type": "Brand", "name": "Solar Arena" },
+        "offers": {
+          "@type": "Offer",
+          "url": "https://solararena.store/urun.html?id=" + encodeURIComponent(p.id),
+          "priceCurrency": "TRY",
+          "price": p.price,
+          "availability": p.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+          "itemCondition": "https://schema.org/NewCondition"
+        }
+      });
+      document.head.appendChild(ld);
+    } catch (_) {}
+  }
 
   if (!p) {
     if (crumb) crumb.innerHTML = "";
