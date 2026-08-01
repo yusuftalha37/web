@@ -405,11 +405,18 @@ function renderCategories() {
         ? `<img class="table-thumb" src="${escHtml(c.image)}" alt="">`
         : '<span class="table-thumb table-thumb-empty">—</span>';
       const isBrand = c.kind === "brand";
+      // Marka satırında: hangi üst kategoriye bağlı olduğunu seçtiren liste
+      let typeCell = isBrand ? '<span class="pill pill-warn">Marka</span>' : "Kategori";
+      if (isBrand) {
+        const opts = cats.filter((x) => x.kind !== "brand")
+          .map((x) => `<option value="${x.id}"${c.parent === x.id ? " selected" : ""}>${escHtml(x.name)}</option>`).join("");
+        typeCell += `<br><select class="cat-parent-sel" data-id="${c.id}" title="Üst kategori"><option value="">— üst kategori seç —</option>${opts}</select>`;
+      }
       return `
       <tr>
         <td>${thumb}</td>
         <td class="cell-strong">${escHtml(c.name)}</td>
-        <td>${isBrand ? '<span class="pill pill-warn">Marka</span>' : "Kategori"}</td>
+        <td>${typeCell}</td>
         <td>${count} ürün</td>
         <td class="cell-actions">
           <button class="row-btn" data-act="setimg" data-id="${c.id}">${c.image ? "Görseli Değiştir" : "Görsel Ekle"}</button>
@@ -421,7 +428,28 @@ function renderCategories() {
       </tr>`;
     }).join("") ||
     '<tr><td colspan="5" class="empty-row">Henüz kategori yok.</td></tr>';
+
+  // Marka → üst kategori seçimi
+  document.querySelectorAll("#catRows .cat-parent-sel").forEach((sel) => {
+    sel.addEventListener("change", () => {
+      Store.saveCategory({ id: sel.dataset.id, parent: sel.value });
+      renderAll();
+    });
+  });
 }
+
+// Kategori formundaki "Üst kategori" listesini doldurur ve Tür=Marka ise gösterir
+function refreshCatFormParent() {
+  const kindSel = document.getElementById("catKind");
+  const wrap = document.getElementById("catParentWrap");
+  const parentSel = document.getElementById("catParent");
+  if (!kindSel || !wrap || !parentSel) return;
+  const normals = Store.getCategories().filter((c) => c.kind !== "brand");
+  parentSel.innerHTML = '<option value="">— üst kategori seç —</option>' +
+    normals.map((c) => `<option value="${c.id}">${escHtml(c.name)}</option>`).join("");
+  wrap.hidden = kindSel.value !== "brand";
+}
+document.getElementById("catKind").addEventListener("change", refreshCatFormParent);
 
 document.getElementById("catForm").addEventListener("submit", (e) => {
   e.preventDefault();
@@ -435,11 +463,13 @@ document.getElementById("catForm").addEventListener("submit", (e) => {
     return;
   }
   const kind = document.getElementById("catKind").value;
-  Store.saveCategory({ name, kind });
+  const parent = kind === "brand" ? document.getElementById("catParent").value : "";
+  Store.saveCategory({ name, kind, parent });
   status.textContent = '"' + name + '" ' + (kind === "brand" ? "markası" : "kategorisi") + " eklendi.";
   status.className = "form-status ok";
   input.value = "";
   document.getElementById("catKind").value = "";
+  refreshCatFormParent();
   renderAll();
 });
 
@@ -940,6 +970,7 @@ document.getElementById("settingsForm").addEventListener("submit", (e) => {
 // ---------- TÜMÜNÜ ÇİZ ----------
 function renderAll() {
   populateCatSelects();
+  refreshCatFormParent();
   renderDashboard();
   renderProducts();
   renderCategories();

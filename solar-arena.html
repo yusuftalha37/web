@@ -447,6 +447,76 @@ img, svg { max-width: 100%; }
   border-bottom-color: var(--orange);
 }
 
+/* ---- Kategori mega-menüsü (fareyle açılan markalar) ---- */
+.catbar-item { position: relative; display: flex; }
+.catbar-caret { font-size: 9px; margin-left: 4px; opacity: 0.7; }
+.catbar-mega {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 300px;
+  max-width: 520px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-top: 2px solid var(--orange);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.16);
+  padding: 12px 14px;
+  z-index: 95;
+  display: none;
+}
+/* Fareyle kategori ya da menü üzerindeyken açık kalır */
+.catbar-item.has-mega:hover .catbar-mega { display: block; }
+.catbar-mega-title {
+  display: block;
+  font-size: 10px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+.catbar-mega-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 8px;
+}
+.catbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  text-decoration: none;
+  color: var(--text);
+  background: #fff;
+}
+.catbar-brand:hover { border-color: var(--blue); background: var(--bg-alt); }
+.catbar-brand img {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+.catbar-brand-noimg {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--blue);
+  color: #fff;
+  font-size: 12px;
+  font-weight: bold;
+  border-radius: var(--radius);
+}
+.catbar-brand-name { font-size: 12px; font-weight: bold; line-height: 1.2; }
+@media (max-width: 720px) {
+  .catbar-mega { position: static; min-width: 0; box-shadow: none; border: none; padding: 6px 0 10px 20px; }
+  .catbar-item.has-mega:hover .catbar-mega { display: block; }
+}
+
 /* ============ BANNER ============ */
 .hero {
   background: var(--blue-dark) repeating-linear-gradient(
@@ -2072,6 +2142,15 @@ img, svg { max-width: 100%; }
 }
 .mode-note-ok { background: #e8f6ec; border: 1px solid #b7e0c2; color: #1f6b3a; }
 .mode-note-warn { background: #fdeceb; border: 1px solid #f3b7b2; color: #9a2820; }
+
+.cat-parent-sel {
+  margin-top: 5px;
+  font-size: 11px;
+  padding: 2px 4px;
+  max-width: 160px;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+}
 
 /* ---- Kenar menü ---- */
 .admin-sidebar {
@@ -3879,6 +3958,10 @@ img, svg { max-width: 100%; }
               </select>
             </div>
           </div>
+          <div class="form-group" id="catParentWrap" hidden>
+            <label for="catParent">Üst kategori <small>(marka bu kategorinin altında görünür)</small></label>
+            <select id="catParent"></select>
+          </div>
           <button type="submit" class="btn btn-small">Ekle</button>
           <p class="form-status" id="catStatus" role="status"></p>
         </form>
@@ -4383,7 +4466,7 @@ const Store = (() => {
         sbSelect("kv", "select=*")
       ]);
       cache.products = products.map(fromDbProduct);
-      cache.categories = categories.map((c) => ({ id: c.id, name: c.name, image: c.image || "", kind: c.kind || "" }));
+      cache.categories = categories.map((c) => ({ id: c.id, name: c.name, image: c.image || "", kind: c.kind || "", parent: c.parent || "" }));
       cache.slides = slides.map(fromDbSlide);
       const kvMap = {};
       kv.forEach((row) => (kvMap[row.k] = row.v));
@@ -4462,15 +4545,17 @@ const Store = (() => {
         if (name) ex.name = name;
         if (cat.image !== undefined) ex.image = cat.image;
         if (cat.kind !== undefined) ex.kind = cat.kind;
+        if (cat.parent !== undefined) ex.parent = cat.parent;
       }
       const row = { id: cat.id, name: ex ? ex.name : name };
       if (cat.image !== undefined) row.image = cat.image;
       if (cat.kind !== undefined) row.kind = cat.kind;
+      if (cat.parent !== undefined) row.parent = cat.parent;
       if (persist) return sbWrite("POST", "categories", "", row).catch(logErr);
     } else {
-      const nc = { id: "c-" + Date.now(), name, image: cat.image || "", kind: cat.kind || "" };
+      const nc = { id: "c-" + Date.now(), name, image: cat.image || "", kind: cat.kind || "", parent: cat.parent || "" };
       cache.categories.push(nc);
-      if (persist) return sbWrite("POST", "categories", "", { id: nc.id, name: nc.name, image: nc.image, kind: nc.kind, sort: cache.categories.length }).catch(logErr);
+      if (persist) return sbWrite("POST", "categories", "", { id: nc.id, name: nc.name, image: nc.image, kind: nc.kind, parent: nc.parent, sort: cache.categories.length }).catch(logErr);
     }
     write("gp-cats", cache.categories);
   }
@@ -5155,11 +5240,20 @@ function initSite(root) {
 
     const currentQuery = () => (!featured && searchInput ? searchInput.value.trim() : "");
 
+    // Bir ürün, seçili kategoriye ait mi? Üst kategori seçiliyse, o kategorinin
+    // markalarına (parent === kategori) atanmış ürünler de dahil edilir.
+    const childBrandIds = (catId) => CATEGORIES.filter((c) => c.kind === "brand" && c.parent === catId).map((c) => c.id);
+    function catMatch(p, catId) {
+      if (catId === "all") return true;
+      if (p.cat === catId) return true;
+      return childBrandIds(catId).indexOf(p.cat) !== -1;
+    }
+
     // Kategori + arama uygulanmış liste (güç filtresi hariç — facet bundan üretilir)
     function baseList() {
       const q = currentQuery();
       return PRODUCTS.filter(
-        (p) => (currentCat === "all" || p.cat === currentCat) && matchesQuery(p, q)
+        (p) => catMatch(p, currentCat) && matchesQuery(p, q)
       );
     }
 
@@ -5190,7 +5284,7 @@ function initSite(root) {
     // ---- Sol kenar: kategori listesi + güç/kapasite facet'i (ürünler sayfası) ----
     function buildCatList() {
       const item = (c) => {
-        const n = PRODUCTS.filter((p) => p.cat === c.id).length;
+        const n = PRODUCTS.filter((p) => catMatch(p, c.id)).length;
         return `<li><button class="cat-link${currentCat === c.id ? " active" : ""}" data-cat="${c.id}">${escHtml(c.name)} <span>${n}</span></button></li>`;
       };
       const normal = CATEGORIES.filter((c) => c.kind !== "brand");
@@ -5330,16 +5424,32 @@ function initSite(root) {
     const catIcon = (c) => c.image ? `<img class="catbar-ico" src="${escHtml(c.image)}" alt="">` : "";
     const normalCats = CATEGORIES.filter((c) => c.kind !== "brand");
     const brandCats = CATEGORIES.filter((c) => c.kind === "brand");
+    const brandsOf = (catId) => brandCats.filter((b) => b.parent === catId);
+    const href = pageLink("urunler.html");
+
     if (catbarLinks) {
-      // Yatay çubukta ürün kategorileri; markalar açılır listede "Markalar" altında
-      catbarLinks.innerHTML = normalCats.map(
-        (c) => `<a href="${pageLink("urunler.html")}" class="catbar-link" data-cat="${c.id}">${catIcon(c)}${escHtml(c.name)}</a>`
-      ).join("");
+      // Her ürün kategorisi; alt markası varsa fareyle açılan mega-menü ile
+      catbarLinks.innerHTML = normalCats.map((c) => {
+        const kids = brandsOf(c.id);
+        const mega = kids.length ? `
+          <div class="catbar-mega">
+            <span class="catbar-mega-title">Markalar</span>
+            <div class="catbar-mega-grid">${kids.map((b) => `
+              <a href="${href}" class="catbar-brand" data-cat="${b.id}">
+                ${b.image ? `<img src="${escHtml(b.image)}" alt="${escHtml(b.name)}">` : `<span class="catbar-brand-noimg">${escHtml(b.name.slice(0, 2).toUpperCase())}</span>`}
+                <span class="catbar-brand-name">${escHtml(b.name)}</span>
+              </a>`).join("")}</div>
+          </div>` : "";
+        return `<div class="catbar-item${kids.length ? " has-mega" : ""}">
+          <a href="${href}" class="catbar-link" data-cat="${c.id}">${catIcon(c)}${escHtml(c.name)}${kids.length ? ' <span class="catbar-caret">▾</span>' : ""}</a>
+          ${mega}
+        </div>`;
+      }).join("");
     }
     if (catbarDropdown) {
-      const item = (c) => `<li><a href="${pageLink("urunler.html")}" data-cat="${c.id}">${catIcon(c)}${escHtml(c.name)}</a></li>`;
+      const item = (c) => `<li><a href="${href}" data-cat="${c.id}">${catIcon(c)}${escHtml(c.name)}</a></li>`;
       catbarDropdown.innerHTML =
-        `<li><a href="${pageLink("urunler.html")}" data-cat="all">Tüm Ürünler</a></li>` +
+        `<li><a href="${href}" data-cat="all">Tüm Ürünler</a></li>` +
         normalCats.map(item).join("") +
         (brandCats.length ? `<li class="catbar-group">Markalar</li>` + brandCats.map(item).join("") : "");
     }
@@ -6487,11 +6597,18 @@ function renderCategories() {
         ? `<img class="table-thumb" src="${escHtml(c.image)}" alt="">`
         : '<span class="table-thumb table-thumb-empty">—</span>';
       const isBrand = c.kind === "brand";
+      // Marka satırında: hangi üst kategoriye bağlı olduğunu seçtiren liste
+      let typeCell = isBrand ? '<span class="pill pill-warn">Marka</span>' : "Kategori";
+      if (isBrand) {
+        const opts = cats.filter((x) => x.kind !== "brand")
+          .map((x) => `<option value="${x.id}"${c.parent === x.id ? " selected" : ""}>${escHtml(x.name)}</option>`).join("");
+        typeCell += `<br><select class="cat-parent-sel" data-id="${c.id}" title="Üst kategori"><option value="">— üst kategori seç —</option>${opts}</select>`;
+      }
       return `
       <tr>
         <td>${thumb}</td>
         <td class="cell-strong">${escHtml(c.name)}</td>
-        <td>${isBrand ? '<span class="pill pill-warn">Marka</span>' : "Kategori"}</td>
+        <td>${typeCell}</td>
         <td>${count} ürün</td>
         <td class="cell-actions">
           <button class="row-btn" data-act="setimg" data-id="${c.id}">${c.image ? "Görseli Değiştir" : "Görsel Ekle"}</button>
@@ -6503,7 +6620,28 @@ function renderCategories() {
       </tr>`;
     }).join("") ||
     '<tr><td colspan="5" class="empty-row">Henüz kategori yok.</td></tr>';
+
+  // Marka → üst kategori seçimi
+  document.querySelectorAll("#catRows .cat-parent-sel").forEach((sel) => {
+    sel.addEventListener("change", () => {
+      Store.saveCategory({ id: sel.dataset.id, parent: sel.value });
+      renderAll();
+    });
+  });
 }
+
+// Kategori formundaki "Üst kategori" listesini doldurur ve Tür=Marka ise gösterir
+function refreshCatFormParent() {
+  const kindSel = document.getElementById("catKind");
+  const wrap = document.getElementById("catParentWrap");
+  const parentSel = document.getElementById("catParent");
+  if (!kindSel || !wrap || !parentSel) return;
+  const normals = Store.getCategories().filter((c) => c.kind !== "brand");
+  parentSel.innerHTML = '<option value="">— üst kategori seç —</option>' +
+    normals.map((c) => `<option value="${c.id}">${escHtml(c.name)}</option>`).join("");
+  wrap.hidden = kindSel.value !== "brand";
+}
+document.getElementById("catKind").addEventListener("change", refreshCatFormParent);
 
 document.getElementById("catForm").addEventListener("submit", (e) => {
   e.preventDefault();
@@ -6517,11 +6655,13 @@ document.getElementById("catForm").addEventListener("submit", (e) => {
     return;
   }
   const kind = document.getElementById("catKind").value;
-  Store.saveCategory({ name, kind });
+  const parent = kind === "brand" ? document.getElementById("catParent").value : "";
+  Store.saveCategory({ name, kind, parent });
   status.textContent = '"' + name + '" ' + (kind === "brand" ? "markası" : "kategorisi") + " eklendi.";
   status.className = "form-status ok";
   input.value = "";
   document.getElementById("catKind").value = "";
+  refreshCatFormParent();
   renderAll();
 });
 
@@ -7022,6 +7162,7 @@ document.getElementById("settingsForm").addEventListener("submit", (e) => {
 // ---------- TÜMÜNÜ ÇİZ ----------
 function renderAll() {
   populateCatSelects();
+  refreshCatFormParent();
   renderDashboard();
   renderProducts();
   renderCategories();

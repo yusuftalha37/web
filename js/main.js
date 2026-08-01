@@ -192,11 +192,20 @@ function initSite(root) {
 
     const currentQuery = () => (!featured && searchInput ? searchInput.value.trim() : "");
 
+    // Bir ürün, seçili kategoriye ait mi? Üst kategori seçiliyse, o kategorinin
+    // markalarına (parent === kategori) atanmış ürünler de dahil edilir.
+    const childBrandIds = (catId) => CATEGORIES.filter((c) => c.kind === "brand" && c.parent === catId).map((c) => c.id);
+    function catMatch(p, catId) {
+      if (catId === "all") return true;
+      if (p.cat === catId) return true;
+      return childBrandIds(catId).indexOf(p.cat) !== -1;
+    }
+
     // Kategori + arama uygulanmış liste (güç filtresi hariç — facet bundan üretilir)
     function baseList() {
       const q = currentQuery();
       return PRODUCTS.filter(
-        (p) => (currentCat === "all" || p.cat === currentCat) && matchesQuery(p, q)
+        (p) => catMatch(p, currentCat) && matchesQuery(p, q)
       );
     }
 
@@ -227,7 +236,7 @@ function initSite(root) {
     // ---- Sol kenar: kategori listesi + güç/kapasite facet'i (ürünler sayfası) ----
     function buildCatList() {
       const item = (c) => {
-        const n = PRODUCTS.filter((p) => p.cat === c.id).length;
+        const n = PRODUCTS.filter((p) => catMatch(p, c.id)).length;
         return `<li><button class="cat-link${currentCat === c.id ? " active" : ""}" data-cat="${c.id}">${escHtml(c.name)} <span>${n}</span></button></li>`;
       };
       const normal = CATEGORIES.filter((c) => c.kind !== "brand");
@@ -367,16 +376,32 @@ function initSite(root) {
     const catIcon = (c) => c.image ? `<img class="catbar-ico" src="${escHtml(c.image)}" alt="">` : "";
     const normalCats = CATEGORIES.filter((c) => c.kind !== "brand");
     const brandCats = CATEGORIES.filter((c) => c.kind === "brand");
+    const brandsOf = (catId) => brandCats.filter((b) => b.parent === catId);
+    const href = pageLink("urunler.html");
+
     if (catbarLinks) {
-      // Yatay çubukta ürün kategorileri; markalar açılır listede "Markalar" altında
-      catbarLinks.innerHTML = normalCats.map(
-        (c) => `<a href="${pageLink("urunler.html")}" class="catbar-link" data-cat="${c.id}">${catIcon(c)}${escHtml(c.name)}</a>`
-      ).join("");
+      // Her ürün kategorisi; alt markası varsa fareyle açılan mega-menü ile
+      catbarLinks.innerHTML = normalCats.map((c) => {
+        const kids = brandsOf(c.id);
+        const mega = kids.length ? `
+          <div class="catbar-mega">
+            <span class="catbar-mega-title">Markalar</span>
+            <div class="catbar-mega-grid">${kids.map((b) => `
+              <a href="${href}" class="catbar-brand" data-cat="${b.id}">
+                ${b.image ? `<img src="${escHtml(b.image)}" alt="${escHtml(b.name)}">` : `<span class="catbar-brand-noimg">${escHtml(b.name.slice(0, 2).toUpperCase())}</span>`}
+                <span class="catbar-brand-name">${escHtml(b.name)}</span>
+              </a>`).join("")}</div>
+          </div>` : "";
+        return `<div class="catbar-item${kids.length ? " has-mega" : ""}">
+          <a href="${href}" class="catbar-link" data-cat="${c.id}">${catIcon(c)}${escHtml(c.name)}${kids.length ? ' <span class="catbar-caret">▾</span>' : ""}</a>
+          ${mega}
+        </div>`;
+      }).join("");
     }
     if (catbarDropdown) {
-      const item = (c) => `<li><a href="${pageLink("urunler.html")}" data-cat="${c.id}">${catIcon(c)}${escHtml(c.name)}</a></li>`;
+      const item = (c) => `<li><a href="${href}" data-cat="${c.id}">${catIcon(c)}${escHtml(c.name)}</a></li>`;
       catbarDropdown.innerHTML =
-        `<li><a href="${pageLink("urunler.html")}" data-cat="all">Tüm Ürünler</a></li>` +
+        `<li><a href="${href}" data-cat="all">Tüm Ürünler</a></li>` +
         normalCats.map(item).join("") +
         (brandCats.length ? `<li class="catbar-group">Markalar</li>` + brandCats.map(item).join("") : "");
     }

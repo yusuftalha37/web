@@ -32,6 +32,15 @@
 .mode-note-ok { background: #e8f6ec; border: 1px solid #b7e0c2; color: #1f6b3a; }
 .mode-note-warn { background: #fdeceb; border: 1px solid #f3b7b2; color: #9a2820; }
 
+.cat-parent-sel {
+  margin-top: 5px;
+  font-size: 11px;
+  padding: 2px 4px;
+  max-width: 160px;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+}
+
 /* ---- Kenar menü ---- */
 .admin-sidebar {
   width: 240px;

@@ -438,6 +438,76 @@ img, svg { max-width: 100%; }
   border-bottom-color: var(--orange);
 }
 
+/* ---- Kategori mega-menüsü (fareyle açılan markalar) ---- */
+.catbar-item { position: relative; display: flex; }
+.catbar-caret { font-size: 9px; margin-left: 4px; opacity: 0.7; }
+.catbar-mega {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 300px;
+  max-width: 520px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-top: 2px solid var(--orange);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.16);
+  padding: 12px 14px;
+  z-index: 95;
+  display: none;
+}
+/* Fareyle kategori ya da menü üzerindeyken açık kalır */
+.catbar-item.has-mega:hover .catbar-mega { display: block; }
+.catbar-mega-title {
+  display: block;
+  font-size: 10px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+.catbar-mega-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 8px;
+}
+.catbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  text-decoration: none;
+  color: var(--text);
+  background: #fff;
+}
+.catbar-brand:hover { border-color: var(--blue); background: var(--bg-alt); }
+.catbar-brand img {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+.catbar-brand-noimg {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--blue);
+  color: #fff;
+  font-size: 12px;
+  font-weight: bold;
+  border-radius: var(--radius);
+}
+.catbar-brand-name { font-size: 12px; font-weight: bold; line-height: 1.2; }
+@media (max-width: 720px) {
+  .catbar-mega { position: static; min-width: 0; box-shadow: none; border: none; padding: 6px 0 10px 20px; }
+  .catbar-item.has-mega:hover .catbar-mega { display: block; }
+}
+
 /* ============ BANNER ============ */
 .hero {
   background: var(--blue-dark) repeating-linear-gradient(
