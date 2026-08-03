@@ -150,23 +150,27 @@
     <!-- KATEGORİLER -->
     <section class="admin-view" id="view-categories" hidden>
       <div class="admin-panel settings-panel">
-        <h2>Yeni Kategori Ekle</h2>
+        <h2>Yeni Kategori / Marka Ekle</h2>
+        <div class="cat-help">
+          <strong>İki seviye vardır:</strong>
+          <span><b>1) Üst kategori</b> = ürün tipi (Güneş Paneli, İnvertör, Akü…).</span>
+          <span><b>2) Alt kategori = Marka</b> — bir üst kategorinin altına bağlanır (ör. İnvertörler → <b>Lexron</b>).</span>
+          Önce üst kategoriyi oluştur, sonra altına markaları ekle.
+        </div>
         <form id="catForm">
-          <div class="form-row">
-            <div class="form-group">
-              <label for="catNameInput">Kategori / marka adı</label>
-              <input type="text" id="catNameInput" required placeholder="Örn. Şarj Kontrol Cihazları veya Lexron">
-            </div>
-            <div class="form-group">
-              <label for="catKind">Tür</label>
-              <select id="catKind">
-                <option value="">Ürün Kategorisi</option>
-                <option value="brand">Marka</option>
-              </select>
-            </div>
+          <div class="form-group">
+            <label for="catKind">Ne ekliyorsunuz?</label>
+            <select id="catKind">
+              <option value="">Üst kategori (ürün tipi)</option>
+              <option value="brand">Alt kategori — Marka</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="catNameInput" id="catNameLabel">Üst kategori adı</label>
+            <input type="text" id="catNameInput" required placeholder="Örn. Şarj Kontrol Cihazları">
           </div>
           <div class="form-group" id="catParentWrap" hidden>
-            <label for="catParent">Üst kategori <small>(marka bu kategorinin altında görünür)</small></label>
+            <label for="catParent">Bu marka hangi üst kategorinin altında? *</label>
             <select id="catParent"></select>
           </div>
           <button type="submit" class="btn btn-small">Ekle</button>
@@ -174,11 +178,11 @@
         </form>
       </div>
       <div class="admin-panel">
-        <p class="panel-hint">Kategoriler mağazadaki filtre butonlarında, üst kategori çubuğunda ve ürün formlarında kullanılır. Her kategoriye bir görsel (ikon) ekleyebilirsiniz; bu görsel üst kategori çubuğunda kategori adının yanında görünür. İçinde ürün bulunan kategori silinemez; önce ürünleri başka kategoriye taşıyın.</p>
+        <p class="panel-hint">Aşağıda üst kategoriler ve altlarındaki markalar görünür. Markalar bağlı oldukları üst kategorinin altında girintili listelenir. Her kategoriye/markaya bir görsel (ikon) ekleyebilirsiniz. İçinde ürün bulunan kategori silinemez; önce ürünleri başka kategoriye taşıyın.</p>
         <input type="file" id="catImgFile" accept="image/*" hidden>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Görsel</th><th>Kategori / Marka</th><th>Tür</th><th>Ürün Sayısı</th><th></th></tr></thead>
+            <thead><tr><th>Görsel</th><th>Üst kategori / Marka</th><th>Tür</th><th>Ürün</th><th></th></tr></thead>
             <tbody id="catRows"></tbody>
           </table>
         </div>

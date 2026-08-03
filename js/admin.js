@@ -445,36 +445,59 @@ renderUploadPreview();
 function renderCategories() {
   const cats = Store.getCategories();
   const products = Store.getProducts();
-  document.getElementById("catRows").innerHTML =
-    cats.map((c) => {
-      const count = products.filter((p) => Store.productCatIds(p).indexOf(c.id) !== -1).length;
-      const thumb = c.image
-        ? `<img class="table-thumb" src="${escHtml(c.image)}" alt="">`
-        : '<span class="table-thumb table-thumb-empty">—</span>';
-      const isBrand = c.kind === "brand";
-      // Marka satırında: hangi üst kategoriye bağlı olduğunu seçtiren liste
-      let typeCell = isBrand ? '<span class="pill pill-warn">Marka</span>' : "Kategori";
-      if (isBrand) {
-        const opts = cats.filter((x) => x.kind !== "brand")
-          .map((x) => `<option value="${x.id}"${c.parent === x.id ? " selected" : ""}>${escHtml(x.name)}</option>`).join("");
-        typeCell += `<br><select class="cat-parent-sel" data-id="${c.id}" title="Üst kategori"><option value="">— üst kategori seç —</option>${opts}</select>`;
-      }
-      return `
-      <tr>
-        <td>${thumb}</td>
+  const normals = cats.filter((c) => c.kind !== "brand");
+  const brands = cats.filter((c) => c.kind === "brand");
+  const countOf = (id) => products.filter((p) => Store.productCatIds(p).indexOf(id) !== -1).length;
+  const thumbOf = (c) => c.image
+    ? `<img class="table-thumb" src="${escHtml(c.image)}" alt="">`
+    : '<span class="table-thumb table-thumb-empty">—</span>';
+
+  // Üst kategori satırı
+  const topRow = (c) => `
+      <tr class="cat-row-top">
+        <td>${thumbOf(c)}</td>
         <td class="cell-strong">${escHtml(c.name)}</td>
-        <td>${typeCell}</td>
-        <td>${count} ürün</td>
+        <td><span class="pill pill-ok">Üst kategori</span></td>
+        <td>${countOf(c.id)}</td>
         <td class="cell-actions">
           <button class="row-btn" data-act="setimg" data-id="${c.id}">${c.image ? "Görseli Değiştir" : "Görsel Ekle"}</button>
           ${c.image ? `<button class="row-btn" data-act="rmimg" data-id="${c.id}">Görseli Kaldır</button>` : ""}
-          <button class="row-btn" data-act="togglekind" data-id="${c.id}">${isBrand ? "Kategoriye Çevir" : "Markaya Çevir"}</button>
           <button class="row-btn" data-act="rename" data-id="${c.id}">Yeniden Adlandır</button>
           <button class="row-btn row-btn-danger" data-act="delcat" data-id="${c.id}">Sil</button>
         </td>
       </tr>`;
-    }).join("") ||
-    '<tr><td colspan="5" class="empty-row">Henüz kategori yok.</td></tr>';
+
+  // Marka (alt) satırı — girintili; hangi üst kategoriye bağlı olduğu seçilebilir
+  const brandRow = (c) => {
+    const opts = normals.map((x) => `<option value="${x.id}"${c.parent === x.id ? " selected" : ""}>${escHtml(x.name)}</option>`).join("");
+    return `
+      <tr class="cat-row-brand">
+        <td>${thumbOf(c)}</td>
+        <td class="cell-strong"><span class="cat-branch">└</span> ${escHtml(c.name)} <span class="pill pill-warn">Marka</span></td>
+        <td><select class="cat-parent-sel" data-id="${c.id}" title="Üst kategori"><option value="">— üst kategori seç —</option>${opts}</select></td>
+        <td>${countOf(c.id)}</td>
+        <td class="cell-actions">
+          <button class="row-btn" data-act="setimg" data-id="${c.id}">${c.image ? "Görseli Değiştir" : "Görsel Ekle"}</button>
+          ${c.image ? `<button class="row-btn" data-act="rmimg" data-id="${c.id}">Görseli Kaldır</button>` : ""}
+          <button class="row-btn" data-act="rename" data-id="${c.id}">Yeniden Adlandır</button>
+          <button class="row-btn row-btn-danger" data-act="delcat" data-id="${c.id}">Sil</button>
+        </td>
+      </tr>`;
+  };
+
+  let html = "";
+  normals.forEach((c) => {
+    html += topRow(c);
+    brands.filter((b) => b.parent === c.id).forEach((b) => { html += brandRow(b); });
+  });
+  // Üst kategorisi seçilmemiş (bağsız) markalar en altta, uyarı ile
+  const orphans = brands.filter((b) => !b.parent || !normals.some((n) => n.id === b.parent));
+  if (orphans.length) {
+    html += '<tr class="cat-row-warn"><td colspan="5">⚠ Aşağıdaki markalar bir üst kategoriye bağlı değil — sağdaki listeden üst kategori seçin:</td></tr>';
+    orphans.forEach((b) => { html += brandRow(b); });
+  }
+  document.getElementById("catRows").innerHTML = html ||
+    '<tr><td colspan="5" class="empty-row">Henüz kategori yok. Önce bir üst kategori ekleyin.</td></tr>';
 
   // Marka → üst kategori seçimi
   document.querySelectorAll("#catRows .cat-parent-sel").forEach((sel) => {
@@ -491,10 +514,16 @@ function refreshCatFormParent() {
   const wrap = document.getElementById("catParentWrap");
   const parentSel = document.getElementById("catParent");
   if (!kindSel || !wrap || !parentSel) return;
+  const isBrand = kindSel.value === "brand";
   const normals = Store.getCategories().filter((c) => c.kind !== "brand");
   parentSel.innerHTML = '<option value="">— üst kategori seç —</option>' +
     normals.map((c) => `<option value="${c.id}">${escHtml(c.name)}</option>`).join("");
-  wrap.hidden = kindSel.value !== "brand";
+  wrap.hidden = !isBrand;
+  // Ad alanı etiketi ve örneği türe göre değişsin
+  const lbl = document.getElementById("catNameLabel");
+  const inp = document.getElementById("catNameInput");
+  if (lbl) lbl.textContent = isBrand ? "Marka adı" : "Üst kategori adı";
+  if (inp) inp.placeholder = isBrand ? "Örn. Lexron" : "Örn. Şarj Kontrol Cihazları";
 }
 document.getElementById("catKind").addEventListener("change", refreshCatFormParent);
 
@@ -511,8 +540,13 @@ document.getElementById("catForm").addEventListener("submit", (e) => {
   }
   const kind = document.getElementById("catKind").value;
   const parent = kind === "brand" ? document.getElementById("catParent").value : "";
+  if (kind === "brand" && !parent) {
+    status.textContent = "Marka için bir üst kategori seçmelisiniz (ör. İnvertörler).";
+    status.className = "form-status err";
+    return;
+  }
   Store.saveCategory({ name, kind, parent });
-  status.textContent = '"' + name + '" ' + (kind === "brand" ? "markası" : "kategorisi") + " eklendi.";
+  status.textContent = '"' + name + '" ' + (kind === "brand" ? "markası eklendi (üst kategori: " + (Store.getCategories().find((c) => c.id === parent) || {}).name + ")" : "üst kategorisi eklendi") + ".";
   status.className = "form-status ok";
   input.value = "";
   document.getElementById("catKind").value = "";
