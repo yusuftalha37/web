@@ -88,8 +88,13 @@ function renderMyOrders() {
     '<p class="account-empty">Henüz bir sipariş talebiniz bulunmuyor.<br><a href="index.html#urunler">Mağazamıza göz atın →</a></p>';
 }
 
-// Önce eldeki veriyle çiz, sonra sunucudan tazeleyip yeniden çiz
-Store.ready(() => {
-  renderMyOrders();
-  Store.refreshOrders().then(renderMyOrders);
-});
+// Önce eldeki veriyle çiz, sonra sunucudan tazeleyip yeniden çiz.
+// Giriş yoksa sayfa zaten giris.html'e yönleniyor; Store.ready çağrısı
+// veri yüklemesini (fetch) başlatır ve navigasyonla iptal olunca konsola
+// hata düşer — bu yüzden yalnızca oturum varken çağırıyoruz.
+if (me) {
+  Store.ready(() => {
+    renderMyOrders();
+    Store.refreshOrders().then(renderMyOrders);
+  });
+}

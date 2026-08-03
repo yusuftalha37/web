@@ -78,7 +78,7 @@ const Store = (() => {
     // ---- Süreç adımları ----
     procTitle: "Siparişiniz 4 Adımda Kapınızda",
     step1Title: "Siparişinizi Verin",
-    step1Text: "Ürünleri sepete ekleyin, WhatsApp üzerinden siparişinizi iletin.",
+    step1Text: "Ürünleri sepete ekleyin, sipariş formunu doldurup talebinizi iletin.",
     step2Title: "Onay & Ödeme",
     step2Text: "Siparişinizi onaylayıp güvenli ödeme seçeneklerini sunuyoruz.",
     step3Title: "Aynı Gün Kargo",

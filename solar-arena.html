@@ -2869,7 +2869,7 @@ img, svg { max-width: 100%; }
         <div class="step">
           <div class="step-num">1</div>
           <h3 data-site="step1Title">Siparişinizi Verin</h3>
-          <p data-site="step1Text">Ürünleri sepete ekleyin, WhatsApp üzerinden siparişinizi iletin.</p>
+          <p data-site="step1Text">Ürünleri sepete ekleyin, sipariş formunu doldurup talebinizi iletin.</p>
         </div>
         <div class="step">
           <div class="step-num">2</div>
@@ -3799,8 +3799,9 @@ img, svg { max-width: 100%; }
           <div class="box-body" id="myOrders"></div>
         </div>
         <p class="account-note">
-          Siparişleriniz WhatsApp üzerinden tarafımıza iletilir; buradaki liste
-          gönderdiğiniz sipariş taleplerinin kaydıdır. Sorularınız için
+          Buradaki liste verdiğiniz sipariş taleplerinin kaydıdır. Ödeme
+          Havale/EFT ile yapılır; dekontunuzu ilettiğinizde siparişiniz
+          hazırlanır. Sorularınız için
           <a href="#iletisim">bize ulaşın</a>.
         </p>
       </div>
@@ -4347,7 +4348,7 @@ const Store = (() => {
     // ---- Süreç adımları ----
     procTitle: "Siparişiniz 4 Adımda Kapınızda",
     step1Title: "Siparişinizi Verin",
-    step1Text: "Ürünleri sepete ekleyin, WhatsApp üzerinden siparişinizi iletin.",
+    step1Text: "Ürünleri sepete ekleyin, sipariş formunu doldurup talebinizi iletin.",
     step2Title: "Onay & Ödeme",
     step2Text: "Siparişinizi onaylayıp güvenli ödeme seçeneklerini sunuyoruz.",
     step3Title: "Aynı Gün Kargo",
@@ -6191,11 +6192,16 @@ function renderMyOrders() {
     '<p class="account-empty">Henüz bir sipariş talebiniz bulunmuyor.<br><a href="#urunler">Mağazamıza göz atın →</a></p>';
 }
 
-// Önce eldeki veriyle çiz, sonra sunucudan tazeleyip yeniden çiz
-Store.ready(() => {
-  renderMyOrders();
-  Store.refreshOrders().then(renderMyOrders);
-});
+// Önce eldeki veriyle çiz, sonra sunucudan tazeleyip yeniden çiz.
+// Giriş yoksa sayfa zaten giris.html'e yönleniyor; Store.ready çağrısı
+// veri yüklemesini (fetch) başlatır ve navigasyonla iptal olunca konsola
+// hata düşer — bu yüzden yalnızca oturum varken çağırıyoruz.
+if (me) {
+  Store.ready(() => {
+    renderMyOrders();
+    Store.refreshOrders().then(renderMyOrders);
+  });
+}
 
 })();
 
