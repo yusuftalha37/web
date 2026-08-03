@@ -300,9 +300,27 @@
 }
 .cat-check-empty {
   font-size: 0.82rem;
-  color: var(--muted, #94a3b8);
+  color: #64748b;
   line-height: 1.4;
+  flex-basis: 100%;
 }
+/* Ürün formundan hızlı marka ekleme */
+.cat-brand-add {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-basis: 100%;
+  margin-top: 4px;
+}
+.cat-brand-add-input {
+  flex: 1;
+  min-width: 120px;
+  padding: 6px 9px;
+  border: 1px solid var(--border, #cbd5e1);
+  border-radius: 6px;
+  font-size: 0.85rem;
+}
+.cat-brand-add-btn { white-space: nowrap; }
 
 /* Kategoriler ekranı: iki seviye açıklaması + hiyerarşik tablo */
 .cat-help {

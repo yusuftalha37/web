@@ -2413,9 +2413,27 @@ img, svg { max-width: 100%; }
 }
 .cat-check-empty {
   font-size: 0.82rem;
-  color: var(--muted, #94a3b8);
+  color: #64748b;
   line-height: 1.4;
+  flex-basis: 100%;
 }
+/* Ürün formundan hızlı marka ekleme */
+.cat-brand-add {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-basis: 100%;
+  margin-top: 4px;
+}
+.cat-brand-add-input {
+  flex: 1;
+  min-width: 120px;
+  padding: 6px 9px;
+  border: 1px solid var(--border, #cbd5e1);
+  border-radius: 6px;
+  font-size: 0.85rem;
+}
+.cat-brand-add-btn { white-space: nowrap; }
 
 /* Kategoriler ekranı: iki seviye açıklaması + hiyerarşik tablo */
 .cat-help {
@@ -6352,22 +6370,66 @@ function renderBrandChecks(containerId, topCatId) {
   const box = document.getElementById(containerId);
   if (!box) return;
   const checked = getCheckedCats(containerId);
+  const topName = (Store.getCategories().find((c) => c.id === topCatId) || {}).name || "bu kategori";
   const brands = Store.getCategories().filter(
     (c) => c.kind === "brand" && (!c.parent || c.parent === topCatId)
   );
-  box.innerHTML = brands.map((c) =>
+  let html = brands.map((c) =>
     `<label class="cat-check"><input type="checkbox" name="${containerId}" value="${escHtml(c.id)}"> <span>${escHtml(c.name)} <em class="cat-check-brand">marka</em></span></label>`
   ).join("");
   if (!brands.length) {
-    box.innerHTML = '<span class="cat-check-empty">Bu üst kategoriye tanımlı marka yok. “Kategoriler” ekranından marka ekleyip üst kategorisini seçebilirsiniz.</span>';
+    html = `<span class="cat-check-empty">“${escHtml(topName)}” için henüz marka yok. Aşağıdan hemen ekleyebilirsiniz:</span>`;
   }
+  // Buradan doğrudan yeni marka ekleme — Kategoriler ekranına gitmeye gerek yok
+  html += `<div class="cat-brand-add">
+      <input type="text" class="cat-brand-add-input" placeholder="Yeni marka (ör. Lexron)" data-box="${containerId}" data-top="${escHtml(topCatId)}">
+      <button type="button" class="btn btn-small cat-brand-add-btn" data-box="${containerId}" data-top="${escHtml(topCatId)}">+ Marka Ekle</button>
+    </div>`;
+  box.innerHTML = html;
   setCheckedCats(containerId, checked);
+}
+
+// Ürün formundan doğrudan yeni marka ekle (seçili üst kategorinin altına)
+function addBrandInline(boxId, topCatId) {
+  const box = document.getElementById(boxId);
+  if (!box) return;
+  const input = box.querySelector(".cat-brand-add-input");
+  const name = (input && input.value.trim()) || "";
+  if (!name) { if (input) input.focus(); return; }
+  const existing = Store.getCategories().find((c) => c.name.toLowerCase() === name.toLowerCase());
+  if (existing) {
+    // Aynı isim zaten varsa: markaysa onu bu üst kategoriye bağlayıp işaretle, değilse uyar
+    if (existing.kind === "brand") {
+      Store.saveCategory({ id: existing.id, parent: topCatId });
+    } else {
+      alert("“" + name + "” zaten bir üst kategori. Marka için farklı bir ad girin.");
+      return;
+    }
+  } else {
+    Store.saveCategory({ name, kind: "brand", parent: topCatId });
+  }
+  const nb = Store.getCategories().find((c) => c.name.toLowerCase() === name.toLowerCase() && c.kind === "brand");
+  const keep = getCheckedCats(boxId).concat(nb ? [nb.id] : []);
+  renderBrandChecks(boxId, topCatId);
+  setCheckedCats(boxId, keep);
 }
 
 // Üst kategori değişince marka (alt kategori) listesi o kategoriye göre yenilensin
 ["pfCat", "upCat"].forEach((id) => {
   const sel = document.getElementById(id);
   if (sel) sel.addEventListener("change", () => renderBrandChecks(id + "s", sel.value));
+});
+
+// "+ Marka Ekle" butonu ve Enter tuşu (form gönderimini engelleyerek)
+document.addEventListener("click", (e) => {
+  const btn = e.target.closest(".cat-brand-add-btn");
+  if (btn) { e.preventDefault(); addBrandInline(btn.dataset.box, btn.dataset.top); }
+});
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && e.target.classList && e.target.classList.contains("cat-brand-add-input")) {
+    e.preventDefault();
+    addBrandInline(e.target.dataset.box, e.target.dataset.top);
+  }
 });
 
 function setCheckedCats(containerId, ids) {
