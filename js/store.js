@@ -30,6 +30,7 @@ const Store = (() => {
     { id: "inv-5g", cat: "inverter", img: "inverter", authorized: true, name: "5 kW On-Grid İnvertör (Monofaze)", specs: ["2 MPPT girişi", "Wi-Fi izleme modülü dahil", "5 yıl garanti"], price: 38500, stock: 9 },
     { id: "inv-6h", hit: true, cat: "inverter", img: "inverter", authorized: true, name: "6 kW Hibrit İnvertör 48V", specs: ["120A MPPT şarj kontrollü", "Şebeke + akü + jeneratör girişi", "Paralellenebilir (9 adede kadar)"], price: 52900, stock: 7 },
     { id: "inv-3s", cat: "inverter", img: "inverter", authorized: true, name: "3 kW Tam Sinüs İnvertör 24V", specs: ["Off-grid kullanım için", "LCD ekran, USB çıkış", "Düşük bekleme tüketimi"], price: 14750, stock: 14 },
+    { id: "inv-lexron-smart5", cat: "inverter", cats: ["lexron"], img: "inverter", authorized: true, name: "Lexron 5.5 kW Akıllı Hibrit İnvertör", specs: ["Wi-Fi izleme + mobil uygulama", "Çift MPPT · %98 verim", "Şebeke + akü + jeneratör girişi"], price: 44900, stock: 6 },
     { id: "aku-lfp", hit: true, cat: "aku", img: "battery", name: "48V 100Ah LiFePO4 Lityum Akü", specs: ["5,12 kWh kapasite", "6.000+ çevrim ömrü", "Dahili BMS, Bluetooth takip"], price: 58900, stock: 6 },
     { id: "aku-jel", cat: "aku", img: "battery", name: "12V 150Ah Derin Döngü Jel Akü", specs: ["Bakım gerektirmez", "Solar sistemler için optimize", "2 yıl garanti"], price: 9850, stock: 22 },
     { id: "kit-krv", hit: true, cat: "paket", img: "kit", name: "Karavan Solar Paketi 410W", specs: ["410W panel + 30A MPPT regülatör", "Kablolama ve montaj aparatları dahil", "Kurulum şeması ile birlikte"], price: 32500, stock: 3 },
@@ -44,7 +45,9 @@ const Store = (() => {
     { id: "inverter", name: "İnvertörler" },
     { id: "aku", name: "Aküler" },
     { id: "paket", name: "Hazır Paketler" },
-    { id: "aksesuar", name: "Aksesuarlar" }
+    { id: "aksesuar", name: "Aksesuarlar" },
+    // Marka alt kategorisi örneği: İnvertörler > Lexron
+    { id: "lexron", name: "Lexron", kind: "brand", parent: "inverter", image: "" }
   ];
   const DEFAULT_SLIDES = [
     { id: "sl1", image: "", art: "roof", title: "Güneş Enerjisinde Türkiye'nin Her Yerine Gönderim", subtitle: "Panel, invertör, akü ve hazır paketler stoktan — siparişiniz aynı gün kargoda.", btnText: "Ürünleri İncele", btnLink: "urunler.html" },
@@ -247,8 +250,8 @@ const Store = (() => {
   }
 
   // ---- DB satırı <-> uygulama nesnesi ----
-  function fromDbProduct(r) { return { id: r.id, cat: r.cat, img: r.img, photo: r.photo || "", name: r.name, specs: r.specs || [], price: r.price, stock: r.stock, hit: !!r.hit, authorized: !!r.authorized }; }
-  function toDbProduct(p, sort) { return { id: p.id, cat: p.cat, img: p.img, photo: p.photo || "", name: p.name, specs: p.specs || [], price: p.price, stock: p.stock, hit: !!p.hit, authorized: !!p.authorized, sort: sort == null ? 0 : sort }; }
+  function fromDbProduct(r) { return { id: r.id, cat: r.cat, cats: Array.isArray(r.cats) ? r.cats : [], img: r.img, photo: r.photo || "", name: r.name, specs: r.specs || [], price: r.price, stock: r.stock, hit: !!r.hit, authorized: !!r.authorized }; }
+  function toDbProduct(p, sort) { return { id: p.id, cat: p.cat, cats: Array.isArray(p.cats) ? p.cats : [], img: p.img, photo: p.photo || "", name: p.name, specs: p.specs || [], price: p.price, stock: p.stock, hit: !!p.hit, authorized: !!p.authorized, sort: sort == null ? 0 : sort }; }
   function fromDbSlide(r) { return { id: r.id, image: r.image || "", art: r.art, title: r.title, subtitle: r.subtitle || "", btnText: r.btnText || "", btnLink: r.btnLink || "urunler.html" }; }
   function toDbSlide(s, sort) { return { id: s.id, image: s.image || "", art: s.art, title: s.title, subtitle: s.subtitle || "", btnText: s.btnText || "", btnLink: s.btnLink || "urunler.html", sort: sort == null ? 0 : sort }; }
   function fromDbOrder(r) { return { id: r.id, customer: r.customer, phone: r.phone, email: r.email, city: r.city, address: r.address, payment: r.payment, status: r.status, items: r.items || [], total: r.total, date: r.created }; }
@@ -256,6 +259,13 @@ const Store = (() => {
 
   // ===================== ÜRÜNLER =====================
   function getProducts() { return cache.products; }
+  // Bir ürünün ait olduğu tüm kategori kimlikleri (birincil + ek/marka), tekilleştirilmiş
+  function productCatIds(p) {
+    const ids = [];
+    if (p && p.cat) ids.push(p.cat);
+    if (p && Array.isArray(p.cats)) p.cats.forEach((c) => { if (c && ids.indexOf(c) === -1) ids.push(c); });
+    return ids;
+  }
   function saveProduct(product) {
     const i = cache.products.findIndex((p) => p.id === product.id);
     if (i >= 0) cache.products[i] = product; else cache.products.unshift(product);
@@ -561,7 +571,7 @@ const Store = (() => {
 
   return {
     mode: MODE, load, ready,
-    getProducts, saveProduct, deleteProduct,
+    getProducts, saveProduct, deleteProduct, productCatIds,
     getCategories, saveCategory, deleteCategory,
     getSlides, saveSlide, deleteSlide, moveSlide,
     register, login, logout, session,

@@ -37,6 +37,7 @@ const SEED = {
     { id: "inv-5g", cat: "inverter", img: "inverter", photo: "", authorized: true, name: "5 kW On-Grid İnvertör (Monofaze)", specs: ["2 MPPT girişi", "Wi-Fi izleme modülü dahil", "5 yıl garanti"], price: 38500, stock: 9, hit: false, sort: 3 },
     { id: "inv-6h", cat: "inverter", img: "inverter", photo: "", authorized: true, name: "6 kW Hibrit İnvertör 48V", specs: ["120A MPPT şarj kontrollü", "Şebeke + akü + jeneratör girişi", "Paralellenebilir (9 adede kadar)"], price: 52900, stock: 7, hit: true, sort: 4 },
     { id: "inv-3s", cat: "inverter", img: "inverter", photo: "", authorized: true, name: "3 kW Tam Sinüs İnvertör 24V", specs: ["Off-grid kullanım için", "LCD ekran, USB çıkış", "Düşük bekleme tüketimi"], price: 14750, stock: 14, hit: false, sort: 5 },
+    { id: "inv-lexron-smart5", cat: "inverter", cats: ["lexron"], img: "inverter", photo: "", authorized: true, name: "Lexron 5.5 kW Akıllı Hibrit İnvertör", specs: ["Wi-Fi izleme + mobil uygulama", "Çift MPPT · %98 verim", "Şebeke + akü + jeneratör girişi"], price: 44900, stock: 6, hit: false, sort: 14 },
     { id: "aku-lfp", cat: "aku", img: "battery", photo: "", name: "48V 100Ah LiFePO4 Lityum Akü", specs: ["5,12 kWh kapasite", "6.000+ çevrim ömrü", "Dahili BMS, Bluetooth takip"], price: 58900, stock: 6, hit: true, sort: 6 },
     { id: "aku-jel", cat: "aku", img: "battery", photo: "", name: "12V 150Ah Derin Döngü Jel Akü", specs: ["Bakım gerektirmez", "Solar sistemler için optimize", "2 yıl garanti"], price: 9850, stock: 22, hit: false, sort: 7 },
     { id: "kit-krv", cat: "paket", img: "kit", photo: "", name: "Karavan Solar Paketi 410W", specs: ["410W panel + 30A MPPT regülatör", "Kablolama ve montaj aparatları dahil", "Kurulum şeması ile birlikte"], price: 32500, stock: 3, hit: true, sort: 8 },
@@ -51,7 +52,8 @@ const SEED = {
     { id: "inverter", name: "İnvertörler", sort: 1 },
     { id: "aku", name: "Aküler", sort: 2 },
     { id: "paket", name: "Hazır Paketler", sort: 3 },
-    { id: "aksesuar", name: "Aksesuarlar", sort: 4 }
+    { id: "aksesuar", name: "Aksesuarlar", sort: 4 },
+    { id: "lexron", name: "Lexron", kind: "brand", parent: "inverter", image: "", sort: 5 }
   ],
   slides: [
     { id: "sl1", image: "", art: "roof", title: "Güneş Enerjisinde Türkiye'nin Her Yerine Gönderim", subtitle: "Panel, invertör, akü ve hazır paketler stoktan — siparişiniz aynı gün kargoda.", btnText: "Ürünleri İncele", btnLink: "urunler.html", sort: 0 },

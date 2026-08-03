@@ -2370,6 +2370,48 @@ img, svg { max-width: 100%; }
 
 .check-label input { margin-right: 6px; }
 
+/* Ek kategoriler / markalar — işaretlenebilir kutu grubu */
+.cat-check-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-soft, #f8fafc);
+  max-height: 160px;
+  overflow-y: auto;
+}
+.cat-check-group:empty::before {
+  content: "Kategori yok";
+  color: var(--muted, #94a3b8);
+  font-size: 0.85rem;
+}
+.cat-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text);
+  cursor: pointer;
+  padding: 3px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+.cat-check:hover { background: rgba(0, 0, 0, 0.04); }
+.cat-check input { margin: 0; }
+.cat-check-brand {
+  font-style: normal;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #b45309;
+  background: #fef3c7;
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
 .table-thumb {
   width: 46px;
   height: 46px;
@@ -3897,7 +3939,7 @@ img, svg { max-width: 100%; }
             </div>
             <div class="form-row">
               <div class="form-group">
-                <label for="upCat">Kategori</label>
+                <label for="upCat">Ana kategori (üst)</label>
                 <select id="upCat"></select>
               </div>
               <div class="form-group">
@@ -3914,6 +3956,10 @@ img, svg { max-width: 100%; }
                   <option value="cable">Kablo / konnektör</option>
                 </select>
               </div>
+            </div>
+            <div class="form-group">
+              <label>Ek kategoriler / markalar (alt) <small>(ürün bunlarda da listelenir)</small></label>
+              <div id="upCats" class="cat-check-group"></div>
             </div>
             <div class="form-row">
               <div class="form-group">
@@ -4198,7 +4244,7 @@ img, svg { max-width: 100%; }
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label for="pfCat">Kategori</label>
+            <label for="pfCat">Ana kategori (üst)</label>
             <select id="pfCat"></select>
           </div>
           <div class="form-group">
@@ -4215,6 +4261,10 @@ img, svg { max-width: 100%; }
               <option value="cable">Kablo / konnektör</option>
             </select>
           </div>
+        </div>
+        <div class="form-group">
+          <label>Ek kategoriler / markalar (alt) <small>(ürün bunlarda da listelenir)</small></label>
+          <div id="pfCats" class="cat-check-group"></div>
         </div>
         <div class="form-row">
           <div class="form-group">
@@ -4300,6 +4350,7 @@ const Store = (() => {
     { id: "inv-5g", cat: "inverter", img: "inverter", authorized: true, name: "5 kW On-Grid İnvertör (Monofaze)", specs: ["2 MPPT girişi", "Wi-Fi izleme modülü dahil", "5 yıl garanti"], price: 38500, stock: 9 },
     { id: "inv-6h", hit: true, cat: "inverter", img: "inverter", authorized: true, name: "6 kW Hibrit İnvertör 48V", specs: ["120A MPPT şarj kontrollü", "Şebeke + akü + jeneratör girişi", "Paralellenebilir (9 adede kadar)"], price: 52900, stock: 7 },
     { id: "inv-3s", cat: "inverter", img: "inverter", authorized: true, name: "3 kW Tam Sinüs İnvertör 24V", specs: ["Off-grid kullanım için", "LCD ekran, USB çıkış", "Düşük bekleme tüketimi"], price: 14750, stock: 14 },
+    { id: "inv-lexron-smart5", cat: "inverter", cats: ["lexron"], img: "inverter", authorized: true, name: "Lexron 5.5 kW Akıllı Hibrit İnvertör", specs: ["Wi-Fi izleme + mobil uygulama", "Çift MPPT · %98 verim", "Şebeke + akü + jeneratör girişi"], price: 44900, stock: 6 },
     { id: "aku-lfp", hit: true, cat: "aku", img: "battery", name: "48V 100Ah LiFePO4 Lityum Akü", specs: ["5,12 kWh kapasite", "6.000+ çevrim ömrü", "Dahili BMS, Bluetooth takip"], price: 58900, stock: 6 },
     { id: "aku-jel", cat: "aku", img: "battery", name: "12V 150Ah Derin Döngü Jel Akü", specs: ["Bakım gerektirmez", "Solar sistemler için optimize", "2 yıl garanti"], price: 9850, stock: 22 },
     { id: "kit-krv", hit: true, cat: "paket", img: "kit", name: "Karavan Solar Paketi 410W", specs: ["410W panel + 30A MPPT regülatör", "Kablolama ve montaj aparatları dahil", "Kurulum şeması ile birlikte"], price: 32500, stock: 3 },
@@ -4314,7 +4365,9 @@ const Store = (() => {
     { id: "inverter", name: "İnvertörler" },
     { id: "aku", name: "Aküler" },
     { id: "paket", name: "Hazır Paketler" },
-    { id: "aksesuar", name: "Aksesuarlar" }
+    { id: "aksesuar", name: "Aksesuarlar" },
+    // Marka alt kategorisi örneği: İnvertörler > Lexron
+    { id: "lexron", name: "Lexron", kind: "brand", parent: "inverter", image: "" }
   ];
   const DEFAULT_SLIDES = [
     { id: "sl1", image: "", art: "roof", title: "Güneş Enerjisinde Türkiye'nin Her Yerine Gönderim", subtitle: "Panel, invertör, akü ve hazır paketler stoktan — siparişiniz aynı gün kargoda.", btnText: "Ürünleri İncele", btnLink: "urunler.html" },
@@ -4517,8 +4570,8 @@ const Store = (() => {
   }
 
   // ---- DB satırı <-> uygulama nesnesi ----
-  function fromDbProduct(r) { return { id: r.id, cat: r.cat, img: r.img, photo: r.photo || "", name: r.name, specs: r.specs || [], price: r.price, stock: r.stock, hit: !!r.hit, authorized: !!r.authorized }; }
-  function toDbProduct(p, sort) { return { id: p.id, cat: p.cat, img: p.img, photo: p.photo || "", name: p.name, specs: p.specs || [], price: p.price, stock: p.stock, hit: !!p.hit, authorized: !!p.authorized, sort: sort == null ? 0 : sort }; }
+  function fromDbProduct(r) { return { id: r.id, cat: r.cat, cats: Array.isArray(r.cats) ? r.cats : [], img: r.img, photo: r.photo || "", name: r.name, specs: r.specs || [], price: r.price, stock: r.stock, hit: !!r.hit, authorized: !!r.authorized }; }
+  function toDbProduct(p, sort) { return { id: p.id, cat: p.cat, cats: Array.isArray(p.cats) ? p.cats : [], img: p.img, photo: p.photo || "", name: p.name, specs: p.specs || [], price: p.price, stock: p.stock, hit: !!p.hit, authorized: !!p.authorized, sort: sort == null ? 0 : sort }; }
   function fromDbSlide(r) { return { id: r.id, image: r.image || "", art: r.art, title: r.title, subtitle: r.subtitle || "", btnText: r.btnText || "", btnLink: r.btnLink || "urunler.html" }; }
   function toDbSlide(s, sort) { return { id: s.id, image: s.image || "", art: s.art, title: s.title, subtitle: s.subtitle || "", btnText: s.btnText || "", btnLink: s.btnLink || "urunler.html", sort: sort == null ? 0 : sort }; }
   function fromDbOrder(r) { return { id: r.id, customer: r.customer, phone: r.phone, email: r.email, city: r.city, address: r.address, payment: r.payment, status: r.status, items: r.items || [], total: r.total, date: r.created }; }
@@ -4526,6 +4579,13 @@ const Store = (() => {
 
   // ===================== ÜRÜNLER =====================
   function getProducts() { return cache.products; }
+  // Bir ürünün ait olduğu tüm kategori kimlikleri (birincil + ek/marka), tekilleştirilmiş
+  function productCatIds(p) {
+    const ids = [];
+    if (p && p.cat) ids.push(p.cat);
+    if (p && Array.isArray(p.cats)) p.cats.forEach((c) => { if (c && ids.indexOf(c) === -1) ids.push(c); });
+    return ids;
+  }
   function saveProduct(product) {
     const i = cache.products.findIndex((p) => p.id === product.id);
     if (i >= 0) cache.products[i] = product; else cache.products.unshift(product);
@@ -4831,7 +4891,7 @@ const Store = (() => {
 
   return {
     mode: MODE, load, ready,
-    getProducts, saveProduct, deleteProduct,
+    getProducts, saveProduct, deleteProduct, productCatIds,
     getCategories, saveCategory, deleteCategory,
     getSlides, saveSlide, deleteSlide, moveSlide,
     register, login, logout, session,
@@ -5227,7 +5287,10 @@ function initSite(root) {
     const m = t.match(/(\d+(?:[.,]\d+)?)\s?(\S+)/);
     return [UNIT_RANK[m[2]] ?? 9, parseFloat(m[1].replace(",", "."))];
   }
-  PRODUCTS.forEach((p) => { p._tags = extractTags(p); });
+  // Etiketleri ihtiyaç anında hesapla + önbelleğe al. Böylece admin'den sonradan
+  // eklenen/düzenlenen ürünler de (henüz _tags'i olmayanlar) güvenle işlenir.
+  const tagsOf = (p) => p._tags || (p._tags = extractTags(p));
+  PRODUCTS.forEach((p) => { tagsOf(p); });
 
   if (shopGrid) {
     // data-mode="featured": ana sayfadaki 'En Çok Satan Ürünler' vitrini
@@ -5243,13 +5306,17 @@ function initSite(root) {
 
     const currentQuery = () => (!featured && searchInput ? searchInput.value.trim() : "");
 
-    // Bir ürün, seçili kategoriye ait mi? Üst kategori seçiliyse, o kategorinin
-    // markalarına (parent === kategori) atanmış ürünler de dahil edilir.
+    // Bir ürün, seçili kategoriye ait mi? Ürün birden fazla kategoriye
+    // (birincil + ek/marka) atanmış olabilir. Ayrıca üst kategori seçiliyse,
+    // o kategorinin markalarına (parent === kategori) atanmış ürünler de dahil edilir.
     const childBrandIds = (catId) => CATEGORIES.filter((c) => c.kind === "brand" && c.parent === catId).map((c) => c.id);
+    const prodCatIds = (p) => Store.productCatIds(p);
     function catMatch(p, catId) {
       if (catId === "all") return true;
-      if (p.cat === catId) return true;
-      return childBrandIds(catId).indexOf(p.cat) !== -1;
+      const ids = prodCatIds(p);
+      if (ids.indexOf(catId) !== -1) return true;
+      const kids = childBrandIds(catId);
+      return ids.some((c) => kids.indexOf(c) !== -1);
     }
 
     // Kategori + arama uygulanmış liste (güç filtresi hariç — facet bundan üretilir)
@@ -5269,7 +5336,7 @@ function initSite(root) {
         list = list.slice(0, 8);
       } else {
         list = baseList().filter(
-          (p) => selectedPowers.size === 0 || Array.from(p._tags).some((t) => selectedPowers.has(t))
+          (p) => selectedPowers.size === 0 || Array.from(tagsOf(p)).some((t) => selectedPowers.has(t))
         );
       }
 
@@ -5300,7 +5367,7 @@ function initSite(root) {
 
     function buildPowerFacet() {
       const counts = {};
-      baseList().forEach((p) => p._tags.forEach((t) => (counts[t] = (counts[t] || 0) + 1)));
+      baseList().forEach((p) => tagsOf(p).forEach((t) => (counts[t] = (counts[t] || 0) + 1)));
       const tags = Object.keys(counts).sort((a, b) => {
         const [ra, va] = tagValue(a), [rb, vb] = tagValue(b);
         return ra - rb || va - vb;
@@ -6235,6 +6302,33 @@ function populateCatSelects() {
     sel.innerHTML = options;
     if (current && [...sel.options].some((o) => o.value === current)) sel.value = current;
   });
+  // Ek kategoriler / markalar: işaretlenebilir kutu grupları (işaretli olanları koru)
+  ["pfCats", "upCats"].forEach((id) => {
+    const box = document.getElementById(id);
+    if (!box) return;
+    const checked = getCheckedCats(id);
+    box.innerHTML = catCheckboxHtml(id);
+    setCheckedCats(id, checked);
+  });
+}
+
+// Bir ürünün ek kategorileri için kutucuk grubu HTML'i (tüm kategoriler; markalar işaretli)
+function catCheckboxHtml(name) {
+  return Store.getCategories().map((c) => {
+    const brand = c.kind === "brand";
+    return `<label class="cat-check"><input type="checkbox" name="${name}" value="${escHtml(c.id)}"> <span>${escHtml(c.name)}${brand ? ' <em class="cat-check-brand">marka</em>' : ""}</span></label>`;
+  }).join("");
+}
+function setCheckedCats(containerId, ids) {
+  ids = Array.isArray(ids) ? ids : [];
+  document.querySelectorAll("#" + containerId + " input[type=checkbox]").forEach((cb) => {
+    cb.checked = ids.indexOf(cb.value) !== -1;
+  });
+}
+function getCheckedCats(containerId, excludeId) {
+  return [...document.querySelectorAll("#" + containerId + " input[type=checkbox]:checked")]
+    .map((cb) => cb.value)
+    .filter((v) => v !== excludeId);
 }
 
 const tlFmt = (n) => "₺" + Math.round(n).toLocaleString("tr-TR");
@@ -6397,6 +6491,7 @@ function openProductModal(product) {
   document.getElementById("pfId").value = product ? product.id : "";
   document.getElementById("pfName").value = product ? product.name : "";
   document.getElementById("pfCat").value = product ? product.cat : "panel";
+  setCheckedCats("pfCats", product ? product.cats : []);
   document.getElementById("pfImg").value = product ? product.img : "panel";
   document.getElementById("pfPrice").value = product ? product.price : "";
   document.getElementById("pfStock").value = product ? product.stock : "";
@@ -6439,6 +6534,7 @@ productForm.addEventListener("submit", (e) => {
       id,
       name: document.getElementById("pfName").value.trim(),
       cat: document.getElementById("pfCat").value,
+      cats: getCheckedCats("pfCats", document.getElementById("pfCat").value),
       img: document.getElementById("pfImg").value,
       photo: currentPhoto,
       hit: document.getElementById("pfHit").checked,
@@ -6580,6 +6676,7 @@ uploadForm.addEventListener("submit", (e) => {
       id: "p-" + Date.now(),
       name,
       cat: document.getElementById("upCat").value,
+      cats: getCheckedCats("upCats", document.getElementById("upCat").value),
       img: document.getElementById("upImg").value,
       photo: uploadPhoto,
       hit: document.getElementById("upHit").checked,
@@ -6609,7 +6706,7 @@ function renderCategories() {
   const products = Store.getProducts();
   document.getElementById("catRows").innerHTML =
     cats.map((c) => {
-      const count = products.filter((p) => p.cat === c.id).length;
+      const count = products.filter((p) => Store.productCatIds(p).indexOf(c.id) !== -1).length;
       const thumb = c.image
         ? `<img class="table-thumb" src="${escHtml(c.image)}" alt="">`
         : '<span class="table-thumb table-thumb-empty">—</span>';

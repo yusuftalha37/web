@@ -176,7 +176,10 @@ function initSite(root) {
     const m = t.match(/(\d+(?:[.,]\d+)?)\s?(\S+)/);
     return [UNIT_RANK[m[2]] ?? 9, parseFloat(m[1].replace(",", "."))];
   }
-  PRODUCTS.forEach((p) => { p._tags = extractTags(p); });
+  // Etiketleri ihtiyaç anında hesapla + önbelleğe al. Böylece admin'den sonradan
+  // eklenen/düzenlenen ürünler de (henüz _tags'i olmayanlar) güvenle işlenir.
+  const tagsOf = (p) => p._tags || (p._tags = extractTags(p));
+  PRODUCTS.forEach((p) => { tagsOf(p); });
 
   if (shopGrid) {
     // data-mode="featured": ana sayfadaki 'En Çok Satan Ürünler' vitrini
@@ -192,13 +195,17 @@ function initSite(root) {
 
     const currentQuery = () => (!featured && searchInput ? searchInput.value.trim() : "");
 
-    // Bir ürün, seçili kategoriye ait mi? Üst kategori seçiliyse, o kategorinin
-    // markalarına (parent === kategori) atanmış ürünler de dahil edilir.
+    // Bir ürün, seçili kategoriye ait mi? Ürün birden fazla kategoriye
+    // (birincil + ek/marka) atanmış olabilir. Ayrıca üst kategori seçiliyse,
+    // o kategorinin markalarına (parent === kategori) atanmış ürünler de dahil edilir.
     const childBrandIds = (catId) => CATEGORIES.filter((c) => c.kind === "brand" && c.parent === catId).map((c) => c.id);
+    const prodCatIds = (p) => Store.productCatIds(p);
     function catMatch(p, catId) {
       if (catId === "all") return true;
-      if (p.cat === catId) return true;
-      return childBrandIds(catId).indexOf(p.cat) !== -1;
+      const ids = prodCatIds(p);
+      if (ids.indexOf(catId) !== -1) return true;
+      const kids = childBrandIds(catId);
+      return ids.some((c) => kids.indexOf(c) !== -1);
     }
 
     // Kategori + arama uygulanmış liste (güç filtresi hariç — facet bundan üretilir)
@@ -218,7 +225,7 @@ function initSite(root) {
         list = list.slice(0, 8);
       } else {
         list = baseList().filter(
-          (p) => selectedPowers.size === 0 || Array.from(p._tags).some((t) => selectedPowers.has(t))
+          (p) => selectedPowers.size === 0 || Array.from(tagsOf(p)).some((t) => selectedPowers.has(t))
         );
       }
 
@@ -249,7 +256,7 @@ function initSite(root) {
 
     function buildPowerFacet() {
       const counts = {};
-      baseList().forEach((p) => p._tags.forEach((t) => (counts[t] = (counts[t] || 0) + 1)));
+      baseList().forEach((p) => tagsOf(p).forEach((t) => (counts[t] = (counts[t] || 0) + 1)));
       const tags = Object.keys(counts).sort((a, b) => {
         const [ra, va] = tagValue(a), [rb, vb] = tagValue(b);
         return ra - rb || va - vb;

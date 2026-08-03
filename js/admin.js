@@ -26,6 +26,33 @@ function populateCatSelects() {
     sel.innerHTML = options;
     if (current && [...sel.options].some((o) => o.value === current)) sel.value = current;
   });
+  // Ek kategoriler / markalar: işaretlenebilir kutu grupları (işaretli olanları koru)
+  ["pfCats", "upCats"].forEach((id) => {
+    const box = document.getElementById(id);
+    if (!box) return;
+    const checked = getCheckedCats(id);
+    box.innerHTML = catCheckboxHtml(id);
+    setCheckedCats(id, checked);
+  });
+}
+
+// Bir ürünün ek kategorileri için kutucuk grubu HTML'i (tüm kategoriler; markalar işaretli)
+function catCheckboxHtml(name) {
+  return Store.getCategories().map((c) => {
+    const brand = c.kind === "brand";
+    return `<label class="cat-check"><input type="checkbox" name="${name}" value="${escHtml(c.id)}"> <span>${escHtml(c.name)}${brand ? ' <em class="cat-check-brand">marka</em>' : ""}</span></label>`;
+  }).join("");
+}
+function setCheckedCats(containerId, ids) {
+  ids = Array.isArray(ids) ? ids : [];
+  document.querySelectorAll("#" + containerId + " input[type=checkbox]").forEach((cb) => {
+    cb.checked = ids.indexOf(cb.value) !== -1;
+  });
+}
+function getCheckedCats(containerId, excludeId) {
+  return [...document.querySelectorAll("#" + containerId + " input[type=checkbox]:checked")]
+    .map((cb) => cb.value)
+    .filter((v) => v !== excludeId);
 }
 
 const tlFmt = (n) => "₺" + Math.round(n).toLocaleString("tr-TR");
@@ -188,6 +215,7 @@ function openProductModal(product) {
   document.getElementById("pfId").value = product ? product.id : "";
   document.getElementById("pfName").value = product ? product.name : "";
   document.getElementById("pfCat").value = product ? product.cat : "panel";
+  setCheckedCats("pfCats", product ? product.cats : []);
   document.getElementById("pfImg").value = product ? product.img : "panel";
   document.getElementById("pfPrice").value = product ? product.price : "";
   document.getElementById("pfStock").value = product ? product.stock : "";
@@ -230,6 +258,7 @@ productForm.addEventListener("submit", (e) => {
       id,
       name: document.getElementById("pfName").value.trim(),
       cat: document.getElementById("pfCat").value,
+      cats: getCheckedCats("pfCats", document.getElementById("pfCat").value),
       img: document.getElementById("pfImg").value,
       photo: currentPhoto,
       hit: document.getElementById("pfHit").checked,
@@ -371,6 +400,7 @@ uploadForm.addEventListener("submit", (e) => {
       id: "p-" + Date.now(),
       name,
       cat: document.getElementById("upCat").value,
+      cats: getCheckedCats("upCats", document.getElementById("upCat").value),
       img: document.getElementById("upImg").value,
       photo: uploadPhoto,
       hit: document.getElementById("upHit").checked,
@@ -400,7 +430,7 @@ function renderCategories() {
   const products = Store.getProducts();
   document.getElementById("catRows").innerHTML =
     cats.map((c) => {
-      const count = products.filter((p) => p.cat === c.id).length;
+      const count = products.filter((p) => Store.productCatIds(p).indexOf(c.id) !== -1).length;
       const thumb = c.image
         ? `<img class="table-thumb" src="${escHtml(c.image)}" alt="">`
         : '<span class="table-thumb table-thumb-empty">—</span>';
