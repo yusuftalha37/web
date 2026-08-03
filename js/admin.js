@@ -17,7 +17,10 @@ function catName(id) {
 
 // Ürün formlarındaki kategori listelerini doldurur (seçim korunur)
 function populateCatSelects() {
+  // "Ana kategori (üst)" yalnızca normal kategoriler — markalar burada olmaz,
+  // onlar aşağıdaki "Ek kategoriler / markalar (alt)" kutularında yer alır.
   const options = Store.getCategories()
+    .filter((c) => c.kind !== "brand")
     .map((c) => `<option value="${c.id}">${escHtml(c.name)}</option>`)
     .join("");
   ["pfCat", "upCat"].forEach((id) => {
@@ -26,23 +29,35 @@ function populateCatSelects() {
     sel.innerHTML = options;
     if (current && [...sel.options].some((o) => o.value === current)) sel.value = current;
   });
-  // Ek kategoriler / markalar: işaretlenebilir kutu grupları (işaretli olanları koru)
-  ["pfCats", "upCats"].forEach((id) => {
-    const box = document.getElementById(id);
-    if (!box) return;
-    const checked = getCheckedCats(id);
-    box.innerHTML = catCheckboxHtml(id);
-    setCheckedCats(id, checked);
-  });
+  // Marka (alt kategori) kutuları: üst kategoriye göre doldur (işaretlileri koru)
+  renderBrandChecks("pfCats", document.getElementById("pfCat").value);
+  renderBrandChecks("upCats", document.getElementById("upCat").value);
 }
 
-// Bir ürünün ek kategorileri için kutucuk grubu HTML'i (tüm kategoriler; markalar işaretli)
-function catCheckboxHtml(name) {
-  return Store.getCategories().map((c) => {
-    const brand = c.kind === "brand";
-    return `<label class="cat-check"><input type="checkbox" name="${name}" value="${escHtml(c.id)}"> <span>${escHtml(c.name)}${brand ? ' <em class="cat-check-brand">marka</em>' : ""}</span></label>`;
-  }).join("");
+// Verilen üst kategoriye tanımlı markaları (parent === üst, ya da üstsüz) kutu grubu olarak çizer.
+// İşaretli olanlar korunur.
+function renderBrandChecks(containerId, topCatId) {
+  const box = document.getElementById(containerId);
+  if (!box) return;
+  const checked = getCheckedCats(containerId);
+  const brands = Store.getCategories().filter(
+    (c) => c.kind === "brand" && (!c.parent || c.parent === topCatId)
+  );
+  box.innerHTML = brands.map((c) =>
+    `<label class="cat-check"><input type="checkbox" name="${containerId}" value="${escHtml(c.id)}"> <span>${escHtml(c.name)} <em class="cat-check-brand">marka</em></span></label>`
+  ).join("");
+  if (!brands.length) {
+    box.innerHTML = '<span class="cat-check-empty">Bu üst kategoriye tanımlı marka yok. “Kategoriler” ekranından marka ekleyip üst kategorisini seçebilirsiniz.</span>';
+  }
+  setCheckedCats(containerId, checked);
 }
+
+// Üst kategori değişince marka (alt kategori) listesi o kategoriye göre yenilensin
+["pfCat", "upCat"].forEach((id) => {
+  const sel = document.getElementById(id);
+  if (sel) sel.addEventListener("change", () => renderBrandChecks(id + "s", sel.value));
+});
+
 function setCheckedCats(containerId, ids) {
   ids = Array.isArray(ids) ? ids : [];
   document.querySelectorAll("#" + containerId + " input[type=checkbox]").forEach((cb) => {
@@ -215,6 +230,8 @@ function openProductModal(product) {
   document.getElementById("pfId").value = product ? product.id : "";
   document.getElementById("pfName").value = product ? product.name : "";
   document.getElementById("pfCat").value = product ? product.cat : "panel";
+  // Üst kategoriye göre marka listesini kur, sonra ürünün markalarını işaretle
+  renderBrandChecks("pfCats", document.getElementById("pfCat").value);
   setCheckedCats("pfCats", product ? product.cats : []);
   document.getElementById("pfImg").value = product ? product.img : "panel";
   document.getElementById("pfPrice").value = product ? product.price : "";

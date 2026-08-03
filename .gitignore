@@ -1,6 +1,8 @@
 # Sunucu veritabanı (kalıcı veriler) — depoya girmemeli
 data.json
 data.json.tmp
+data.yedek.json
+mail-ayarlari.json
 
 # Yerel/geçici
 *.log

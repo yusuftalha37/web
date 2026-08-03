@@ -72,9 +72,25 @@ const SEED = {
 // -------------------- Veri yükle / kaydet --------------------
 let DB;
 function loadDB() {
-  try { DB = JSON.parse(fs.readFileSync(DATA_FILE, "utf8")); }
-  catch (_) { DB = JSON.parse(JSON.stringify(SEED)); }
+  let restoredFromBackup = false;
+  try {
+    DB = JSON.parse(fs.readFileSync(DATA_FILE, "utf8"));
+  } catch (_) {
+    // data.json yok ya da bozuk. Bir güvenlik yedeği varsa ONDAN kurtar
+    // (böylece güncelleme sırasında dosya silinse bile ürün/ayarlar geri gelir);
+    // yedek de yoksa ilk kurulum tohum verisiyle başla.
+    try {
+      DB = JSON.parse(fs.readFileSync(path.join(ROOT, "data.yedek.json"), "utf8"));
+      restoredFromBackup = true;
+      console.log("Uyarı: data.json bulunamadı/bozuktu — data.yedek.json yedeğinden geri yüklendi.");
+    } catch (_2) {
+      DB = JSON.parse(JSON.stringify(SEED));
+    }
+  }
   ["products", "categories", "slides", "kv", "orders", "leads", "users"].forEach((t) => { if (!DB[t]) DB[t] = []; });
+
+  // Yedekten kurtarıldıysa data.json'u hemen yeniden yaz (kalıcı olsun)
+  if (restoredFromBackup) saveDB();
 
   // Oturum jetonlarını yeniden başlatmada koru (yoksa admin her yeniden
   // başlatmada oturumdan düşer ve kullanıcı/sipariş listeleri boş görünür).
@@ -108,11 +124,21 @@ function loadDB() {
   }
 }
 let saveTimer = null;
+const BACKUP_FILE = path.join(ROOT, "data.yedek.json");
 function saveDB() {
   // atomik yazma: önce geçici dosya, sonra taşı
   const tmp = DATA_FILE + ".tmp";
-  fs.writeFileSync(tmp, JSON.stringify(DB));
+  const json = JSON.stringify(DB);
+  fs.writeFileSync(tmp, json);
   fs.renameSync(tmp, DATA_FILE);
+  // Güvenlik yedeği: dosyalar dışarıdan (ör. güncelleme sırasında) üzerine
+  // yazılsa bile veriler klasörde ikinci bir kopyada durur. Yalnızca anlamlı
+  // veri varken yazılır ki boş/bozuk bir DB iyi yedeğin üstüne geçmesin.
+  try {
+    if ((DB.products && DB.products.length) || (DB.users && DB.users.length)) {
+      fs.writeFileSync(BACKUP_FILE, json);
+    }
+  } catch (_) {}
 }
 
 // -------------------- Kullanıcı / şifre / token --------------------
