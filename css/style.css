@@ -457,6 +457,8 @@ img, svg { max-width: 100%; }
 }
 /* Fareyle kategori ya da menü üzerindeyken açık kalır */
 .catbar-item.has-mega:hover .catbar-mega { display: block; }
+/* En sağdaki kategorinin menüsü ekran dışına taşmasın — sağa hizalı açılır */
+.catbar-item:last-child .catbar-mega { left: auto; right: 0; }
 .catbar-mega-title {
   display: block;
   font-size: 10px;

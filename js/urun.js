@@ -128,8 +128,17 @@ function initProductPage(root) {
 }
 
 if (typeof goPage === "function") {
-  // Tek dosya: hash rotası (#urun/ID) değişince yeniden çiz
-  const run = () => { if (location.hash.indexOf("#urun/") === 0) Store.ready(() => initProductPage(document.getElementById("page-urun"))); };
+  // Tek dosya: hash rotası (#urun/ID). Yalnızca ürün DEĞİŞTİĞİNDE yeniden çiz;
+  // aynı üründeyken gelen hashchange'lerde (ör. sepete eklerken rozet tazeleme)
+  // sayfayı yeniden kurup "Sepete Eklendi" onayını silmemek için atla.
+  let lastId = null;
+  const run = () => {
+    if (location.hash.indexOf("#urun/") !== 0) { lastId = null; return; }
+    const id = decodeURIComponent(location.hash.slice(6));
+    if (id === lastId) return;
+    lastId = id;
+    Store.ready(() => initProductPage(document.getElementById("page-urun")));
+  };
   window.addEventListener("hashchange", run);
   run();
 } else {
