@@ -102,6 +102,17 @@
 
 .admin-sidebar-foot a:hover { color: #fff; }
 
+.admin-version {
+  margin: 8px 14px 0;
+  padding: 5px 9px;
+  font-size: 0.72rem;
+  color: #cbd5e1;
+  background: #16344f;
+  border: 1px solid #24405c;
+  border-radius: 6px;
+  letter-spacing: 0.02em;
+}
+
 /* ---- Ana içerik ---- */
 .admin-main {
   flex: 1;
