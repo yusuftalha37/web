@@ -34,7 +34,7 @@
     <div class="admin-sidebar-foot">
       <a href="index.html">← Siteye Dön</a>
       <a href="#" id="adminLogout">Çıkış Yap</a>
-      <div class="admin-version" id="adminVersion">Sürüm: 2026-08-04 · 8</div>
+      <div class="admin-version" id="adminVersion">Sürüm: 2026-08-04 · 9</div>
     </div>
   </aside>
 
@@ -95,29 +95,25 @@
               </div>
               <input type="text" id="upPhotoUrl" class="up-url" placeholder="veya görsel bağlantısı: https://...">
               <button type="button" class="row-btn row-btn-danger" id="upPhotoRemove">Fotoğrafı Kaldır</button>
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label for="upCat">Ana kategori (üst)</label>
-                <select id="upCat"></select>
-              </div>
-              <div class="form-group">
-                <label for="upImg">Yedek çizim <small>(fotoğraf yoksa)</small></label>
-                <select id="upImg">
-                  <option value="panel">Panel</option>
-                  <option value="flex">Esnek panel</option>
-                  <option value="inverter">İnvertör</option>
-                  <option value="battery">Akü</option>
-                  <option value="kit">Paket</option>
-                  <option value="controller">Şarj kontrol cihazı</option>
-                  <option value="streetlight">Solar lamba</option>
-                  <option value="mount">Montaj seti</option>
-                  <option value="cable">Kablo / konnektör</option>
-                </select>
-              </div>
+              <label for="upImg" class="sub-label">Yedek çizim <small>(fotoğraf yüklemezseniz kartta bu ikon gösterilir)</small></label>
+              <select id="upImg">
+                <option value="panel">Panel</option>
+                <option value="flex">Esnek panel</option>
+                <option value="inverter">İnvertör</option>
+                <option value="battery">Akü</option>
+                <option value="kit">Paket</option>
+                <option value="controller">Şarj kontrol cihazı</option>
+                <option value="streetlight">Solar lamba</option>
+                <option value="mount">Montaj seti</option>
+                <option value="cable">Kablo / konnektör</option>
+              </select>
             </div>
             <div class="form-group">
-              <label>Marka (alt kategori) <small>(üst kategoriye tanımlı markalar — birden çok seçilebilir)</small></label>
+              <label for="upCat">1) Ana kategori (üst) — ürün tipi</label>
+              <select id="upCat"></select>
+            </div>
+            <div class="form-group">
+              <label>2) Marka (alt kategori) <small>(üst kategoriye bağlı marka — yoksa aşağıdan hemen ekleyin)</small></label>
               <div id="upCats" class="cat-check-group"></div>
             </div>
             <div class="form-row">
@@ -404,29 +400,25 @@
             </div>
           </div>
           <small class="photo-hint">Bilgisayarınızdan yükleyin (otomatik küçültülür) ya da internetten bir görsel bağlantısı yapıştırın. Fotoğraf yoksa kategoriye uygun çizim gösterilir.</small>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label for="pfCat">Ana kategori (üst)</label>
-            <select id="pfCat"></select>
-          </div>
-          <div class="form-group">
-            <label for="pfImg">Yedek çizim <small>(fotoğraf yoksa)</small></label>
-            <select id="pfImg">
-              <option value="panel">Panel</option>
-              <option value="flex">Esnek panel</option>
-              <option value="inverter">İnvertör</option>
-              <option value="battery">Akü</option>
-              <option value="kit">Paket</option>
-              <option value="controller">Şarj kontrol cihazı</option>
-              <option value="streetlight">Solar lamba</option>
-              <option value="mount">Montaj seti</option>
-              <option value="cable">Kablo / konnektör</option>
-            </select>
-          </div>
+          <label for="pfImg" class="sub-label">Yedek çizim <small>(fotoğraf yüklemezseniz kartta bu ikon gösterilir)</small></label>
+          <select id="pfImg">
+            <option value="panel">Panel</option>
+            <option value="flex">Esnek panel</option>
+            <option value="inverter">İnvertör</option>
+            <option value="battery">Akü</option>
+            <option value="kit">Paket</option>
+            <option value="controller">Şarj kontrol cihazı</option>
+            <option value="streetlight">Solar lamba</option>
+            <option value="mount">Montaj seti</option>
+            <option value="cable">Kablo / konnektör</option>
+          </select>
         </div>
         <div class="form-group">
-          <label>Marka (alt kategori) <small>(üst kategoriye tanımlı markalar — birden çok seçilebilir)</small></label>
+          <label for="pfCat">1) Ana kategori (üst) — ürün tipi</label>
+          <select id="pfCat"></select>
+        </div>
+        <div class="form-group">
+          <label>2) Marka (alt kategori) <small>(üst kategoriye bağlı marka — yoksa aşağıdan hemen ekleyin)</small></label>
           <div id="pfCats" class="cat-check-group"></div>
         </div>
         <div class="form-row">
