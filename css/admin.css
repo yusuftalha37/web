@@ -230,6 +230,8 @@
 
 .row-btn:hover { border-color: var(--primary); color: var(--primary-dark); }
 
+.row-btn-accent { color: #b45309; border-color: #fde68a; }
+.row-btn-accent:hover { border-color: #d97706; color: #92400e; }
 .row-btn-danger { color: #dc2626; border-color: #fecaca; }
 
 .row-btn-danger:hover { border-color: #dc2626; color: #b91c1c; }

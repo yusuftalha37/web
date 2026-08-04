@@ -2343,6 +2343,8 @@ img, svg { max-width: 100%; }
 
 .row-btn:hover { border-color: var(--primary); color: var(--primary-dark); }
 
+.row-btn-accent { color: #b45309; border-color: #fde68a; }
+.row-btn-accent:hover { border-color: #d97706; color: #92400e; }
 .row-btn-danger { color: #dc2626; border-color: #fecaca; }
 
 .row-btn-danger:hover { border-color: #dc2626; color: #b91c1c; }
@@ -6837,6 +6839,7 @@ function renderCategories() {
           <button class="row-btn" data-act="setimg" data-id="${c.id}">${c.image ? "Görseli Değiştir" : "Görsel Ekle"}</button>
           ${c.image ? `<button class="row-btn" data-act="rmimg" data-id="${c.id}">Görseli Kaldır</button>` : ""}
           <button class="row-btn" data-act="rename" data-id="${c.id}">Yeniden Adlandır</button>
+          <button class="row-btn row-btn-accent" data-act="tobrand" data-id="${c.id}">Markaya Çevir</button>
           <button class="row-btn row-btn-danger" data-act="delcat" data-id="${c.id}">Sil</button>
         </td>
       </tr>`;
@@ -6854,6 +6857,7 @@ function renderCategories() {
           <button class="row-btn" data-act="setimg" data-id="${c.id}">${c.image ? "Görseli Değiştir" : "Görsel Ekle"}</button>
           ${c.image ? `<button class="row-btn" data-act="rmimg" data-id="${c.id}">Görseli Kaldır</button>` : ""}
           <button class="row-btn" data-act="rename" data-id="${c.id}">Yeniden Adlandır</button>
+          <button class="row-btn" data-act="totop" data-id="${c.id}">Üst Kategori Yap</button>
           <button class="row-btn row-btn-danger" data-act="delcat" data-id="${c.id}">Sil</button>
         </td>
       </tr>`;
@@ -6962,8 +6966,16 @@ document.getElementById("catRows").addEventListener("click", (e) => {
     return;
   }
 
-  if (act === "togglekind") {
-    Store.saveCategory({ id, kind: cat.kind === "brand" ? "" : "brand" });
+  if (act === "tobrand") {
+    // Üst kategoriyi markaya çevir. Üst kategorisi henüz yok → aşağıda "bağsız
+    // marka" uyarısıyla listelenir; oradan üst kategori seçilir.
+    Store.saveCategory({ id, kind: "brand", parent: "" });
+    renderAll();
+    setTimeout(() => alert('"' + cat.name + '" artık bir MARKA. Aşağıda hangi üst kategorinin altında olacağını seçin.'), 30);
+    return;
+  }
+  if (act === "totop") {
+    Store.saveCategory({ id, kind: "", parent: "" });
     renderAll();
     return;
   }
@@ -6977,7 +6989,7 @@ document.getElementById("catRows").addEventListener("click", (e) => {
   }
 
   if (act === "delcat") {
-    const count = Store.getProducts().filter((p) => p.cat === id).length;
+    const count = Store.getProducts().filter((p) => Store.productCatIds(p).indexOf(id) !== -1).length;
     if (count > 0) {
       alert('"' + cat.name + '" kategorisinde ' + count + " ürün var. Silmeden önce bu ürünleri başka bir kategoriye taşıyın veya silin.");
       return;
