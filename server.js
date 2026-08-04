@@ -385,8 +385,14 @@ function serveStatic(req, res) {
     if (err || !st.isFile()) { send(res, 404, { error: "not found" }); return; }
     fs.readFile(file, (err2, data) => {
       if (err2) { send(res, 404, { error: "not found" }); return; }
+      const ext = path.extname(file).toLowerCase();
+      // Kod/işaretleme dosyaları önbelleğe alınmasın — güncelleme sonrası tarayıcı
+      // her zaman en yeni sürümü çeksin (aksi halde eski admin.js/HTML gösterilir).
+      // Görseller değişmediği için makul süre önbelleklenebilir.
+      const noCache = [".html", ".js", ".css", ".json", ".xml", ".txt"].includes(ext);
       res.writeHead(200, Object.assign({
-        "Content-Type": MIME[path.extname(file).toLowerCase()] || "application/octet-stream"
+        "Content-Type": MIME[ext] || "application/octet-stream",
+        "Cache-Control": noCache ? "no-cache, no-store, must-revalidate" : "public, max-age=86400"
       }, SECURITY_HEADERS));
       res.end(data);
     });
