@@ -514,6 +514,30 @@ img, svg { max-width: 100%; }
   border-radius: var(--radius);
 }
 .catbar-brand-name { font-size: 12px; font-weight: bold; line-height: 1.2; }
+
+/* Mega menüde alt kategori sütunları (hiyerarşi) */
+.catbar-megacol { min-width: 140px; }
+.catbar-mega-head {
+  display: block;
+  font-size: 13px;
+  font-weight: bold;
+  color: var(--text);
+  text-decoration: none;
+  padding: 4px 0;
+}
+.catbar-mega-head:hover { color: var(--blue); }
+.catbar-mega-sub { display: flex; flex-direction: column; gap: 2px; padding: 2px 0 6px 8px; }
+.catbar-mega-sub a {
+  font-size: 12px;
+  color: var(--muted);
+  text-decoration: none;
+  padding: 2px 0;
+}
+.catbar-mega-sub a:hover { color: var(--blue); }
+/* Açılır listede hiyerarşi girintisi */
+.catbar-depth-1 { padding-left: 26px !important; font-size: 12.5px; }
+.catbar-depth-2 { padding-left: 40px !important; font-size: 12.5px; opacity: 0.9; }
+.catbar-depth-3 { padding-left: 54px !important; font-size: 12px; opacity: 0.85; }
 @media (max-width: 720px) {
   .catbar-mega { position: static; min-width: 0; box-shadow: none; border: none; padding: 6px 0 10px 20px; }
   .catbar-item.has-mega:hover .catbar-mega { display: block; }
@@ -1236,6 +1260,15 @@ img, svg { max-width: 100%; }
   font-weight: bold;
   border-left-color: var(--orange);
 }
+
+/* Hiyerarşi girintisi — alt kategoriler kademeli içeri alınır */
+.cat-depth-0 { padding-left: 14px; }
+.cat-depth-1 { padding-left: 30px; font-size: 12.5px; }
+.cat-depth-2 { padding-left: 46px; font-size: 12.5px; color: var(--muted); }
+.cat-depth-3 { padding-left: 62px; font-size: 12px; color: var(--muted); }
+.cat-depth-1::before,
+.cat-depth-2::before,
+.cat-depth-3::before { content: "└ "; opacity: 0.45; margin-right: 2px; }
 
 .cat-link span {
   font-size: 11px;
@@ -2485,7 +2518,7 @@ img, svg { max-width: 100%; }
 .cat-help strong { color: #1d4ed8; }
 .cat-row-top .cell-strong { font-size: 1rem; }
 .cat-row-brand > td { background: #fbfaf5; }
-.cat-row-brand .cell-strong { padding-left: 18px; font-weight: 600; }
+.cat-row-brand .cell-strong { font-weight: 600; }
 .cat-branch { color: #cb8a2e; font-weight: 700; margin-right: 2px; }
 .cat-row-warn td {
   background: #fef3c7;
@@ -2494,6 +2527,24 @@ img, svg { max-width: 100%; }
   font-weight: 600;
 }
 .cat-parent-sel { max-width: 190px; }
+
+/* Hiyerarşi tablosu — bölüm başlıkları ve seviye görünümü */
+.cat-section-row td {
+  background: #eef2ff;
+  color: #3730a3;
+  font-weight: 700;
+  font-size: 0.86rem;
+  letter-spacing: 0.01em;
+}
+.cat-section-row em { font-weight: 500; color: #6366f1; font-style: normal; }
+.cat-row-tree .cell-strong { font-weight: 600; }
+.cat-row-d0 .cell-strong { font-size: 1rem; font-weight: 700; }
+.cat-row-d1 > td { background: #fcfcfd; }
+.cat-row-d2 > td { background: #f8fafc; }
+.cat-row-d3 > td { background: #f4f6f9; }
+.cat-row-d2 .cell-strong,
+.cat-row-d3 .cell-strong { font-size: 0.88rem; font-weight: 500; }
+.cat-note { color: #94a3b8; font-style: normal; font-size: 0.78rem; }
 
 .table-thumb {
   width: 46px;
@@ -3972,7 +4023,7 @@ img, svg { max-width: 100%; }
     <div class="admin-sidebar-foot">
       <a href="#">← Siteye Dön</a>
       <a href="#" id="adminLogout">Çıkış Yap</a>
-      <div class="admin-version" id="adminVersion">Sürüm: 2026-08-05 · 12</div>
+      <div class="admin-version" id="adminVersion">Sürüm: 2026-08-05 · 13</div>
     </div>
   </aside>
 
@@ -4047,11 +4098,11 @@ img, svg { max-width: 100%; }
               </select>
             </div>
             <div class="form-group">
-              <label for="upCat">1) Ana kategori (üst) — ürün tipi</label>
+              <label for="upCat">1) Kategori <small>(hiyerarşiden seçin — alt kategoriler girintili görünür)</small></label>
               <select id="upCat"></select>
             </div>
             <div class="form-group">
-              <label>2) Marka (alt kategori) <small>(üst kategoriye bağlı marka — yoksa aşağıdan hemen ekleyin)</small></label>
+              <label>2) Marka <small>(hiyerarşiden bağımsız — yoksa aşağıdan hemen ekleyin)</small></label>
               <div id="upCats" class="cat-check-group"></div>
             </div>
             <div class="form-row">
@@ -4087,25 +4138,25 @@ img, svg { max-width: 100%; }
       <div class="admin-panel settings-panel">
         <h2>Yeni Kategori / Marka Ekle</h2>
         <div class="cat-help">
-          <strong>İki seviye vardır:</strong>
-          <span><b>1) Üst kategori</b> = ürün tipi (Güneş Paneli, İnvertör, Akü…).</span>
-          <span><b>2) Alt kategori = Marka</b> — bir üst kategorinin altına bağlanır (ör. İnvertörler → <b>Lexron</b>).</span>
-          Önce üst kategoriyi oluştur, sonra altına markaları ekle.
+          <strong>İki ayrı yapı vardır:</strong>
+          <span><b>1) Kategori hiyerarşisi</b> — istediğiniz kadar derin olabilir. Örn. <b>İnvertörler → Hibrit İnvertörler → 48V Hibrit</b>. Alt kategori eklemek için "Üst kategori" seçin; boş bırakırsanız en üst seviyede ana kategori olur.</span>
+          <span><b>2) Markalar</b> — hiyerarşinin <b>dışındadır</b>, üst kategorisi yoktur (ör. <b>Lexron</b>). Ürüne kategorisinden ayrı olarak eklenir; böylece bir marka birden çok kategoride ürün taşıyabilir.</span>
+          Aşağıdaki tabloda üst kategoriyi değiştirerek kategorileri istediğiniz seviyeye taşıyabilirsiniz.
         </div>
         <form id="catForm">
           <div class="form-group">
             <label for="catKind">Ne ekliyorsunuz?</label>
             <select id="catKind">
-              <option value="">Üst kategori (ürün tipi)</option>
-              <option value="brand">Alt kategori — Marka</option>
+              <option value="">Kategori (hiyerarşiye dahil)</option>
+              <option value="brand">Marka (hiyerarşi dışı)</option>
             </select>
           </div>
           <div class="form-group">
-            <label for="catNameInput" id="catNameLabel">Üst kategori adı</label>
-            <input type="text" id="catNameInput" required placeholder="Örn. Şarj Kontrol Cihazları">
+            <label for="catNameInput" id="catNameLabel">Kategori adı</label>
+            <input type="text" id="catNameInput" required placeholder="Örn. Hibrit İnvertörler">
           </div>
-          <div class="form-group" id="catParentWrap" hidden>
-            <label for="catParent">Bu marka hangi üst kategorinin altında? *</label>
+          <div class="form-group" id="catParentWrap">
+            <label for="catParent">Üst kategori <small>(boş = en üst seviye ana kategori)</small></label>
             <select id="catParent"></select>
           </div>
           <button type="submit" class="btn btn-small">Ekle</button>
@@ -4113,11 +4164,11 @@ img, svg { max-width: 100%; }
         </form>
       </div>
       <div class="admin-panel">
-        <p class="panel-hint">Aşağıda üst kategoriler ve altlarındaki markalar görünür. Markalar bağlı oldukları üst kategorinin altında girintili listelenir. Her kategoriye/markaya bir görsel (ikon) ekleyebilirsiniz. İçinde ürün bulunan kategori silinemez; önce ürünleri başka kategoriye taşıyın.</p>
+        <p class="panel-hint">Üstte <b>kategori hiyerarşisi</b> (girintili ağaç), altta <b>markalar</b> listelenir. Bir kategoriyi başka bir kategorinin altına taşımak için "Üst kategori" listesinden seçim yapın; hızlıca alt kategori açmak için <b>+ Alt Kategori</b> butonunu kullanın. İçinde ürün bulunan kategori silinemez; silinen kategorinin alt kategorileri bir üst seviyeye taşınır.</p>
         <input type="file" id="catImgFile" accept="image/*" hidden>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Görsel</th><th>Üst kategori / Marka</th><th>Tür</th><th>Ürün</th><th></th></tr></thead>
+            <thead><tr><th>Görsel</th><th>Ad</th><th>Seviye / Üst kategori</th><th>Ürün</th><th></th></tr></thead>
             <tbody id="catRows"></tbody>
           </table>
         </div>
@@ -4384,11 +4435,11 @@ img, svg { max-width: 100%; }
           </select>
         </div>
         <div class="form-group">
-          <label for="pfCat">1) Ana kategori (üst) — ürün tipi</label>
+          <label for="pfCat">1) Kategori <small>(hiyerarşiden seçin — alt kategoriler girintili görünür)</small></label>
           <select id="pfCat"></select>
         </div>
         <div class="form-group">
-          <label>2) Marka (alt kategori) <small>(üst kategoriye bağlı marka — yoksa aşağıdan hemen ekleyin)</small></label>
+          <label>2) Marka <small>(hiyerarşiden bağımsız — yoksa aşağıdan hemen ekleyin)</small></label>
           <div id="pfCats" class="cat-check-group"></div>
         </div>
         <div class="form-row">
@@ -4491,8 +4542,10 @@ const Store = (() => {
     { id: "aku", name: "Aküler" },
     { id: "paket", name: "Hazır Paketler" },
     { id: "aksesuar", name: "Aksesuarlar" },
-    // Marka alt kategorisi örneği: İnvertörler > Lexron
-    { id: "lexron", name: "Lexron", kind: "brand", parent: "inverter", image: "" }
+    // Hiyerarşi örneği: İnvertörler > Hibrit İnvertörler
+    { id: "inverter-hibrit", name: "Hibrit İnvertörler", parent: "inverter", image: "" },
+    // Marka — hiyerarşi dışıdır, üst kategorisi yoktur
+    { id: "lexron", name: "Lexron", kind: "brand", parent: "", image: "" }
   ];
   const DEFAULT_SLIDES = [
     { id: "sl1", image: "", art: "roof", title: "Güneş Enerjisinde Türkiye'nin Her Yerine Gönderim", subtitle: "Panel, invertör, akü ve hazır paketler stoktan — siparişiniz aynı gün kargoda.", btnText: "Ürünleri İncele", btnLink: "urunler.html" },
@@ -4725,7 +4778,63 @@ const Store = (() => {
   }
 
   // ===================== KATEGORİLER =====================
+  // İki ayrı boyut vardır:
+  //  1) HİYERARŞİ — kind !== "brand" olan kategoriler. parent alanıyla
+  //     istenen derinlikte ağaç kurar (parent === "" ise kök).
+  //  2) MARKALAR — kind === "brand". Hiyerarşinin DIŞINDADIR, düz listedir,
+  //     parent kullanmaz. Bir ürün hem bir kategoriye hem de markalara ait olur.
   function getCategories() { return cache.categories; }
+  function isBrandCat(c) { return !!c && c.kind === "brand"; }
+  function getBrands() { return cache.categories.filter(isBrandCat); }
+  // Hiyerarşiye dahil kategoriler (markalar hariç)
+  function getTreeCategories() { return cache.categories.filter((c) => !isBrandCat(c)); }
+  // Bir kategorinin geçerli üst kimliği: ağaçta gerçekten var olmayan üst = kök
+  function parentOf(c) {
+    const p = (c && c.parent) || "";
+    if (!p) return "";
+    const par = cache.categories.find((x) => x.id === p);
+    return par && !isBrandCat(par) ? p : "";
+  }
+  function catChildren(parentId) {
+    return getTreeCategories().filter((c) => parentOf(c) === (parentId || ""));
+  }
+  // Ağacı derinlik bilgisiyle düz listeye açar (DFS) — çizim/seçim listeleri için
+  function catTree(rootId, depth, seen) {
+    const out = [];
+    seen = seen || {};
+    catChildren(rootId || "").forEach((c) => {
+      if (seen[c.id]) return;          // döngü koruması
+      seen[c.id] = true;
+      out.push({ cat: c, depth: depth || 0 });
+      catTree(c.id, (depth || 0) + 1, seen).forEach((x) => out.push(x));
+    });
+    return out;
+  }
+  // Kategori + tüm alt kategorilerinin kimlikleri (filtreleme bunu kullanır)
+  function catDescendantIds(id) {
+    const ids = [id];
+    catTree(id).forEach((n) => ids.push(n.cat.id));
+    return ids;
+  }
+  // "İnvertörler › Hibrit" biçiminde yol adı
+  function catPath(id) {
+    const names = [];
+    let cur = cache.categories.find((c) => c.id === id);
+    const guard = {};
+    while (cur && !guard[cur.id]) {
+      guard[cur.id] = true;
+      names.unshift(cur.name);
+      const p = parentOf(cur);
+      cur = p ? cache.categories.find((c) => c.id === p) : null;
+    }
+    return names.join(" › ");
+  }
+  // newParent, id'nin kendisi ya da altındaysa taşımaya izin verilmez (döngü)
+  function canReparent(id, newParent) {
+    if (!newParent) return true;
+    if (newParent === id) return false;
+    return catDescendantIds(id).indexOf(newParent) === -1;
+  }
   function saveCategory(cat) {
     const name = (cat.name || "").trim();
     if (cat.id) {
@@ -4734,23 +4843,41 @@ const Store = (() => {
         if (name) ex.name = name;
         if (cat.image !== undefined) ex.image = cat.image;
         if (cat.kind !== undefined) ex.kind = cat.kind;
-        if (cat.parent !== undefined) ex.parent = cat.parent;
+        if (cat.parent !== undefined) {
+          // Marka hiyerarşi dışıdır: üst kategori tutmaz.
+          // Ayrıca bir kategori kendi altına taşınamaz (döngü olurdu).
+          ex.parent = isBrandCat(ex) || !canReparent(cat.id, cat.parent) ? "" : cat.parent;
+        }
+        if (isBrandCat(ex)) ex.parent = "";
       }
       const row = { id: cat.id, name: ex ? ex.name : name };
       if (cat.image !== undefined) row.image = cat.image;
       if (cat.kind !== undefined) row.kind = cat.kind;
-      if (cat.parent !== undefined) row.parent = cat.parent;
+      if (cat.parent !== undefined) row.parent = ex ? ex.parent : "";
       if (persist) return sbWrite("POST", "categories", "", row).catch(logErr);
     } else {
-      const nc = { id: "c-" + Date.now(), name, image: cat.image || "", kind: cat.kind || "", parent: cat.parent || "" };
+      const kind = cat.kind || "";
+      const nc = {
+        id: "c-" + Date.now(), name, image: cat.image || "", kind,
+        parent: kind === "brand" ? "" : (cat.parent || "")
+      };
       cache.categories.push(nc);
       if (persist) return sbWrite("POST", "categories", "", { id: nc.id, name: nc.name, image: nc.image, kind: nc.kind, parent: nc.parent, sort: cache.categories.length }).catch(logErr);
     }
     write("gp-cats", cache.categories);
   }
   function deleteCategory(id) {
+    // Silinen kategorinin alt kategorileri boşta kalmasın: bir üst seviyeye taşınır
+    const victim = cache.categories.find((c) => c.id === id);
+    const newParent = victim ? parentOf(victim) : "";
+    const orphans = cache.categories.filter((c) => !isBrandCat(c) && (c.parent || "") === id);
     cache.categories = cache.categories.filter((c) => c.id !== id);
-    if (persist) return sbWrite("DELETE", "categories", "id=eq." + encodeURIComponent(id)).catch(logErr);
+    orphans.forEach((c) => { c.parent = newParent; });
+    if (persist) {
+      const jobs = orphans.map((c) => sbWrite("POST", "categories", "", { id: c.id, name: c.name, parent: newParent }));
+      jobs.push(sbWrite("DELETE", "categories", "id=eq." + encodeURIComponent(id)));
+      return Promise.all(jobs).catch(logErr);
+    }
     write("gp-cats", cache.categories);
   }
 
@@ -5019,6 +5146,8 @@ const Store = (() => {
     mode: MODE, load, ready,
     getProducts, saveProduct, deleteProduct, productCatIds,
     getCategories, saveCategory, deleteCategory,
+    getBrands, getTreeCategories, isBrandCat, catChildren, catTree,
+    catDescendantIds, catPath, canReparent,
     getSlides, saveSlide, deleteSlide, moveSlide,
     register, login, logout, session,
     getUser, updateProfile, changePassword,
@@ -5435,14 +5564,15 @@ function initSite(root) {
     // Bir ürün, seçili kategoriye ait mi? Ürün birden fazla kategoriye
     // (birincil + ek/marka) atanmış olabilir. Ayrıca üst kategori seçiliyse,
     // o kategorinin markalarına (parent === kategori) atanmış ürünler de dahil edilir.
-    const childBrandIds = (catId) => CATEGORIES.filter((c) => c.kind === "brand" && c.parent === catId).map((c) => c.id);
     const prodCatIds = (p) => Store.productCatIds(p);
     function catMatch(p, catId) {
       if (catId === "all") return true;
       const ids = prodCatIds(p);
       if (ids.indexOf(catId) !== -1) return true;
-      const kids = childBrandIds(catId);
-      return ids.some((c) => kids.indexOf(c) !== -1);
+      // Bir kategori seçiliyse alt kategorilerindeki ürünler de listelenir.
+      // (Marka seçiliyse alt kategori yoktur; yalnızca birebir eşleşme.)
+      const sub = Store.catDescendantIds(catId);
+      return ids.some((c) => sub.indexOf(c) !== -1);
     }
 
     // Kategori + arama uygulanmış liste (güç filtresi hariç — facet bundan üretilir)
@@ -5479,16 +5609,18 @@ function initSite(root) {
 
     // ---- Sol kenar: kategori listesi + güç/kapasite facet'i (ürünler sayfası) ----
     function buildCatList() {
-      const item = (c) => {
+      const item = (c, depth) => {
         const n = PRODUCTS.filter((p) => catMatch(p, c.id)).length;
-        return `<li><button class="cat-link${currentCat === c.id ? " active" : ""}" data-cat="${c.id}">${escHtml(c.name)} <span>${n}</span></button></li>`;
+        const d = depth || 0;
+        return `<li><button class="cat-link cat-depth-${d > 3 ? 3 : d}${currentCat === c.id ? " active" : ""}" data-cat="${c.id}">${escHtml(c.name)} <span>${n}</span></button></li>`;
       };
-      const normal = CATEGORIES.filter((c) => c.kind !== "brand");
-      const brands = CATEGORIES.filter((c) => c.kind === "brand");
+      // Hiyerarşi: kökten aşağı girintili; markalar ayrı grupta (düz liste)
+      const tree = Store.catTree();
+      const brands = Store.getBrands();
       catList.innerHTML =
         `<li><button class="cat-link${currentCat === "all" ? " active" : ""}" data-cat="all">Tüm Ürünler <span>${PRODUCTS.length}</span></button></li>` +
-        normal.map(item).join("") +
-        (brands.length ? `<li class="cat-group-title">Markalar</li>` + brands.map(item).join("") : "");
+        tree.map((n) => item(n.cat, n.depth)).join("") +
+        (brands.length ? `<li class="cat-group-title">Markalar</li>` + brands.map((c) => item(c, 0)).join("") : "");
     }
 
     function buildPowerFacet() {
@@ -5618,23 +5750,26 @@ function initSite(root) {
 
   if (catbarLinks || catbarDropdown) {
     const catIcon = (c) => c.image ? `<img class="catbar-ico" src="${escHtml(c.image)}" alt="">` : "";
-    const normalCats = CATEGORIES.filter((c) => c.kind !== "brand");
-    const brandCats = CATEGORIES.filter((c) => c.kind === "brand");
-    const brandsOf = (catId) => brandCats.filter((b) => b.parent === catId);
+    const rootCats = Store.catChildren("");
+    const brandCats = Store.getBrands();
     const href = pageLink("urunler.html");
 
     if (catbarLinks) {
-      // Her ürün kategorisi; alt markası varsa fareyle açılan mega-menü ile
-      catbarLinks.innerHTML = normalCats.map((c) => {
-        const kids = brandsOf(c.id);
+      // Kök kategoriler; alt kategorisi varsa fareyle açılan mega-menü ile
+      catbarLinks.innerHTML = rootCats.map((c) => {
+        const kids = Store.catChildren(c.id);
         const mega = kids.length ? `
           <div class="catbar-mega">
-            <span class="catbar-mega-title">Markalar</span>
-            <div class="catbar-mega-grid">${kids.map((b) => `
-              <a href="${href}" class="catbar-brand" data-cat="${b.id}">
-                ${b.image ? `<img src="${escHtml(b.image)}" alt="${escHtml(b.name)}">` : `<span class="catbar-brand-noimg">${escHtml(b.name.slice(0, 2).toUpperCase())}</span>`}
-                <span class="catbar-brand-name">${escHtml(b.name)}</span>
-              </a>`).join("")}</div>
+            <span class="catbar-mega-title">${escHtml(c.name)}</span>
+            <div class="catbar-mega-grid">${kids.map((k) => {
+              const grand = Store.catChildren(k.id);
+              return `
+              <div class="catbar-megacol">
+                <a href="${href}" class="catbar-mega-head" data-cat="${k.id}">${escHtml(k.name)}</a>
+                ${grand.length ? `<div class="catbar-mega-sub">${grand.map((g) =>
+                  `<a href="${href}" data-cat="${g.id}">${escHtml(g.name)}</a>`).join("")}</div>` : ""}
+              </div>`;
+            }).join("")}</div>
           </div>` : "";
         return `<div class="catbar-item${kids.length ? " has-mega" : ""}">
           <a href="${href}" class="catbar-link" data-cat="${c.id}">${catIcon(c)}${escHtml(c.name)}${kids.length ? ' <span class="catbar-caret">▾</span>' : ""}</a>
@@ -5643,11 +5778,12 @@ function initSite(root) {
       }).join("");
     }
     if (catbarDropdown) {
-      const item = (c) => `<li><a href="${href}" data-cat="${c.id}">${catIcon(c)}${escHtml(c.name)}</a></li>`;
+      const item = (c, depth) =>
+        `<li><a class="catbar-depth-${(depth || 0) > 3 ? 3 : (depth || 0)}" href="${href}" data-cat="${c.id}">${catIcon(c)}${escHtml(c.name)}</a></li>`;
       catbarDropdown.innerHTML =
         `<li><a href="${href}" data-cat="all">Tüm Ürünler</a></li>` +
-        normalCats.map(item).join("") +
-        (brandCats.length ? `<li class="catbar-group">Markalar</li>` + brandCats.map(item).join("") : "");
+        Store.catTree().map((n) => item(n.cat, n.depth)).join("") +
+        (brandCats.length ? `<li class="catbar-group">Markalar</li>` + brandCats.map((c) => item(c, 0)).join("") : "");
     }
 
     const onProductsPage = !!$("#catList");
@@ -6460,12 +6596,14 @@ function catName(id) {
 }
 
 // Ürün formlarındaki kategori listelerini doldurur (seçim korunur)
+// Ağaçtaki derinliğe göre girinti öneki ("— — Ad")
+function catIndent(depth) { return depth ? "  ".repeat(depth) + "└ " : ""; }
+
 function populateCatSelects() {
-  // "Ana kategori (üst)" yalnızca normal kategoriler — markalar burada olmaz,
-  // onlar aşağıdaki "Ek kategoriler / markalar (alt)" kutularında yer alır.
-  const options = Store.getCategories()
-    .filter((c) => c.kind !== "brand")
-    .map((c) => `<option value="${c.id}">${escHtml(c.name)}</option>`)
+  // Kategori listesi hiyerarşik: alt kategoriler girintili görünür.
+  // Markalar burada YOKTUR — onlar hiyerarşi dışı, ayrı kutularda seçilir.
+  const options = Store.catTree()
+    .map((n) => `<option value="${n.cat.id}">${catIndent(n.depth)}${escHtml(n.cat.name)}</option>`)
     .join("");
   ["pfCat", "upCat"].forEach((id) => {
     const sel = document.getElementById(id);
@@ -6473,76 +6611,61 @@ function populateCatSelects() {
     sel.innerHTML = options;
     if (current && [...sel.options].some((o) => o.value === current)) sel.value = current;
   });
-  // Marka (alt kategori) kutuları: üst kategoriye göre doldur (işaretlileri koru)
-  renderBrandChecks("pfCats", document.getElementById("pfCat").value);
-  renderBrandChecks("upCats", document.getElementById("upCat").value);
+  // Marka kutuları: tüm markalar (kategoriden bağımsız), işaretliler korunur
+  renderBrandChecks("pfCats");
+  renderBrandChecks("upCats");
 }
 
-// Verilen üst kategoriye tanımlı markaları (parent === üst, ya da üstsüz) kutu grubu olarak çizer.
-// İşaretli olanlar korunur.
-function renderBrandChecks(containerId, topCatId) {
+// Tüm markaları kutu grubu olarak çizer. Markalar hiyerarşiden bağımsızdır:
+// hangi kategori seçili olursa olsun aynı liste görünür.
+function renderBrandChecks(containerId) {
   const box = document.getElementById(containerId);
   if (!box) return;
   const checked = getCheckedCats(containerId);
-  const topName = (Store.getCategories().find((c) => c.id === topCatId) || {}).name || "bu kategori";
-  const brands = Store.getCategories().filter(
-    (c) => c.kind === "brand" && (!c.parent || c.parent === topCatId)
-  );
+  const brands = Store.getBrands();
   let html = brands.map((c) =>
     `<label class="cat-check"><input type="checkbox" name="${containerId}" value="${escHtml(c.id)}"> <span>${escHtml(c.name)} <em class="cat-check-brand">marka</em></span></label>`
   ).join("");
   if (!brands.length) {
-    html = `<span class="cat-check-empty">“${escHtml(topName)}” için henüz marka yok. Aşağıdan hemen ekleyebilirsiniz:</span>`;
+    html = '<span class="cat-check-empty">Henüz marka yok. Aşağıdan hemen ekleyebilirsiniz:</span>';
   }
   // Buradan doğrudan yeni marka ekleme — Kategoriler ekranına gitmeye gerek yok
   html += `<div class="cat-brand-add">
-      <input type="text" class="cat-brand-add-input" placeholder="Yeni marka (ör. Lexron)" data-box="${containerId}" data-top="${escHtml(topCatId)}">
-      <button type="button" class="btn btn-small cat-brand-add-btn" data-box="${containerId}" data-top="${escHtml(topCatId)}">+ Marka Ekle</button>
+      <input type="text" class="cat-brand-add-input" placeholder="Yeni marka (ör. Lexron)" data-box="${containerId}">
+      <button type="button" class="btn btn-small cat-brand-add-btn" data-box="${containerId}">+ Marka Ekle</button>
     </div>`;
   box.innerHTML = html;
   setCheckedCats(containerId, checked);
 }
 
-// Ürün formundan doğrudan yeni marka ekle (seçili üst kategorinin altına)
-function addBrandInline(boxId, topCatId) {
+// Ürün formundan doğrudan yeni marka ekle (hiyerarşi dışı, üst kategori almaz)
+function addBrandInline(boxId) {
   const box = document.getElementById(boxId);
   if (!box) return;
   const input = box.querySelector(".cat-brand-add-input");
   const name = (input && input.value.trim()) || "";
   if (!name) { if (input) input.focus(); return; }
   const existing = Store.getCategories().find((c) => c.name.toLowerCase() === name.toLowerCase());
-  if (existing) {
-    // Aynı isim zaten varsa: markaysa onu bu üst kategoriye bağlayıp işaretle, değilse uyar
-    if (existing.kind === "brand") {
-      Store.saveCategory({ id: existing.id, parent: topCatId });
-    } else {
-      alert("“" + name + "” zaten bir üst kategori. Marka için farklı bir ad girin.");
-      return;
-    }
-  } else {
-    Store.saveCategory({ name, kind: "brand", parent: topCatId });
+  if (existing && !Store.isBrandCat(existing)) {
+    alert("“" + name + "” zaten bir kategori adı. Marka için farklı bir ad girin.");
+    return;
   }
-  const nb = Store.getCategories().find((c) => c.name.toLowerCase() === name.toLowerCase() && c.kind === "brand");
+  if (!existing) Store.saveCategory({ name, kind: "brand" });
+  const nb = Store.getCategories().find((c) => c.name.toLowerCase() === name.toLowerCase() && Store.isBrandCat(c));
   const keep = getCheckedCats(boxId).concat(nb ? [nb.id] : []);
-  renderBrandChecks(boxId, topCatId);
+  renderBrandChecks(boxId);
   setCheckedCats(boxId, keep);
 }
-
-// Üst kategori değişince marka (alt kategori) listesi o kategoriye göre yenilensin
-["pfCat", "upCat"].forEach((id) => {
-  const sel = document.getElementById(id);
-  if (sel) sel.addEventListener("change", () => renderBrandChecks(id + "s", sel.value));
-});
 
 // "+ Marka Ekle" butonu ve Enter tuşu (form gönderimini engelleyerek)
 document.addEventListener("click", (e) => {
   const btn = e.target.closest(".cat-brand-add-btn");
-  if (btn) { e.preventDefault(); addBrandInline(btn.dataset.box, btn.dataset.top); }
+  if (btn) { e.preventDefault(); addBrandInline(btn.dataset.box); }
 });
 document.addEventListener("keydown", (e) => {
   if (e.key === "Enter" && e.target.classList && e.target.classList.contains("cat-brand-add-input")) {
     e.preventDefault();
-    addBrandInline(e.target.dataset.box, e.target.dataset.top);
+    addBrandInline(e.target.dataset.box);
   }
 });
 
@@ -6673,7 +6796,9 @@ function renderProducts() {
       <tr>
         <td>${thumbHtml(p)}</td>
         <td class="cell-strong">${p.hit ? '<span class="hit-star" title="Çok satan">★</span> ' : ""}${escHtml(p.name)}${p.authorized ? ' <span class="pill pill-ok">Yetkili</span>' : ""}</td>
-        <td>${escHtml(catName(p.cat))}</td>
+        <td>${escHtml(Store.catPath(p.cat) || catName(p.cat))}${
+          (p.cats || []).length ? '<br><span class="cat-note">' + escHtml((p.cats || []).map(catName).join(", ")) + "</span>" : ""
+        }</td>
         <td>${tlFmt(p.price)}</td>
         <td>${p.stock <= 5 ? `<span class="pill pill-warn">${p.stock} adet</span>` : p.stock + " adet"}</td>
         <td class="cell-actions">
@@ -6729,7 +6854,7 @@ function openProductModal(product) {
   document.getElementById("pfName").value = product ? product.name : "";
   document.getElementById("pfCat").value = product ? product.cat : "panel";
   // Üst kategoriye göre marka listesini kur, sonra ürünün markalarını işaretle
-  renderBrandChecks("pfCats", document.getElementById("pfCat").value);
+  renderBrandChecks("pfCats");
   setCheckedCats("pfCats", product ? product.cats : []);
   document.getElementById("pfImg").value = product ? product.img : "panel";
   document.getElementById("pfPrice").value = product ? product.price : "";
@@ -6947,23 +7072,35 @@ renderUploadPreview();
 
 // ---------- KATEGORİLER ----------
 function renderCategories() {
-  const cats = Store.getCategories();
   const products = Store.getProducts();
-  const normals = cats.filter((c) => c.kind !== "brand");
-  const brands = cats.filter((c) => c.kind === "brand");
+  const tree = Store.catTree();          // hiyerarşi (derinlikli, DFS sırasında)
+  const brands = Store.getBrands();      // hiyerarşi dışı düz liste
   const countOf = (id) => products.filter((p) => Store.productCatIds(p).indexOf(id) !== -1).length;
   const thumbOf = (c) => c.image
     ? `<img class="table-thumb" src="${escHtml(c.image)}" alt="">`
     : '<span class="table-thumb table-thumb-empty">—</span>';
 
-  // Üst kategori satırı
-  const topRow = (c) => `
-      <tr class="cat-row-top">
+  // Hiyerarşi satırı — üst kategorisi açılır listeden değiştirilebilir (taşıma)
+  const treeRow = (c, depth) => {
+    // Kendisi ve alt ağacı seçenek olarak sunulmaz (döngü olurdu)
+    const opts = tree
+      .filter((n) => Store.canReparent(c.id, n.cat.id))
+      .map((n) => `<option value="${n.cat.id}"${(c.parent || "") === n.cat.id ? " selected" : ""}>${catIndent(n.depth)}${escHtml(n.cat.name)}</option>`)
+      .join("");
+    const level = depth === 0 ? "Ana kategori" : depth + ". seviye";
+    return `
+      <tr class="cat-row-tree cat-row-d${depth > 3 ? 3 : depth}">
         <td>${thumbOf(c)}</td>
-        <td class="cell-strong">${escHtml(c.name)}</td>
-        <td><span class="pill pill-ok">Üst kategori</span></td>
+        <td class="cell-strong">${depth ? '<span class="cat-branch">' + "&nbsp;".repeat(depth * 3) + "└</span> " : ""}${escHtml(c.name)}</td>
+        <td>
+          <span class="pill pill-ok">${level}</span>
+          <select class="cat-parent-sel" data-id="${c.id}" title="Üst kategori — değiştirerek taşıyın">
+            <option value="">— en üst seviye —</option>${opts}
+          </select>
+        </td>
         <td>${countOf(c.id)}</td>
         <td class="cell-actions">
+          <button class="row-btn" data-act="addchild" data-id="${c.id}">+ Alt Kategori</button>
           <button class="row-btn" data-act="setimg" data-id="${c.id}">${c.image ? "Görseli Değiştir" : "Görsel Ekle"}</button>
           ${c.image ? `<button class="row-btn" data-act="rmimg" data-id="${c.id}">Görseli Kaldır</button>` : ""}
           <button class="row-btn" data-act="rename" data-id="${c.id}">Yeniden Adlandır</button>
@@ -6971,41 +7108,36 @@ function renderCategories() {
           <button class="row-btn row-btn-danger" data-act="delcat" data-id="${c.id}">Sil</button>
         </td>
       </tr>`;
+  };
 
-  // Marka (alt) satırı — girintili; hangi üst kategoriye bağlı olduğu seçilebilir
-  const brandRow = (c) => {
-    const opts = normals.map((x) => `<option value="${x.id}"${c.parent === x.id ? " selected" : ""}>${escHtml(x.name)}</option>`).join("");
-    return `
+  // Marka satırı — hiyerarşi dışı, üst kategori seçimi yoktur
+  const brandRow = (c) => `
       <tr class="cat-row-brand">
         <td>${thumbOf(c)}</td>
-        <td class="cell-strong"><span class="cat-branch">└</span> ${escHtml(c.name)} <span class="pill pill-warn">Marka</span></td>
-        <td><select class="cat-parent-sel" data-id="${c.id}" title="Üst kategori"><option value="">— üst kategori seç —</option>${opts}</select></td>
+        <td class="cell-strong">${escHtml(c.name)}</td>
+        <td><span class="pill pill-warn">Marka</span> <em class="cat-note">hiyerarşi dışı</em></td>
         <td>${countOf(c.id)}</td>
         <td class="cell-actions">
           <button class="row-btn" data-act="setimg" data-id="${c.id}">${c.image ? "Görseli Değiştir" : "Görsel Ekle"}</button>
           ${c.image ? `<button class="row-btn" data-act="rmimg" data-id="${c.id}">Görseli Kaldır</button>` : ""}
           <button class="row-btn" data-act="rename" data-id="${c.id}">Yeniden Adlandır</button>
-          <button class="row-btn" data-act="totop" data-id="${c.id}">Üst Kategori Yap</button>
+          <button class="row-btn" data-act="totop" data-id="${c.id}">Kategoriye Çevir</button>
           <button class="row-btn row-btn-danger" data-act="delcat" data-id="${c.id}">Sil</button>
         </td>
       </tr>`;
-  };
 
-  let html = "";
-  normals.forEach((c) => {
-    html += topRow(c);
-    brands.filter((b) => b.parent === c.id).forEach((b) => { html += brandRow(b); });
-  });
-  // Üst kategorisi seçilmemiş (bağsız) markalar en altta, uyarı ile
-  const orphans = brands.filter((b) => !b.parent || !normals.some((n) => n.id === b.parent));
-  if (orphans.length) {
-    html += '<tr class="cat-row-warn"><td colspan="5">⚠ Aşağıdaki markalar bir üst kategoriye bağlı değil — sağdaki listeden üst kategori seçin:</td></tr>';
-    orphans.forEach((b) => { html += brandRow(b); });
-  }
-  document.getElementById("catRows").innerHTML = html ||
-    '<tr><td colspan="5" class="empty-row">Henüz kategori yok. Önce bir üst kategori ekleyin.</td></tr>';
+  let html = '<tr class="cat-section-row"><td colspan="5">📂 Kategori hiyerarşisi <em>— üst kategoriyi değiştirerek istediğiniz seviyeye taşıyın</em></td></tr>';
+  html += tree.length
+    ? tree.map((n) => treeRow(n.cat, n.depth)).join("")
+    : '<tr><td colspan="5" class="empty-row">Henüz kategori yok. Yukarıdaki formdan ekleyin.</td></tr>';
+  html += '<tr class="cat-section-row"><td colspan="5">🏷 Markalar <em>— hiyerarşiden bağımsızdır, ürüne kategoriden ayrı olarak eklenir</em></td></tr>';
+  html += brands.length
+    ? brands.map(brandRow).join("")
+    : '<tr><td colspan="5" class="empty-row">Henüz marka yok.</td></tr>';
 
-  // Marka → üst kategori seçimi
+  document.getElementById("catRows").innerHTML = html;
+
+  // Üst kategori değişimi = ağaçta taşıma
   document.querySelectorAll("#catRows .cat-parent-sel").forEach((sel) => {
     sel.addEventListener("change", () => {
       Store.saveCategory({ id: sel.dataset.id, parent: sel.value });
@@ -7014,22 +7146,24 @@ function renderCategories() {
   });
 }
 
-// Kategori formundaki "Üst kategori" listesini doldurur ve Tür=Marka ise gösterir
+// Kategori formundaki "Üst kategori" listesini doldurur.
+// Kategori (hiyerarşi) seçiliyse gösterilir; Marka seçiliyse gizlenir.
 function refreshCatFormParent() {
   const kindSel = document.getElementById("catKind");
   const wrap = document.getElementById("catParentWrap");
   const parentSel = document.getElementById("catParent");
   if (!kindSel || !wrap || !parentSel) return;
   const isBrand = kindSel.value === "brand";
-  const normals = Store.getCategories().filter((c) => c.kind !== "brand");
-  parentSel.innerHTML = '<option value="">— üst kategori seç —</option>' +
-    normals.map((c) => `<option value="${c.id}">${escHtml(c.name)}</option>`).join("");
-  wrap.hidden = !isBrand;
+  const current = parentSel.value;
+  parentSel.innerHTML = '<option value="">— en üst seviye (ana kategori) —</option>' +
+    Store.catTree().map((n) => `<option value="${n.cat.id}">${catIndent(n.depth)}${escHtml(n.cat.name)}</option>`).join("");
+  if (current && [...parentSel.options].some((o) => o.value === current)) parentSel.value = current;
+  wrap.hidden = isBrand;
   // Ad alanı etiketi ve örneği türe göre değişsin
   const lbl = document.getElementById("catNameLabel");
   const inp = document.getElementById("catNameInput");
-  if (lbl) lbl.textContent = isBrand ? "Marka adı" : "Üst kategori adı";
-  if (inp) inp.placeholder = isBrand ? "Örn. Lexron" : "Örn. Şarj Kontrol Cihazları";
+  if (lbl) lbl.textContent = isBrand ? "Marka adı" : "Kategori adı";
+  if (inp) inp.placeholder = isBrand ? "Örn. Lexron" : "Örn. Hibrit İnvertörler";
 }
 document.getElementById("catKind").addEventListener("change", refreshCatFormParent);
 
@@ -7045,17 +7179,16 @@ document.getElementById("catForm").addEventListener("submit", (e) => {
     return;
   }
   const kind = document.getElementById("catKind").value;
-  const parent = kind === "brand" ? document.getElementById("catParent").value : "";
-  if (kind === "brand" && !parent) {
-    status.textContent = "Marka için bir üst kategori seçmelisiniz (ör. İnvertörler).";
-    status.className = "form-status err";
-    return;
-  }
+  // Marka hiyerarşi dışıdır; üst kategori yalnızca normal kategoriler için geçerli
+  const parent = kind === "brand" ? "" : document.getElementById("catParent").value;
   Store.saveCategory({ name, kind, parent });
-  status.textContent = '"' + name + '" ' + (kind === "brand" ? "markası eklendi (üst kategori: " + (Store.getCategories().find((c) => c.id === parent) || {}).name + ")" : "üst kategorisi eklendi") + ".";
+  status.textContent = kind === "brand"
+    ? '"' + name + '" markası eklendi (hiyerarşi dışı).'
+    : '"' + name + '" kategorisi eklendi' + (parent ? " — üst kategori: " + Store.catPath(parent) : " (en üst seviye)") + ".";
   status.className = "form-status ok";
   input.value = "";
   document.getElementById("catKind").value = "";
+  document.getElementById("catParent").value = "";
   refreshCatFormParent();
   renderAll();
 });
@@ -7094,15 +7227,32 @@ document.getElementById("catRows").addEventListener("click", (e) => {
     return;
   }
 
+  if (act === "addchild") {
+    const name = prompt('"' + cat.name + '" altına eklenecek alt kategorinin adı:');
+    if (name && name.trim()) {
+      if (Store.getCategories().some((c) => c.name.toLowerCase() === name.trim().toLowerCase())) {
+        alert("Bu isimde bir kategori zaten var.");
+        return;
+      }
+      Store.saveCategory({ name: name.trim(), kind: "", parent: id });
+      renderAll();
+    }
+    return;
+  }
+
   if (act === "tobrand") {
-    // Üst kategoriyi markaya çevir. Üst kategorisi henüz yok → aşağıda "bağsız
-    // marka" uyarısıyla listelenir; oradan üst kategori seçilir.
+    // Kategoriyi markaya çevir: hiyerarşiden çıkar. Alt kategorileri varsa
+    // boşta kalmasınlar diye bir üst seviyeye taşınır.
+    const kids = Store.catChildren(id);
+    if (kids.length && !confirm('"' + cat.name + '" altındaki ' + kids.length + " alt kategori bir üst seviyeye taşınacak. Devam edilsin mi?")) return;
+    const newParent = cat.parent || "";
+    kids.forEach((k) => Store.saveCategory({ id: k.id, parent: newParent }));
     Store.saveCategory({ id, kind: "brand", parent: "" });
     renderAll();
-    setTimeout(() => alert('"' + cat.name + '" artık bir MARKA. Aşağıda hangi üst kategorinin altında olacağını seçin.'), 30);
     return;
   }
   if (act === "totop") {
+    // Markayı hiyerarşiye al: en üst seviyede normal kategori olur
     Store.saveCategory({ id, kind: "", parent: "" });
     renderAll();
     return;
@@ -7122,7 +7272,9 @@ document.getElementById("catRows").addEventListener("click", (e) => {
       alert('"' + cat.name + '" kategorisinde ' + count + " ürün var. Silmeden önce bu ürünleri başka bir kategoriye taşıyın veya silin.");
       return;
     }
-    if (confirm('"' + cat.name + '" kategorisi silinsin mi?')) {
+    const kids = Store.catChildren(id);
+    const note = kids.length ? "\n\nAltındaki " + kids.length + " alt kategori bir üst seviyeye taşınacak." : "";
+    if (confirm('"' + cat.name + '" silinsin mi?' + note)) {
       Store.deleteCategory(id);
       renderAll();
     }

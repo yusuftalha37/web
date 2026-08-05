@@ -46,8 +46,10 @@ const Store = (() => {
     { id: "aku", name: "Aküler" },
     { id: "paket", name: "Hazır Paketler" },
     { id: "aksesuar", name: "Aksesuarlar" },
-    // Marka alt kategorisi örneği: İnvertörler > Lexron
-    { id: "lexron", name: "Lexron", kind: "brand", parent: "inverter", image: "" }
+    // Hiyerarşi örneği: İnvertörler > Hibrit İnvertörler
+    { id: "inverter-hibrit", name: "Hibrit İnvertörler", parent: "inverter", image: "" },
+    // Marka — hiyerarşi dışıdır, üst kategorisi yoktur
+    { id: "lexron", name: "Lexron", kind: "brand", parent: "", image: "" }
   ];
   const DEFAULT_SLIDES = [
     { id: "sl1", image: "", art: "roof", title: "Güneş Enerjisinde Türkiye'nin Her Yerine Gönderim", subtitle: "Panel, invertör, akü ve hazır paketler stoktan — siparişiniz aynı gün kargoda.", btnText: "Ürünleri İncele", btnLink: "urunler.html" },
@@ -280,7 +282,63 @@ const Store = (() => {
   }
 
   // ===================== KATEGORİLER =====================
+  // İki ayrı boyut vardır:
+  //  1) HİYERARŞİ — kind !== "brand" olan kategoriler. parent alanıyla
+  //     istenen derinlikte ağaç kurar (parent === "" ise kök).
+  //  2) MARKALAR — kind === "brand". Hiyerarşinin DIŞINDADIR, düz listedir,
+  //     parent kullanmaz. Bir ürün hem bir kategoriye hem de markalara ait olur.
   function getCategories() { return cache.categories; }
+  function isBrandCat(c) { return !!c && c.kind === "brand"; }
+  function getBrands() { return cache.categories.filter(isBrandCat); }
+  // Hiyerarşiye dahil kategoriler (markalar hariç)
+  function getTreeCategories() { return cache.categories.filter((c) => !isBrandCat(c)); }
+  // Bir kategorinin geçerli üst kimliği: ağaçta gerçekten var olmayan üst = kök
+  function parentOf(c) {
+    const p = (c && c.parent) || "";
+    if (!p) return "";
+    const par = cache.categories.find((x) => x.id === p);
+    return par && !isBrandCat(par) ? p : "";
+  }
+  function catChildren(parentId) {
+    return getTreeCategories().filter((c) => parentOf(c) === (parentId || ""));
+  }
+  // Ağacı derinlik bilgisiyle düz listeye açar (DFS) — çizim/seçim listeleri için
+  function catTree(rootId, depth, seen) {
+    const out = [];
+    seen = seen || {};
+    catChildren(rootId || "").forEach((c) => {
+      if (seen[c.id]) return;          // döngü koruması
+      seen[c.id] = true;
+      out.push({ cat: c, depth: depth || 0 });
+      catTree(c.id, (depth || 0) + 1, seen).forEach((x) => out.push(x));
+    });
+    return out;
+  }
+  // Kategori + tüm alt kategorilerinin kimlikleri (filtreleme bunu kullanır)
+  function catDescendantIds(id) {
+    const ids = [id];
+    catTree(id).forEach((n) => ids.push(n.cat.id));
+    return ids;
+  }
+  // "İnvertörler › Hibrit" biçiminde yol adı
+  function catPath(id) {
+    const names = [];
+    let cur = cache.categories.find((c) => c.id === id);
+    const guard = {};
+    while (cur && !guard[cur.id]) {
+      guard[cur.id] = true;
+      names.unshift(cur.name);
+      const p = parentOf(cur);
+      cur = p ? cache.categories.find((c) => c.id === p) : null;
+    }
+    return names.join(" › ");
+  }
+  // newParent, id'nin kendisi ya da altındaysa taşımaya izin verilmez (döngü)
+  function canReparent(id, newParent) {
+    if (!newParent) return true;
+    if (newParent === id) return false;
+    return catDescendantIds(id).indexOf(newParent) === -1;
+  }
   function saveCategory(cat) {
     const name = (cat.name || "").trim();
     if (cat.id) {
@@ -289,23 +347,41 @@ const Store = (() => {
         if (name) ex.name = name;
         if (cat.image !== undefined) ex.image = cat.image;
         if (cat.kind !== undefined) ex.kind = cat.kind;
-        if (cat.parent !== undefined) ex.parent = cat.parent;
+        if (cat.parent !== undefined) {
+          // Marka hiyerarşi dışıdır: üst kategori tutmaz.
+          // Ayrıca bir kategori kendi altına taşınamaz (döngü olurdu).
+          ex.parent = isBrandCat(ex) || !canReparent(cat.id, cat.parent) ? "" : cat.parent;
+        }
+        if (isBrandCat(ex)) ex.parent = "";
       }
       const row = { id: cat.id, name: ex ? ex.name : name };
       if (cat.image !== undefined) row.image = cat.image;
       if (cat.kind !== undefined) row.kind = cat.kind;
-      if (cat.parent !== undefined) row.parent = cat.parent;
+      if (cat.parent !== undefined) row.parent = ex ? ex.parent : "";
       if (persist) return sbWrite("POST", "categories", "", row).catch(logErr);
     } else {
-      const nc = { id: "c-" + Date.now(), name, image: cat.image || "", kind: cat.kind || "", parent: cat.parent || "" };
+      const kind = cat.kind || "";
+      const nc = {
+        id: "c-" + Date.now(), name, image: cat.image || "", kind,
+        parent: kind === "brand" ? "" : (cat.parent || "")
+      };
       cache.categories.push(nc);
       if (persist) return sbWrite("POST", "categories", "", { id: nc.id, name: nc.name, image: nc.image, kind: nc.kind, parent: nc.parent, sort: cache.categories.length }).catch(logErr);
     }
     write("gp-cats", cache.categories);
   }
   function deleteCategory(id) {
+    // Silinen kategorinin alt kategorileri boşta kalmasın: bir üst seviyeye taşınır
+    const victim = cache.categories.find((c) => c.id === id);
+    const newParent = victim ? parentOf(victim) : "";
+    const orphans = cache.categories.filter((c) => !isBrandCat(c) && (c.parent || "") === id);
     cache.categories = cache.categories.filter((c) => c.id !== id);
-    if (persist) return sbWrite("DELETE", "categories", "id=eq." + encodeURIComponent(id)).catch(logErr);
+    orphans.forEach((c) => { c.parent = newParent; });
+    if (persist) {
+      const jobs = orphans.map((c) => sbWrite("POST", "categories", "", { id: c.id, name: c.name, parent: newParent }));
+      jobs.push(sbWrite("DELETE", "categories", "id=eq." + encodeURIComponent(id)));
+      return Promise.all(jobs).catch(logErr);
+    }
     write("gp-cats", cache.categories);
   }
 
@@ -574,6 +650,8 @@ const Store = (() => {
     mode: MODE, load, ready,
     getProducts, saveProduct, deleteProduct, productCatIds,
     getCategories, saveCategory, deleteCategory,
+    getBrands, getTreeCategories, isBrandCat, catChildren, catTree,
+    catDescendantIds, catPath, canReparent,
     getSlides, saveSlide, deleteSlide, moveSlide,
     register, login, logout, session,
     getUser, updateProfile, changePassword,

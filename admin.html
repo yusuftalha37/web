@@ -34,7 +34,7 @@
     <div class="admin-sidebar-foot">
       <a href="index.html">← Siteye Dön</a>
       <a href="#" id="adminLogout">Çıkış Yap</a>
-      <div class="admin-version" id="adminVersion">Sürüm: 2026-08-05 · 12</div>
+      <div class="admin-version" id="adminVersion">Sürüm: 2026-08-05 · 13</div>
     </div>
   </aside>
 
@@ -109,11 +109,11 @@
               </select>
             </div>
             <div class="form-group">
-              <label for="upCat">1) Ana kategori (üst) — ürün tipi</label>
+              <label for="upCat">1) Kategori <small>(hiyerarşiden seçin — alt kategoriler girintili görünür)</small></label>
               <select id="upCat"></select>
             </div>
             <div class="form-group">
-              <label>2) Marka (alt kategori) <small>(üst kategoriye bağlı marka — yoksa aşağıdan hemen ekleyin)</small></label>
+              <label>2) Marka <small>(hiyerarşiden bağımsız — yoksa aşağıdan hemen ekleyin)</small></label>
               <div id="upCats" class="cat-check-group"></div>
             </div>
             <div class="form-row">
@@ -149,25 +149,25 @@
       <div class="admin-panel settings-panel">
         <h2>Yeni Kategori / Marka Ekle</h2>
         <div class="cat-help">
-          <strong>İki seviye vardır:</strong>
-          <span><b>1) Üst kategori</b> = ürün tipi (Güneş Paneli, İnvertör, Akü…).</span>
-          <span><b>2) Alt kategori = Marka</b> — bir üst kategorinin altına bağlanır (ör. İnvertörler → <b>Lexron</b>).</span>
-          Önce üst kategoriyi oluştur, sonra altına markaları ekle.
+          <strong>İki ayrı yapı vardır:</strong>
+          <span><b>1) Kategori hiyerarşisi</b> — istediğiniz kadar derin olabilir. Örn. <b>İnvertörler → Hibrit İnvertörler → 48V Hibrit</b>. Alt kategori eklemek için "Üst kategori" seçin; boş bırakırsanız en üst seviyede ana kategori olur.</span>
+          <span><b>2) Markalar</b> — hiyerarşinin <b>dışındadır</b>, üst kategorisi yoktur (ör. <b>Lexron</b>). Ürüne kategorisinden ayrı olarak eklenir; böylece bir marka birden çok kategoride ürün taşıyabilir.</span>
+          Aşağıdaki tabloda üst kategoriyi değiştirerek kategorileri istediğiniz seviyeye taşıyabilirsiniz.
         </div>
         <form id="catForm">
           <div class="form-group">
             <label for="catKind">Ne ekliyorsunuz?</label>
             <select id="catKind">
-              <option value="">Üst kategori (ürün tipi)</option>
-              <option value="brand">Alt kategori — Marka</option>
+              <option value="">Kategori (hiyerarşiye dahil)</option>
+              <option value="brand">Marka (hiyerarşi dışı)</option>
             </select>
           </div>
           <div class="form-group">
-            <label for="catNameInput" id="catNameLabel">Üst kategori adı</label>
-            <input type="text" id="catNameInput" required placeholder="Örn. Şarj Kontrol Cihazları">
+            <label for="catNameInput" id="catNameLabel">Kategori adı</label>
+            <input type="text" id="catNameInput" required placeholder="Örn. Hibrit İnvertörler">
           </div>
-          <div class="form-group" id="catParentWrap" hidden>
-            <label for="catParent">Bu marka hangi üst kategorinin altında? *</label>
+          <div class="form-group" id="catParentWrap">
+            <label for="catParent">Üst kategori <small>(boş = en üst seviye ana kategori)</small></label>
             <select id="catParent"></select>
           </div>
           <button type="submit" class="btn btn-small">Ekle</button>
@@ -175,11 +175,11 @@
         </form>
       </div>
       <div class="admin-panel">
-        <p class="panel-hint">Aşağıda üst kategoriler ve altlarındaki markalar görünür. Markalar bağlı oldukları üst kategorinin altında girintili listelenir. Her kategoriye/markaya bir görsel (ikon) ekleyebilirsiniz. İçinde ürün bulunan kategori silinemez; önce ürünleri başka kategoriye taşıyın.</p>
+        <p class="panel-hint">Üstte <b>kategori hiyerarşisi</b> (girintili ağaç), altta <b>markalar</b> listelenir. Bir kategoriyi başka bir kategorinin altına taşımak için "Üst kategori" listesinden seçim yapın; hızlıca alt kategori açmak için <b>+ Alt Kategori</b> butonunu kullanın. İçinde ürün bulunan kategori silinemez; silinen kategorinin alt kategorileri bir üst seviyeye taşınır.</p>
         <input type="file" id="catImgFile" accept="image/*" hidden>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Görsel</th><th>Üst kategori / Marka</th><th>Tür</th><th>Ürün</th><th></th></tr></thead>
+            <thead><tr><th>Görsel</th><th>Ad</th><th>Seviye / Üst kategori</th><th>Ürün</th><th></th></tr></thead>
             <tbody id="catRows"></tbody>
           </table>
         </div>
@@ -446,11 +446,11 @@
           </select>
         </div>
         <div class="form-group">
-          <label for="pfCat">1) Ana kategori (üst) — ürün tipi</label>
+          <label for="pfCat">1) Kategori <small>(hiyerarşiden seçin — alt kategoriler girintili görünür)</small></label>
           <select id="pfCat"></select>
         </div>
         <div class="form-group">
-          <label>2) Marka (alt kategori) <small>(üst kategoriye bağlı marka — yoksa aşağıdan hemen ekleyin)</small></label>
+          <label>2) Marka <small>(hiyerarşiden bağımsız — yoksa aşağıdan hemen ekleyin)</small></label>
           <div id="pfCats" class="cat-check-group"></div>
         </div>
         <div class="form-row">

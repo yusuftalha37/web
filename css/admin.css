@@ -356,7 +356,7 @@
 .cat-help strong { color: #1d4ed8; }
 .cat-row-top .cell-strong { font-size: 1rem; }
 .cat-row-brand > td { background: #fbfaf5; }
-.cat-row-brand .cell-strong { padding-left: 18px; font-weight: 600; }
+.cat-row-brand .cell-strong { font-weight: 600; }
 .cat-branch { color: #cb8a2e; font-weight: 700; margin-right: 2px; }
 .cat-row-warn td {
   background: #fef3c7;
@@ -365,6 +365,24 @@
   font-weight: 600;
 }
 .cat-parent-sel { max-width: 190px; }
+
+/* Hiyerarşi tablosu — bölüm başlıkları ve seviye görünümü */
+.cat-section-row td {
+  background: #eef2ff;
+  color: #3730a3;
+  font-weight: 700;
+  font-size: 0.86rem;
+  letter-spacing: 0.01em;
+}
+.cat-section-row em { font-weight: 500; color: #6366f1; font-style: normal; }
+.cat-row-tree .cell-strong { font-weight: 600; }
+.cat-row-d0 .cell-strong { font-size: 1rem; font-weight: 700; }
+.cat-row-d1 > td { background: #fcfcfd; }
+.cat-row-d2 > td { background: #f8fafc; }
+.cat-row-d3 > td { background: #f4f6f9; }
+.cat-row-d2 .cell-strong,
+.cat-row-d3 .cell-strong { font-size: 0.88rem; font-weight: 500; }
+.cat-note { color: #94a3b8; font-style: normal; font-size: 0.78rem; }
 
 .table-thumb {
   width: 46px;

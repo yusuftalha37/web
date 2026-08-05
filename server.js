@@ -55,7 +55,8 @@ const SEED = {
     { id: "aku", name: "Aküler", sort: 2 },
     { id: "paket", name: "Hazır Paketler", sort: 3 },
     { id: "aksesuar", name: "Aksesuarlar", sort: 4 },
-    { id: "lexron", name: "Lexron", kind: "brand", parent: "inverter", image: "", sort: 5 }
+    { id: "inverter-hibrit", name: "Hibrit İnvertörler", parent: "inverter", image: "", sort: 5 },
+    { id: "lexron", name: "Lexron", kind: "brand", parent: "", image: "", sort: 6 }
   ],
   slides: [
     { id: "sl1", image: "", art: "roof", title: "Güneş Enerjisinde Türkiye'nin Her Yerine Gönderim", subtitle: "Panel, invertör, akü ve hazır paketler stoktan — siparişiniz aynı gün kargoda.", btnText: "Ürünleri İncele", btnLink: "urunler.html", sort: 0 },
