@@ -2020,6 +2020,22 @@ img, svg { max-width: 100%; }
 }
 
 .auth-back:hover { color: var(--blue); }
+.auth-forgot {
+  display: block;
+  text-align: center;
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 13px;
+  cursor: pointer;
+}
+.auth-forgot:hover { color: var(--orange); }
+.auth-desc {
+  color: var(--muted);
+  font-size: 14px;
+  margin-bottom: 16px;
+  text-align: center;
+  line-height: 1.5;
+}
 
 /* ============ RESPONSIVE ============ */
 @media (max-width: 960px) {

@@ -1102,6 +1102,66 @@ document.getElementById("settingsForm").addEventListener("submit", (e) => {
   status.className = "form-status ok";
 });
 
+// ---------- MAİL AYARLARI ----------
+async function loadMailSettings() {
+  try {
+    const tk = Store.session() && Store.session().token;
+    const r = await fetch("/api/mail-settings", { headers: { Authorization: "Bearer " + tk } });
+    if (!r.ok) return;
+    const d = await r.json();
+    document.getElementById("smtpHost").value = d.host || "";
+    document.getElementById("smtpPort").value = d.port || 587;
+    document.getElementById("smtpUser").value = d.user || "";
+    document.getElementById("smtpPass").value = d.pass || "";
+    document.getElementById("smtpFrom").value = d.from || "";
+  } catch (_) {}
+}
+loadMailSettings();
+
+document.getElementById("mailSettingsForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const status = document.getElementById("mailSettingsStatus");
+  const tk = Store.session() && Store.session().token;
+  try {
+    const r = await fetch("/api/mail-settings", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: "Bearer " + tk },
+      body: JSON.stringify({
+        host: document.getElementById("smtpHost").value.trim(),
+        port: parseInt(document.getElementById("smtpPort").value, 10) || 587,
+        user: document.getElementById("smtpUser").value.trim(),
+        pass: document.getElementById("smtpPass").value,
+        from: document.getElementById("smtpFrom").value.trim()
+      })
+    });
+    const d = await r.json();
+    status.textContent = d.msg || "Kaydedildi.";
+    status.className = "form-status " + (r.ok ? "ok" : "err");
+  } catch (_) {
+    status.textContent = "Bağlantı hatası.";
+    status.className = "form-status err";
+  }
+});
+
+document.getElementById("smtpTestBtn").addEventListener("click", async () => {
+  const status = document.getElementById("mailSettingsStatus");
+  const tk = Store.session() && Store.session().token;
+  status.textContent = "Test maili gönderiliyor…";
+  status.className = "form-status ok";
+  try {
+    const r = await fetch("/api/mail-test", {
+      method: "POST",
+      headers: { Authorization: "Bearer " + tk }
+    });
+    const d = await r.json();
+    status.textContent = d.msg;
+    status.className = "form-status " + (r.ok ? "ok" : "err");
+  } catch (_) {
+    status.textContent = "Bağlantı hatası.";
+    status.className = "form-status err";
+  }
+});
+
 // ---------- TÜMÜNÜ ÇİZ ----------
 function renderAll() {
   populateCatSelects();

@@ -49,6 +49,48 @@ loginForm.addEventListener("submit", async (e) => {
   }, 600);
 });
 
+// Şifremi unuttum
+const forgotForm = document.getElementById("forgotForm");
+const forgotLink = document.getElementById("forgotLink");
+const forgotBack = document.getElementById("forgotBack");
+
+forgotLink.addEventListener("click", (e) => {
+  e.preventDefault();
+  loginForm.hidden = true;
+  forgotForm.hidden = false;
+  document.querySelectorAll(".auth-tab").forEach((t) => t.classList.remove("active"));
+});
+
+forgotBack.addEventListener("click", (e) => {
+  e.preventDefault();
+  forgotForm.hidden = true;
+  loginForm.hidden = false;
+  document.querySelectorAll(".auth-tab")[0].classList.add("active");
+});
+
+forgotForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const status = document.getElementById("forgotStatus");
+  const email = document.getElementById("forgotEmail").value.trim();
+  if (!email) { setStatus(status, "Lütfen e-posta adresinizi girin.", false); return; }
+  setStatus(status, "Gönderiliyor…", true);
+  try {
+    const r = await fetch("/auth/v1/forgot-password", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email })
+    });
+    if (r.ok) {
+      setStatus(status, "Sıfırlama bağlantısı e-posta adresinize gönderildi. Lütfen gelen kutunuzu kontrol edin.", true);
+    } else {
+      const d = await r.json().catch(() => ({}));
+      setStatus(status, d.msg || "Bir hata oluştu. Daha sonra tekrar deneyin.", false);
+    }
+  } catch (_) {
+    setStatus(status, "Bağlantı hatası. İnternet bağlantınızı kontrol edin.", false);
+  }
+});
+
 // Kayıt
 registerForm.addEventListener("submit", async (e) => {
   e.preventDefault();

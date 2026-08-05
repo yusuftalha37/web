@@ -366,12 +366,38 @@
         <p class="panel-hint" style="margin-top:12px">Bu bilgiler sepet sayfasındaki ödeme bölümünde ve sipariş onayında müşteriye gösterilir.</p>
       </div>
       <div class="admin-panel settings-panel">
-        <h2>Sunucu Bağlantısı</h2>
-        <p class="panel-hint">
-          Şu an tüm veriler bu tarayıcıda (localStorage) saklanıyor. Sunucunuz hazır olduğunda
-          <code>js/store.js</code> dosyasındaki fonksiyonları API çağrılarıyla değiştirmeniz yeterlidir —
-          sitenin geri kalanında değişiklik gerekmez.
-        </p>
+        <h2>E-posta Ayarları (SMTP)</h2>
+        <p class="panel-hint">Şifre sıfırlama bağlantılarını göndermek için bir SMTP sunucusu gereklidir. Gmail, Yandex veya başka bir mail sağlayıcının SMTP bilgilerini girin.</p>
+        <form id="mailSettingsForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="smtpHost">SMTP sunucu</label>
+              <input type="text" id="smtpHost" placeholder="Örn. smtp.gmail.com">
+            </div>
+            <div class="form-group">
+              <label for="smtpPort">Port</label>
+              <input type="number" id="smtpPort" placeholder="587" min="1" max="65535">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="smtpUser">Kullanıcı adı (e-posta)</label>
+              <input type="text" id="smtpUser" placeholder="ornek@gmail.com">
+            </div>
+            <div class="form-group">
+              <label for="smtpPass">Şifre / Uygulama şifresi</label>
+              <input type="password" id="smtpPass" placeholder="••••••••">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="smtpFrom">Gönderen adresi <small>(boş bırakırsanız kullanıcı adı kullanılır)</small></label>
+            <input type="text" id="smtpFrom" placeholder="info@solararena.store">
+          </div>
+          <button type="submit" class="btn btn-small">Kaydet</button>
+          <button type="button" class="btn btn-small btn-outline" id="smtpTestBtn" style="margin-left:8px">Test Maili Gönder</button>
+          <p class="form-status" id="mailSettingsStatus" role="status"></p>
+        </form>
+        <p class="panel-hint" style="margin-top:8px"><b>Gmail için:</b> Google Hesabı → Güvenlik → 2 Adımlı Doğrulama açın → "Uygulama şifreleri" bölümünden 16 haneli bir şifre oluşturun. Host: <code>smtp.gmail.com</code>, Port: <code>587</code></p>
       </div>
     </section>
   </main>

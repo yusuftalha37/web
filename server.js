@@ -13,6 +13,8 @@ const http = require("http");
 const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
+const net = require("net");
+const tls = require("tls");
 
 const PORT = process.env.PORT || 3000;
 // GÜVENLİK: Varsayılan olarak yalnızca yerel arayüz dinlenir (127.0.0.1).
@@ -175,6 +177,95 @@ function revokeUserTokens(uid) {
     const id = typeof v === "string" ? v : v.uid;
     if (id === uid) { delete DB.tokens[tk]; tokens.delete(tk); }
   });
+}
+
+// -------------------- Mail ayarları & SMTP gönderici --------------------
+const MAIL_CFG_FILE = path.join(ROOT, "mail-ayarlari.json");
+function loadMailCfg() {
+  try { return JSON.parse(fs.readFileSync(MAIL_CFG_FILE, "utf8")); } catch (_) { return null; }
+}
+function smtpSend(to, subject, html) {
+  const cfg = loadMailCfg();
+  if (!cfg || !cfg.host || !cfg.user || !cfg.pass) return Promise.reject(new Error("Mail ayarları eksik"));
+  const port = cfg.port || 587;
+  const from = cfg.from || cfg.user;
+  const useTLS = port === 465;
+  return new Promise((resolve, reject) => {
+    let buf = "", step = 0, upgraded = false;
+    const cmds = [
+      "EHLO solararena.store\r\n",
+      "AUTH LOGIN\r\n",
+      Buffer.from(cfg.user).toString("base64") + "\r\n",
+      Buffer.from(cfg.pass).toString("base64") + "\r\n",
+      "MAIL FROM:<" + from + ">\r\n",
+      "RCPT TO:<" + to + ">\r\n",
+      "DATA\r\n"
+    ];
+    const boundary = crypto.randomBytes(16).toString("hex");
+    const msg = [
+      "From: Solar Arena <" + from + ">",
+      "To: " + to,
+      "Subject: =?UTF-8?B?" + Buffer.from(subject).toString("base64") + "?=",
+      "MIME-Version: 1.0",
+      "Content-Type: text/html; charset=UTF-8",
+      "Content-Transfer-Encoding: base64",
+      "",
+      Buffer.from(html).toString("base64").replace(/.{76}/g, "$&\r\n"),
+      ".",
+      ""
+    ].join("\r\n");
+    function next(sock) {
+      if (step < cmds.length) { sock.write(cmds[step++]); }
+      else { sock.write(msg + "\r\n"); step++; }
+    }
+    function onData(sock, data) {
+      buf += data.toString();
+      const lines = buf.split("\r\n");
+      buf = lines.pop();
+      for (const line of lines) {
+        const code = parseInt(line.substring(0, 3), 10);
+        if (code >= 400) { sock.end("QUIT\r\n"); return reject(new Error("SMTP hata: " + line)); }
+        if (!upgraded && step === 0 && code === 220) { next(sock); }
+        else if (!upgraded && line.includes("STARTTLS")) { /* bekle, EHLO yanıtı devam ediyor */ }
+        else if (!upgraded && step === 1 && /^250[ -]/.test(line) && !line.startsWith("250-")) {
+          if (!useTLS) {
+            sock.write("STARTTLS\r\n"); upgraded = "pending";
+          } else { next(sock); }
+        }
+        else if (upgraded === "pending" && code === 220) {
+          const tlsSock = tls.connect({ socket: sock, servername: cfg.host }, () => {
+            upgraded = true; step = 0;
+            tlsSock.on("data", (d) => onData(tlsSock, d));
+            next(tlsSock);
+          });
+          tlsSock.on("error", reject);
+          return;
+        }
+        else if (code === 250 || code === 235 || code === 334 || code === 354) { next(sock); }
+        else if (step > cmds.length && code === 250) { sock.end("QUIT\r\n"); resolve(); }
+      }
+    }
+    if (useTLS) {
+      const sock = tls.connect(port, cfg.host, { servername: cfg.host }, () => {
+        sock.on("data", (d) => onData(sock, d));
+      });
+      sock.on("error", reject);
+      sock.setTimeout(15000, () => { sock.destroy(); reject(new Error("SMTP zaman aşımı")); });
+    } else {
+      const sock = net.createConnection(port, cfg.host, () => {
+        sock.on("data", (d) => onData(sock, d));
+      });
+      sock.on("error", reject);
+      sock.setTimeout(15000, () => { sock.destroy(); reject(new Error("SMTP zaman aşımı")); });
+    }
+  });
+}
+
+const RESET_TTL = 30 * 60 * 1000; // 30 dakika
+function cleanExpiredResets() {
+  if (!DB.resets) return;
+  const now = Date.now();
+  DB.resets = DB.resets.filter((r) => r.exp > now);
 }
 
 // -------------------- Kaba kuvvet (brute force) koruması --------------------
@@ -463,6 +554,85 @@ async function handleApi(req, res, u) {
       saveDB();
     }
     return send(res, 200, {});
+  }
+
+  // ---- Şifremi unuttum ----
+  if (u.pathname === "/auth/v1/forgot-password" && req.method === "POST") {
+    if (tooManyRequests("forgot:" + ip, 5, 60 * 60 * 1000)) return send(res, 429, { msg: "Çok fazla deneme. Bir saat sonra tekrar deneyin." });
+    const b = await readBody(req, MAX_BODY_SMALL);
+    const email = String(b.email || "").toLowerCase().trim();
+    if (!EMAIL_RE.test(email)) return send(res, 200, { msg: "ok" });
+    const usr = DB.users.find((x) => x.email === email);
+    if (!usr) return send(res, 200, { msg: "ok" });
+    cleanExpiredResets();
+    if (!DB.resets) DB.resets = [];
+    DB.resets = DB.resets.filter((r) => r.uid !== usr.id);
+    const token = crypto.randomBytes(32).toString("hex");
+    DB.resets.push({ uid: usr.id, token, exp: Date.now() + RESET_TTL });
+    saveDB();
+    const host = req.headers.host || "solararena.store";
+    const proto = host.includes("localhost") ? "http" : "https";
+    const link = proto + "://" + host + "/sifre-sifirla.html?token=" + token;
+    const html = '<div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:24px">'
+      + '<h2 style="color:#e67e22">Solar Arena - Şifre Sıfırlama</h2>'
+      + '<p>Merhaba,</p>'
+      + '<p>Hesabınız için bir şifre sıfırlama talebi aldık. Yeni şifrenizi belirlemek için aşağıdaki bağlantıya tıklayın:</p>'
+      + '<p style="text-align:center;margin:24px 0"><a href="' + link + '" style="background:#e67e22;color:#fff;padding:12px 28px;border-radius:6px;text-decoration:none;font-weight:bold">Şifremi Sıfırla</a></p>'
+      + '<p style="font-size:13px;color:#888">Bu bağlantı 30 dakika geçerlidir. Bu talebi siz yapmadıysanız bu maili dikkate almayın.</p>'
+      + '<hr style="border:none;border-top:1px solid #eee;margin:24px 0">'
+      + '<p style="font-size:12px;color:#aaa">Solar Arena Enerji &mdash; solararena.store</p></div>';
+    smtpSend(email, "Şifre Sıfırlama - Solar Arena", html)
+      .then(() => console.log("[MAIL] Şifre sıfırlama maili gönderildi: " + email))
+      .catch((e) => console.error("[MAIL HATA]", e.message));
+    return send(res, 200, { msg: "ok" });
+  }
+  if (u.pathname === "/auth/v1/reset-password" && req.method === "POST") {
+    const b = await readBody(req, MAX_BODY_SMALL);
+    const token = String(b.token || "").trim();
+    const newPass = String(b.password || "");
+    if (!token || newPass.length < 6 || newPass.length > 200) return send(res, 400, { msg: "Geçersiz istek. Şifre en az 6 karakter olmalıdır." });
+    cleanExpiredResets();
+    if (!DB.resets) DB.resets = [];
+    const rec = DB.resets.find((r) => r.token === token);
+    if (!rec) return send(res, 400, { msg: "Sıfırlama bağlantısı geçersiz veya süresi dolmuş. Lütfen yeni bir sıfırlama talebi gönderin." });
+    const usr = DB.users.find((x) => x.id === rec.uid);
+    if (!usr) return send(res, 400, { msg: "Kullanıcı bulunamadı." });
+    const nu = makeUser(usr.email, newPass, usr.name, usr.phone, usr.role);
+    usr.pass = nu.pass;
+    DB.resets = DB.resets.filter((r) => r.uid !== usr.id);
+    revokeUserTokens(usr.id);
+    saveDB();
+    return send(res, 200, { msg: "Şifreniz başarıyla değiştirildi. Giriş yapabilirsiniz." });
+  }
+
+  // ---- Mail ayarları (sadece admin) ----
+  if (u.pathname === "/api/mail-settings" && req.method === "GET") {
+    if (!isAdmin) return send(res, 401, { error: "unauthorized" });
+    const cfg = loadMailCfg() || {};
+    return send(res, 200, { host: cfg.host || "", port: cfg.port || 587, user: cfg.user || "", pass: cfg.pass ? "••••••••" : "", from: cfg.from || "" });
+  }
+  if (u.pathname === "/api/mail-settings" && req.method === "POST") {
+    if (!isAdmin) return send(res, 401, { error: "unauthorized" });
+    const b = await readBody(req, MAX_BODY_SMALL);
+    const existing = loadMailCfg() || {};
+    const cfg = {
+      host: String(b.host || "").trim(),
+      port: parseInt(b.port, 10) || 587,
+      user: String(b.user || "").trim(),
+      pass: (b.pass && b.pass !== "••••••••") ? String(b.pass) : (existing.pass || ""),
+      from: String(b.from || "").trim()
+    };
+    try { fs.writeFileSync(MAIL_CFG_FILE, JSON.stringify(cfg, null, 2), "utf8"); } catch (e) { return send(res, 500, { msg: "Dosya yazılamadı: " + e.message }); }
+    return send(res, 200, { msg: "Kaydedildi." });
+  }
+  if (u.pathname === "/api/mail-test" && req.method === "POST") {
+    if (!isAdmin) return send(res, 401, { error: "unauthorized" });
+    try {
+      await smtpSend(caller.email, "Solar Arena - Test Maili", '<div style="font-family:sans-serif;padding:24px"><h2 style="color:#e67e22">Test Maili</h2><p>Bu mail, Solar Arena mail ayarlarının doğru yapılandırıldığını onaylar.</p><p style="color:#888;font-size:13px">Solar Arena Enerji</p></div>');
+      return send(res, 200, { msg: "Test maili " + caller.email + " adresine gönderildi." });
+    } catch (e) {
+      return send(res, 500, { msg: "Mail gönderilemedi: " + e.message });
+    }
   }
 
   // ---- Veri (REST) ----

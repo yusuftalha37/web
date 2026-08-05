@@ -35,6 +35,19 @@
       </div>
       <button type="submit" class="btn btn-block">Giriş Yap</button>
       <p class="form-status" id="loginStatus" role="status"></p>
+      <a href="#" id="forgotLink" class="auth-forgot">Şifremi unuttum</a>
+    </form>
+
+    <!-- ŞİFREMİ UNUTTUM -->
+    <form id="forgotForm" class="auth-form" hidden novalidate>
+      <p class="auth-desc">E-posta adresinizi girin, şifre sıfırlama bağlantısı göndereceğiz.</p>
+      <div class="form-group">
+        <label for="forgotEmail">E-posta</label>
+        <input type="email" id="forgotEmail" required placeholder="ornek@eposta.com" autocomplete="email">
+      </div>
+      <button type="submit" class="btn btn-block">Sıfırlama Bağlantısı Gönder</button>
+      <p class="form-status" id="forgotStatus" role="status"></p>
+      <a href="#" id="forgotBack" class="auth-forgot">← Giriş ekranına dön</a>
     </form>
 
     <!-- KAYIT -->

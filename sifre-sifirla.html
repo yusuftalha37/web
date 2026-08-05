@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Şifre Sıfırla | Solar Arena Enerji</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>☀️</text></svg>">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="auth-body">
+
+  <div class="auth-card">
+    <a href="index.html" class="logo auth-logo">
+      <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <circle cx="12" cy="12" r="4"/>
+        <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+      </svg>
+      Solar<span>Arena</span>
+    </a>
+
+    <h2 style="text-align:center;margin-bottom:1rem;font-size:1.2rem;color:var(--text)">Yeni Şifre Belirleyin</h2>
+
+    <form id="resetForm" class="auth-form" novalidate>
+      <div class="form-group">
+        <label for="resetPass">Yeni şifre <small>(en az 6 karakter)</small></label>
+        <input type="password" id="resetPass" required placeholder="••••••••" autocomplete="new-password">
+      </div>
+      <div class="form-group">
+        <label for="resetPass2">Yeni şifre (tekrar)</label>
+        <input type="password" id="resetPass2" required placeholder="••••••••" autocomplete="new-password">
+      </div>
+      <button type="submit" class="btn btn-block">Şifremi Değiştir</button>
+      <p class="form-status" id="resetStatus" role="status"></p>
+    </form>
+
+    <div id="resetDone" hidden style="text-align:center;padding:1.5rem 0">
+      <p id="resetDoneMsg" style="font-size:1.05rem;margin-bottom:1rem"></p>
+      <a href="giris.html" class="btn btn-block">Giriş Yap</a>
+    </div>
+
+    <a href="index.html" class="auth-back">← Siteye dön</a>
+  </div>
+
+  <script>
+  (function() {
+    var params = new URLSearchParams(location.search);
+    var token = params.get("token");
+    var form = document.getElementById("resetForm");
+    var status = document.getElementById("resetStatus");
+    var done = document.getElementById("resetDone");
+    var doneMsg = document.getElementById("resetDoneMsg");
+
+    if (!token) {
+      form.hidden = true;
+      done.hidden = false;
+      doneMsg.textContent = "Geçersiz bağlantı. Lütfen giriş sayfasından yeni bir sıfırlama talebi gönderin.";
+      doneMsg.style.color = "var(--danger, #e74c3c)";
+      return;
+    }
+
+    function setStatus(msg, ok) {
+      status.textContent = msg;
+      status.className = "form-status " + (ok ? "ok" : "err");
+    }
+
+    form.addEventListener("submit", function(e) {
+      e.preventDefault();
+      var pass = document.getElementById("resetPass").value;
+      var pass2 = document.getElementById("resetPass2").value;
+      if (pass.length < 6) { setStatus("Şifre en az 6 karakter olmalıdır.", false); return; }
+      if (pass !== pass2) { setStatus("Şifreler birbiriyle uyuşmuyor.", false); return; }
+      setStatus("Şifre değiştiriliyor…", true);
+      fetch("/auth/v1/reset-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token: token, password: pass })
+      }).then(function(r) { return r.json(); }).then(function(d) {
+        if (d.msg && d.msg.indexOf("başarı") !== -1) {
+          form.hidden = true;
+          done.hidden = false;
+          doneMsg.textContent = d.msg;
+          doneMsg.style.color = "var(--success, #27ae60)";
+        } else {
+          setStatus(d.msg || "Bir hata oluştu.", false);
+        }
+      }).catch(function() {
+        setStatus("Bağlantı hatası. İnternet bağlantınızı kontrol edin.", false);
+      });
+    });
+  })();
+  </script>
+</body>
+</html>
