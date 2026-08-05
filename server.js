@@ -345,7 +345,7 @@ const SECURITY_HEADERS = {
   // data: (yüklenen fotoğraf) veya https: (bağlantı) olabildiği için img gevşek.
   "Content-Security-Policy": [
     "default-src 'self'",
-    "img-src 'self' data: https:",
+    "img-src 'self' data: blob: https:",
     "style-src 'self' 'unsafe-inline'",
     "script-src 'self' 'unsafe-inline'",
     "connect-src 'self'",
