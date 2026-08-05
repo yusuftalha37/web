@@ -2029,6 +2029,22 @@ img, svg { max-width: 100%; }
 }
 
 .auth-back:hover { color: var(--blue); }
+.auth-forgot {
+  display: block;
+  text-align: center;
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 13px;
+  cursor: pointer;
+}
+.auth-forgot:hover { color: var(--orange); }
+.auth-desc {
+  color: var(--muted);
+  font-size: 14px;
+  margin-bottom: 16px;
+  text-align: center;
+  line-height: 1.5;
+}
 
 /* ============ RESPONSIVE ============ */
 @media (max-width: 960px) {
@@ -3796,6 +3812,19 @@ img, svg { max-width: 100%; }
       </div>
       <button type="submit" class="btn btn-block">Giriş Yap</button>
       <p class="form-status" id="loginStatus" role="status"></p>
+      <a href="#" id="forgotLink" class="auth-forgot">Şifremi unuttum</a>
+    </form>
+
+    <!-- ŞİFREMİ UNUTTUM -->
+    <form id="forgotForm" class="auth-form" hidden novalidate>
+      <p class="auth-desc">E-posta adresinizi girin, şifre sıfırlama bağlantısı göndereceğiz.</p>
+      <div class="form-group">
+        <label for="forgotEmail">E-posta</label>
+        <input type="email" id="forgotEmail" required placeholder="ornek@eposta.com" autocomplete="email">
+      </div>
+      <button type="submit" class="btn btn-block">Sıfırlama Bağlantısı Gönder</button>
+      <p class="form-status" id="forgotStatus" role="status"></p>
+      <a href="#" id="forgotBack" class="auth-forgot">← Giriş ekranına dön</a>
     </form>
 
     <!-- KAYIT -->
@@ -3943,7 +3972,7 @@ img, svg { max-width: 100%; }
     <div class="admin-sidebar-foot">
       <a href="#">← Siteye Dön</a>
       <a href="#" id="adminLogout">Çıkış Yap</a>
-      <div class="admin-version" id="adminVersion">Sürüm: 2026-08-04 · 9</div>
+      <div class="admin-version" id="adminVersion">Sürüm: 2026-08-05 · 10</div>
     </div>
   </aside>
 
@@ -4275,12 +4304,38 @@ img, svg { max-width: 100%; }
         <p class="panel-hint" style="margin-top:12px">Bu bilgiler sepet sayfasındaki ödeme bölümünde ve sipariş onayında müşteriye gösterilir.</p>
       </div>
       <div class="admin-panel settings-panel">
-        <h2>Sunucu Bağlantısı</h2>
-        <p class="panel-hint">
-          Şu an tüm veriler bu tarayıcıda (localStorage) saklanıyor. Sunucunuz hazır olduğunda
-          <code>js/store.js</code> dosyasındaki fonksiyonları API çağrılarıyla değiştirmeniz yeterlidir —
-          sitenin geri kalanında değişiklik gerekmez.
-        </p>
+        <h2>E-posta Ayarları (SMTP)</h2>
+        <p class="panel-hint">Şifre sıfırlama bağlantılarını göndermek için bir SMTP sunucusu gereklidir. Gmail, Yandex veya başka bir mail sağlayıcının SMTP bilgilerini girin.</p>
+        <form id="mailSettingsForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="smtpHost">SMTP sunucu</label>
+              <input type="text" id="smtpHost" placeholder="Örn. smtp.gmail.com">
+            </div>
+            <div class="form-group">
+              <label for="smtpPort">Port</label>
+              <input type="number" id="smtpPort" placeholder="587" min="1" max="65535">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="smtpUser">Kullanıcı adı (e-posta)</label>
+              <input type="text" id="smtpUser" placeholder="ornek@gmail.com">
+            </div>
+            <div class="form-group">
+              <label for="smtpPass">Şifre / Uygulama şifresi</label>
+              <input type="password" id="smtpPass" placeholder="••••••••">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="smtpFrom">Gönderen adresi <small>(boş bırakırsanız kullanıcı adı kullanılır)</small></label>
+            <input type="text" id="smtpFrom" placeholder="info@solararena.store">
+          </div>
+          <button type="submit" class="btn btn-small">Kaydet</button>
+          <button type="button" class="btn btn-small btn-outline" id="smtpTestBtn" style="margin-left:8px">Test Maili Gönder</button>
+          <p class="form-status" id="mailSettingsStatus" role="status"></p>
+        </form>
+        <p class="panel-hint" style="margin-top:8px"><b>Gmail için:</b> Google Hesabı → Güvenlik → 2 Adımlı Doğrulama açın → "Uygulama şifreleri" bölümünden 16 haneli bir şifre oluşturun. Host: <code>smtp.gmail.com</code>, Port: <code>587</code></p>
       </div>
     </section>
   </main>
@@ -4653,8 +4708,9 @@ const Store = (() => {
   function saveProduct(product) {
     const i = cache.products.findIndex((p) => p.id === product.id);
     if (i >= 0) cache.products[i] = product; else cache.products.unshift(product);
-    if (persist) return sbWrite("POST", "products", "", toDbProduct(product)).catch(logErr);
+    if (persist) return sbWrite("POST", "products", "", toDbProduct(product));
     write("gp-products", cache.products);
+    return Promise.resolve();
   }
   function deleteProduct(id) {
     cache.products = cache.products.filter((p) => p.id !== id);
@@ -6190,6 +6246,48 @@ loginForm.addEventListener("submit", async (e) => {
   }, 600);
 });
 
+// Şifremi unuttum
+const forgotForm = document.getElementById("forgotForm");
+const forgotLink = document.getElementById("forgotLink");
+const forgotBack = document.getElementById("forgotBack");
+
+forgotLink.addEventListener("click", (e) => {
+  e.preventDefault();
+  loginForm.hidden = true;
+  forgotForm.hidden = false;
+  document.querySelectorAll(".auth-tab").forEach((t) => t.classList.remove("active"));
+});
+
+forgotBack.addEventListener("click", (e) => {
+  e.preventDefault();
+  forgotForm.hidden = true;
+  loginForm.hidden = false;
+  document.querySelectorAll(".auth-tab")[0].classList.add("active");
+});
+
+forgotForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const status = document.getElementById("forgotStatus");
+  const email = document.getElementById("forgotEmail").value.trim();
+  if (!email) { setStatus(status, "Lütfen e-posta adresinizi girin.", false); return; }
+  setStatus(status, "Gönderiliyor…", true);
+  try {
+    const r = await fetch("/auth/v1/forgot-password", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email })
+    });
+    if (r.ok) {
+      setStatus(status, "Sıfırlama bağlantısı e-posta adresinize gönderildi. Lütfen gelen kutunuzu kontrol edin.", true);
+    } else {
+      const d = await r.json().catch(() => ({}));
+      setStatus(status, d.msg || "Bir hata oluştu. Daha sonra tekrar deneyin.", false);
+    }
+  } catch (_) {
+    setStatus(status, "Bağlantı hatası. İnternet bağlantınızı kontrol edin.", false);
+  }
+});
+
 // Kayıt
 registerForm.addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -6480,6 +6578,16 @@ const VIEW_TITLES = {
   settings: "Ayarlar"
 };
 
+// Kayıt hatasını kullanıcı diline çevirir (sunucu/depolama kaynaklı)
+function saveErrorText(err) {
+  const msg = String((err && err.message) || err || "");
+  if (/too_large|413/i.test(msg)) return "Kayıt başarısız: fotoğraf çok büyük. Daha küçük bir görsel seçin veya görsel bağlantısı kullanın.";
+  if (/quota|exceeded|storage/i.test(msg)) return "Kayıt başarısız: tarayıcı depolama alanı doldu. Daha az/küçük fotoğraf kullanın.";
+  if (/401|403|unauthorized|izin/i.test(msg)) return "Kayıt başarısız: oturum süreniz dolmuş olabilir. Çıkış yapıp tekrar giriş yapın.";
+  if (/Failed to fetch|NetworkError|network/i.test(msg)) return "Kayıt başarısız: sunucuya ulaşılamadı. Sunucunun (server.js) çalıştığından emin olun.";
+  return "Kayıt başarısız: " + (msg || "bilinmeyen hata") + ". Sunucunun çalıştığından ve dosyaların güncel olduğundan emin olun.";
+}
+
 // Görsel dosyasını en fazla 900px olacak şekilde küçültüp JPEG'e çevirir;
 // hem düzenleme penceresi hem ürün yükleme ekranı kullanır.
 function readImageFile(file, cb) {
@@ -6651,11 +6759,14 @@ document.getElementById("productRows").addEventListener("click", (e) => {
   }
 });
 
-productForm.addEventListener("submit", (e) => {
+productForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   const id = document.getElementById("pfId").value || "p-" + Date.now();
+  const saveBtn = productForm.querySelector('button[type=submit]');
+  const oldLabel = saveBtn ? saveBtn.textContent : "";
+  if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = "Kaydediliyor…"; }
   try {
-    Store.saveProduct({
+    await Store.saveProduct({
       id,
       name: document.getElementById("pfName").value.trim(),
       cat: document.getElementById("pfCat").value,
@@ -6672,10 +6783,11 @@ productForm.addEventListener("submit", (e) => {
         .filter(Boolean)
     });
   } catch (err) {
-    // localStorage kotası dolduysa (çok sayıda büyük fotoğraf)
-    alert("Kayıt başarısız: tarayıcı depolama alanı doldu. Daha az/küçük fotoğraf kullanın veya görsel bağlantısı tercih edin.");
+    if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = oldLabel; }
+    alert(saveErrorText(err));
     return;
   }
+  if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = oldLabel; }
   productModal.hidden = true;
   renderAll();
 });
@@ -6787,7 +6899,7 @@ function renderUploadPreview() {
 });
 document.getElementById("upAuthorized").addEventListener("change", renderUploadPreview);
 
-uploadForm.addEventListener("submit", (e) => {
+uploadForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   const name = document.getElementById("upName").value.trim();
   const price = parseInt(document.getElementById("upPrice").value, 10) || 0;
@@ -6796,8 +6908,10 @@ uploadForm.addEventListener("submit", (e) => {
     upStatus.className = "form-status err";
     return;
   }
+  upStatus.textContent = "Kaydediliyor…";
+  upStatus.className = "form-status ok";
   try {
-    Store.saveProduct({
+    await Store.saveProduct({
       id: "p-" + Date.now(),
       name,
       cat: document.getElementById("upCat").value,
@@ -6812,7 +6926,7 @@ uploadForm.addEventListener("submit", (e) => {
         .split("\n").map((s) => s.trim()).filter(Boolean)
     });
   } catch (err) {
-    upStatus.textContent = "Kayıt başarısız: tarayıcı depolama alanı doldu. Daha küçük fotoğraf kullanın.";
+    upStatus.textContent = saveErrorText(err);
     upStatus.className = "form-status err";
     return;
   }
@@ -7440,6 +7554,66 @@ document.getElementById("settingsForm").addEventListener("submit", (e) => {
   document.getElementById("waNumber").value = num;
   status.textContent = "Kaydedildi.";
   status.className = "form-status ok";
+});
+
+// ---------- MAİL AYARLARI ----------
+async function loadMailSettings() {
+  try {
+    const tk = Store.session() && Store.session().token;
+    const r = await fetch("/api/mail-settings", { headers: { Authorization: "Bearer " + tk } });
+    if (!r.ok) return;
+    const d = await r.json();
+    document.getElementById("smtpHost").value = d.host || "";
+    document.getElementById("smtpPort").value = d.port || 587;
+    document.getElementById("smtpUser").value = d.user || "";
+    document.getElementById("smtpPass").value = d.pass || "";
+    document.getElementById("smtpFrom").value = d.from || "";
+  } catch (_) {}
+}
+loadMailSettings();
+
+document.getElementById("mailSettingsForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const status = document.getElementById("mailSettingsStatus");
+  const tk = Store.session() && Store.session().token;
+  try {
+    const r = await fetch("/api/mail-settings", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: "Bearer " + tk },
+      body: JSON.stringify({
+        host: document.getElementById("smtpHost").value.trim(),
+        port: parseInt(document.getElementById("smtpPort").value, 10) || 587,
+        user: document.getElementById("smtpUser").value.trim(),
+        pass: document.getElementById("smtpPass").value,
+        from: document.getElementById("smtpFrom").value.trim()
+      })
+    });
+    const d = await r.json();
+    status.textContent = d.msg || "Kaydedildi.";
+    status.className = "form-status " + (r.ok ? "ok" : "err");
+  } catch (_) {
+    status.textContent = "Bağlantı hatası.";
+    status.className = "form-status err";
+  }
+});
+
+document.getElementById("smtpTestBtn").addEventListener("click", async () => {
+  const status = document.getElementById("mailSettingsStatus");
+  const tk = Store.session() && Store.session().token;
+  status.textContent = "Test maili gönderiliyor…";
+  status.className = "form-status ok";
+  try {
+    const r = await fetch("/api/mail-test", {
+      method: "POST",
+      headers: { Authorization: "Bearer " + tk }
+    });
+    const d = await r.json();
+    status.textContent = d.msg;
+    status.className = "form-status " + (r.ok ? "ok" : "err");
+  } catch (_) {
+    status.textContent = "Bağlantı hatası.";
+    status.className = "form-status err";
+  }
 });
 
 // ---------- TÜMÜNÜ ÇİZ ----------

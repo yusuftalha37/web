@@ -140,6 +140,16 @@ const VIEW_TITLES = {
   settings: "Ayarlar"
 };
 
+// Kayıt hatasını kullanıcı diline çevirir (sunucu/depolama kaynaklı)
+function saveErrorText(err) {
+  const msg = String((err && err.message) || err || "");
+  if (/too_large|413/i.test(msg)) return "Kayıt başarısız: fotoğraf çok büyük. Daha küçük bir görsel seçin veya görsel bağlantısı kullanın.";
+  if (/quota|exceeded|storage/i.test(msg)) return "Kayıt başarısız: tarayıcı depolama alanı doldu. Daha az/küçük fotoğraf kullanın.";
+  if (/401|403|unauthorized|izin/i.test(msg)) return "Kayıt başarısız: oturum süreniz dolmuş olabilir. Çıkış yapıp tekrar giriş yapın.";
+  if (/Failed to fetch|NetworkError|network/i.test(msg)) return "Kayıt başarısız: sunucuya ulaşılamadı. Sunucunun (server.js) çalıştığından emin olun.";
+  return "Kayıt başarısız: " + (msg || "bilinmeyen hata") + ". Sunucunun çalıştığından ve dosyaların güncel olduğundan emin olun.";
+}
+
 // Görsel dosyasını en fazla 900px olacak şekilde küçültüp JPEG'e çevirir;
 // hem düzenleme penceresi hem ürün yükleme ekranı kullanır.
 function readImageFile(file, cb) {
@@ -311,11 +321,14 @@ document.getElementById("productRows").addEventListener("click", (e) => {
   }
 });
 
-productForm.addEventListener("submit", (e) => {
+productForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   const id = document.getElementById("pfId").value || "p-" + Date.now();
+  const saveBtn = productForm.querySelector('button[type=submit]');
+  const oldLabel = saveBtn ? saveBtn.textContent : "";
+  if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = "Kaydediliyor…"; }
   try {
-    Store.saveProduct({
+    await Store.saveProduct({
       id,
       name: document.getElementById("pfName").value.trim(),
       cat: document.getElementById("pfCat").value,
@@ -332,10 +345,11 @@ productForm.addEventListener("submit", (e) => {
         .filter(Boolean)
     });
   } catch (err) {
-    // localStorage kotası dolduysa (çok sayıda büyük fotoğraf)
-    alert("Kayıt başarısız: tarayıcı depolama alanı doldu. Daha az/küçük fotoğraf kullanın veya görsel bağlantısı tercih edin.");
+    if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = oldLabel; }
+    alert(saveErrorText(err));
     return;
   }
+  if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = oldLabel; }
   productModal.hidden = true;
   renderAll();
 });
@@ -447,7 +461,7 @@ function renderUploadPreview() {
 });
 document.getElementById("upAuthorized").addEventListener("change", renderUploadPreview);
 
-uploadForm.addEventListener("submit", (e) => {
+uploadForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   const name = document.getElementById("upName").value.trim();
   const price = parseInt(document.getElementById("upPrice").value, 10) || 0;
@@ -456,8 +470,10 @@ uploadForm.addEventListener("submit", (e) => {
     upStatus.className = "form-status err";
     return;
   }
+  upStatus.textContent = "Kaydediliyor…";
+  upStatus.className = "form-status ok";
   try {
-    Store.saveProduct({
+    await Store.saveProduct({
       id: "p-" + Date.now(),
       name,
       cat: document.getElementById("upCat").value,
@@ -472,7 +488,7 @@ uploadForm.addEventListener("submit", (e) => {
         .split("\n").map((s) => s.trim()).filter(Boolean)
     });
   } catch (err) {
-    upStatus.textContent = "Kayıt başarısız: tarayıcı depolama alanı doldu. Daha küçük fotoğraf kullanın.";
+    upStatus.textContent = saveErrorText(err);
     upStatus.className = "form-status err";
     return;
   }

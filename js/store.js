@@ -269,8 +269,9 @@ const Store = (() => {
   function saveProduct(product) {
     const i = cache.products.findIndex((p) => p.id === product.id);
     if (i >= 0) cache.products[i] = product; else cache.products.unshift(product);
-    if (persist) return sbWrite("POST", "products", "", toDbProduct(product)).catch(logErr);
+    if (persist) return sbWrite("POST", "products", "", toDbProduct(product));
     write("gp-products", cache.products);
+    return Promise.resolve();
   }
   function deleteProduct(id) {
     cache.products = cache.products.filter((p) => p.id !== id);
