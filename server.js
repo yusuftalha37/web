@@ -184,79 +184,116 @@ const MAIL_CFG_FILE = path.join(ROOT, "mail-ayarlari.json");
 function loadMailCfg() {
   try { return JSON.parse(fs.readFileSync(MAIL_CFG_FILE, "utf8")); } catch (_) { return null; }
 }
+const MAIL_DEBUG = process.env.MAIL_DEBUG === "1";
 function smtpSend(to, subject, html) {
   const cfg = loadMailCfg();
   if (!cfg || !cfg.host || !cfg.user || !cfg.pass) return Promise.reject(new Error("Mail ayarları eksik"));
   const port = cfg.port || 587;
   const from = cfg.from || cfg.user;
-  const useTLS = port === 465;
+  const implicitTLS = port === 465;          // 465 = baştan TLS, 587/25 = STARTTLS
+  const TIMEOUT = 20000;
+
+  const message = [
+    "From: Solar Arena <" + from + ">",
+    "To: " + to,
+    "Subject: =?UTF-8?B?" + Buffer.from(subject).toString("base64") + "?=",
+    "MIME-Version: 1.0",
+    "Content-Type: text/html; charset=UTF-8",
+    "Content-Transfer-Encoding: base64",
+    "",
+    Buffer.from(html).toString("base64").replace(/(.{76})/g, "$1\r\n")
+  ].join("\r\n");
+
   return new Promise((resolve, reject) => {
-    let buf = "", step = 0, upgraded = false;
-    const cmds = [
-      "EHLO solararena.store\r\n",
-      "AUTH LOGIN\r\n",
-      Buffer.from(cfg.user).toString("base64") + "\r\n",
-      Buffer.from(cfg.pass).toString("base64") + "\r\n",
-      "MAIL FROM:<" + from + ">\r\n",
-      "RCPT TO:<" + to + ">\r\n",
-      "DATA\r\n"
-    ];
-    const boundary = crypto.randomBytes(16).toString("hex");
-    const msg = [
-      "From: Solar Arena <" + from + ">",
-      "To: " + to,
-      "Subject: =?UTF-8?B?" + Buffer.from(subject).toString("base64") + "?=",
-      "MIME-Version: 1.0",
-      "Content-Type: text/html; charset=UTF-8",
-      "Content-Transfer-Encoding: base64",
-      "",
-      Buffer.from(html).toString("base64").replace(/.{76}/g, "$&\r\n"),
-      ".",
-      ""
-    ].join("\r\n");
-    function next(sock) {
-      if (step < cmds.length) { sock.write(cmds[step++]); }
-      else { sock.write(msg + "\r\n"); step++; }
+    let sock, buffer = "", stage = "greet", finished = false;
+
+    function log(dir, s) { if (MAIL_DEBUG) console.log("[SMTP " + dir + "] " + s); }
+    function done(err) {
+      if (finished) return; finished = true;
+      try { sock.write("QUIT\r\n"); } catch (_) {}
+      try { sock.end(); } catch (_) {}
+      if (err) reject(err); else resolve();
     }
-    function onData(sock, data) {
-      buf += data.toString();
-      const lines = buf.split("\r\n");
-      buf = lines.pop();
-      for (const line of lines) {
-        const code = parseInt(line.substring(0, 3), 10);
-        if (code >= 400) { sock.end("QUIT\r\n"); return reject(new Error("SMTP hata: " + line)); }
-        if (!upgraded && step === 0 && code === 220) { next(sock); }
-        else if (!upgraded && line.includes("STARTTLS")) { /* bekle, EHLO yanıtı devam ediyor */ }
-        else if (!upgraded && step === 1 && /^250[ -]/.test(line) && !line.startsWith("250-")) {
-          if (!useTLS) {
-            sock.write("STARTTLS\r\n"); upgraded = "pending";
-          } else { next(sock); }
-        }
-        else if (upgraded === "pending" && code === 220) {
-          const tlsSock = tls.connect({ socket: sock, servername: cfg.host }, () => {
-            upgraded = true; step = 0;
-            tlsSock.on("data", (d) => onData(tlsSock, d));
-            next(tlsSock);
-          });
-          tlsSock.on("error", reject);
-          return;
-        }
-        else if (code === 250 || code === 235 || code === 334 || code === 354) { next(sock); }
-        else if (step > cmds.length && code === 250) { sock.end("QUIT\r\n"); resolve(); }
+    function send(line) { log("→", line); sock.write(line + "\r\n"); }
+
+    // Sunucudan gelen tam bir yanıt satırı (çok satırlının SON satırı) işlenir
+    function handle(code, line) {
+      switch (stage) {
+        case "greet":
+          if (code !== 220) return done(new Error("Karşılama hatası: " + line));
+          stage = "ehlo"; send("EHLO solararena.store"); break;
+        case "ehlo":
+          if (code !== 250) return done(new Error("EHLO reddedildi: " + line));
+          if (implicitTLS) { stage = "auth"; send("AUTH LOGIN"); }
+          else { stage = "starttls"; send("STARTTLS"); }
+          break;
+        case "starttls":
+          if (code !== 220) return done(new Error("STARTTLS reddedildi: " + line));
+          upgradeTLS(); break;
+        case "ehlo2":
+          if (code !== 250) return done(new Error("EHLO (TLS) reddedildi: " + line));
+          stage = "auth"; send("AUTH LOGIN"); break;
+        case "auth":
+          if (code !== 334) return done(new Error("AUTH LOGIN reddedildi: " + line));
+          stage = "user"; send(Buffer.from(cfg.user).toString("base64")); break;
+        case "user":
+          if (code !== 334) return done(new Error("Kullanıcı adı aşaması reddedildi: " + line));
+          stage = "pass"; send(Buffer.from(cfg.pass).toString("base64")); break;
+        case "pass":
+          if (code !== 235) return done(new Error("Giriş başarısız — kullanıcı adı/şifre veya yetki reddedildi (" + line + ")"));
+          stage = "from"; send("MAIL FROM:<" + from + ">"); break;
+        case "from":
+          if (code !== 250) return done(new Error("MAIL FROM reddedildi: " + line));
+          stage = "to"; send("RCPT TO:<" + to + ">"); break;
+        case "to":
+          if (code !== 250 && code !== 251) return done(new Error("Alıcı reddedildi: " + line));
+          stage = "data"; send("DATA"); break;
+        case "data":
+          if (code !== 354) return done(new Error("DATA reddedildi: " + line));
+          stage = "body"; log("→", "<mesaj gövdesi>"); sock.write(message + "\r\n.\r\n"); break;
+        case "body":
+          if (code !== 250) return done(new Error("Mesaj kabul edilmedi: " + line));
+          done(); break;   // GERÇEK başarı: sunucu mesajı kuyruğa aldı
       }
     }
-    if (useTLS) {
-      const sock = tls.connect(port, cfg.host, { servername: cfg.host }, () => {
-        sock.on("data", (d) => onData(sock, d));
+    function onData(chunk) {
+      buffer += chunk.toString("utf8");
+      let idx;
+      while ((idx = buffer.indexOf("\r\n")) !== -1) {
+        const line = buffer.slice(0, idx);
+        buffer = buffer.slice(idx + 2);
+        if (line.length < 3) continue;
+        log("←", line);
+        const code = parseInt(line.slice(0, 3), 10);
+        if (line.charAt(3) === "-") continue;   // çok satırlı yanıt: son satırı bekle
+        handle(code, line);
+      }
+    }
+    function attach(s) {
+      sock = s;
+      sock.setTimeout(TIMEOUT, () => done(new Error("SMTP zaman aşımı — sunucuya/porta ulaşılamadı")));
+      sock.on("data", onData);
+      sock.on("error", (e) => done(new Error("Bağlantı hatası: " + e.message)));
+      sock.on("close", () => { if (!finished) done(new Error("Bağlantı beklenmedik şekilde kapandı")); });
+    }
+    function upgradeTLS() {
+      sock.removeListener("data", onData);
+      sock.setTimeout(0);
+      const secure = tls.connect({ socket: sock, servername: cfg.host }, () => {
+        stage = "ehlo2"; buffer = "";
+        attach(secure);
+        send("EHLO solararena.store");
       });
-      sock.on("error", reject);
-      sock.setTimeout(15000, () => { sock.destroy(); reject(new Error("SMTP zaman aşımı")); });
+      secure.on("error", (e) => done(new Error("TLS hatası: " + e.message)));
+    }
+
+    if (implicitTLS) {
+      // servername yalnızca gerçek alan adı için (IP ise TLS SNI'de yok sayılır)
+      const tlsOpts = /^\d+\.\d+\.\d+\.\d+$/.test(cfg.host) ? {} : { servername: cfg.host };
+      const s = tls.connect(port, cfg.host, tlsOpts, () => log("←", "TLS bağlandı"));
+      attach(s);
     } else {
-      const sock = net.createConnection(port, cfg.host, () => {
-        sock.on("data", (d) => onData(sock, d));
-      });
-      sock.on("error", reject);
-      sock.setTimeout(15000, () => { sock.destroy(); reject(new Error("SMTP zaman aşımı")); });
+      attach(net.createConnection(port, cfg.host));
     }
   });
 }
@@ -383,7 +420,7 @@ function botGate(req, res, u) {
 
   // 4) Genel hız sınırı — arama motoru botları muaf
   if (!GOOD_BOT_RE.test(ua)) {
-    const isApi = p.startsWith("/rest/v1/") || p.startsWith("/auth/v1/");
+    const isApi = p.startsWith("/rest/v1/") || p.startsWith("/auth/v1/") || p.startsWith("/api/");
     // Sayfa+varlık yüklemeleri doğal olarak çok olur; API daha sıkı
     const limit = isApi ? 120 : 300;
     if (generalRateExceeded(ip, limit, 60 * 1000)) {
@@ -817,7 +854,7 @@ const server = http.createServer({
   // Bot / saldırı filtresi
   if (botGate(req, res, u)) return;
 
-  if (u.pathname.startsWith("/rest/v1/") || u.pathname.startsWith("/auth/v1/")) {
+  if (u.pathname.startsWith("/rest/v1/") || u.pathname.startsWith("/auth/v1/") || u.pathname.startsWith("/api/")) {
     try { await handleApi(req, res, u); }
     catch (e) { console.error(e); send(res, 500, { error: "server" }); }
   } else {
