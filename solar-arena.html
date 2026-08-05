@@ -3972,7 +3972,7 @@ img, svg { max-width: 100%; }
     <div class="admin-sidebar-foot">
       <a href="#">← Siteye Dön</a>
       <a href="#" id="adminLogout">Çıkış Yap</a>
-      <div class="admin-version" id="adminVersion">Sürüm: 2026-08-05 · 10</div>
+      <div class="admin-version" id="adminVersion">Sürüm: 2026-08-05 · 12</div>
     </div>
   </aside>
 
@@ -4335,7 +4335,13 @@ img, svg { max-width: 100%; }
           <button type="button" class="btn btn-small btn-outline" id="smtpTestBtn" style="margin-left:8px">Test Maili Gönder</button>
           <p class="form-status" id="mailSettingsStatus" role="status"></p>
         </form>
-        <p class="panel-hint" style="margin-top:8px"><b>Gmail için:</b> Google Hesabı → Güvenlik → 2 Adımlı Doğrulama açın → "Uygulama şifreleri" bölümünden 16 haneli bir şifre oluşturun. Host: <code>smtp.gmail.com</code>, Port: <code>587</code></p>
+        <p class="panel-hint" style="margin-top:8px">
+          <b>Hazır ayarlar:</b><br>
+          • <b>Outlook / Hotmail:</b> Host <code>smtp-mail.outlook.com</code>, Port <code>587</code><br>
+          • <b>Gmail:</b> Host <code>smtp.gmail.com</code>, Port <code>587</code> — Google Hesabı → Güvenlik → 2 Adımlı Doğrulama → "Uygulama şifreleri"nden 16 haneli şifre<br>
+          • <b>Yandex:</b> Host <code>smtp.yandex.com</code>, Port <code>465</code><br>
+          Kaydettikten sonra <b>Test Maili Gönder</b> ile deneyin — mail size ulaşırsa ayarlar doğrudur.
+        </p>
       </div>
     </section>
   </main>
