@@ -377,56 +377,30 @@ function initSite(root) {
     });
   }
 
-  // ============ KATEGORİ ÇUBUĞU (Solar Depo tarzı) ============
-  const catbarLinks = $("#catbarLinks");
+  // ============ KATEGORİ SIDEBAR (enerjipazari tarzı) ============
   const catbarDropdown = $("#catbarDropdown");
-  const catbarAll = $("#catbarAll");
 
-  if (catbarLinks || catbarDropdown) {
+  if (catbarDropdown) {
     const catIcon = (c) => c.image ? `<img class="catbar-ico" src="${escHtml(c.image)}" alt="">` : "";
     const rootCats = Store.catChildren("");
-    const brandCats = Store.getBrands();
     const href = pageLink("urunler.html");
 
-    if (catbarLinks) {
-      // Kök kategoriler; alt kategorisi varsa fareyle açılan mega-menü ile
-      catbarLinks.innerHTML = rootCats.map((c) => {
-        const kids = Store.catChildren(c.id);
-        const mega = kids.length ? `
-          <div class="catbar-mega">
-            <span class="catbar-mega-title">${escHtml(c.name)}</span>
-            <div class="catbar-mega-grid">${kids.map((k) => {
-              const grand = Store.catChildren(k.id);
-              return `
-              <div class="catbar-megacol">
-                <a href="${href}" class="catbar-mega-head" data-cat="${k.id}">${escHtml(k.name)}</a>
-                ${grand.length ? `<div class="catbar-mega-sub">${grand.map((g) =>
-                  `<a href="${href}" data-cat="${g.id}">${escHtml(g.name)}</a>`).join("")}</div>` : ""}
-              </div>`;
-            }).join("")}</div>
-          </div>` : "";
-        return `<div class="catbar-item${kids.length ? " has-mega" : ""}">
-          <a href="${href}" class="catbar-link" data-cat="${c.id}">${catIcon(c)}${escHtml(c.name)}${kids.length ? ' <span class="catbar-caret">▾</span>' : ""}</a>
-          ${mega}
-        </div>`;
-      }).join("");
-    }
-    if (catbarDropdown) {
-      const item = (c, depth) =>
-        `<li><a class="catbar-depth-${(depth || 0) > 3 ? 3 : (depth || 0)}" href="${href}" data-cat="${c.id}">${catIcon(c)}${escHtml(c.name)}</a></li>`;
-      catbarDropdown.innerHTML =
-        `<li><a href="${href}" data-cat="all">Tüm Ürünler</a></li>` +
-        Store.catTree().map((n) => item(n.cat, n.depth)).join("") +
-        (brandCats.length ? `<li class="catbar-group">Markalar</li>` + brandCats.map((c) => item(c, 0)).join("") : "");
-    }
+    catbarDropdown.innerHTML = rootCats.map((c) => {
+      const kids = Store.catChildren(c.id);
+      const flyout = kids.length ? `<div class="cat-flyout">${kids.map((k) => {
+        const grand = Store.catChildren(k.id);
+        return `<a href="${href}" data-cat="${k.id}">${escHtml(k.name)}</a>` +
+          grand.map((g) => `<a href="${href}" data-cat="${g.id}" style="padding-left:36px;font-size:12px;color:var(--muted)">${escHtml(g.name)}</a>`).join("");
+      }).join("")}</div>` : "";
+      return `<li><a href="${href}" data-cat="${c.id}">${catIcon(c)}${escHtml(c.name)}</a>${flyout}</li>`;
+    }).join("");
 
     const onProductsPage = !!$("#catList");
 
-    const catbarClick = (e) => {
+    catbarDropdown.addEventListener("click", (e) => {
       const a = e.target.closest("[data-cat]");
       if (!a) return;
       e.preventDefault();
-      if (catbarAll) catbarAll.classList.remove("open");
       sessionStorage.setItem("gp-cat", a.dataset.cat);
       if (onProductsPage) {
         window.dispatchEvent(new Event("gp-apply-filters"));
@@ -437,19 +411,23 @@ function initSite(root) {
       } else {
         location.href = "urunler.html";
       }
-    };
+    });
+  }
 
-    if (catbarLinks) catbarLinks.addEventListener("click", catbarClick);
-    if (catbarDropdown) catbarDropdown.addEventListener("click", catbarClick);
-
-    // "TÜM KATEGORİLER" — dokunmatik için tıklamayla aç/kapa
-    if (catbarAll) {
-      const allBtn = catbarAll.querySelector(".catbar-all-btn");
-      allBtn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        catbarAll.classList.toggle("open");
+  // ============ TOPBAR HESAP LİNKLERİ ============
+  const topbarAccount = $("#topbarAccount");
+  if (topbarAccount) {
+    if (currentUser) {
+      topbarAccount.innerHTML = currentUser.role === "admin"
+        ? '<a href="admin.html">Yönetim Paneli</a><span class="topbar-sep">|</span><a href="#" class="logout-link">Çıkış</a>'
+        : '<a href="hesap.html">Hesabım</a><span class="topbar-sep">|</span><a href="#" class="logout-link">Çıkış</a>';
+      topbarAccount.querySelector(".logout-link").addEventListener("click", (e) => {
+        e.preventDefault();
+        Store.logout();
+        location.reload();
       });
-      document.addEventListener("click", () => catbarAll.classList.remove("open"));
+    } else {
+      topbarAccount.innerHTML = '<a href="giris.html">YENİ ÜYELİK</a><span class="topbar-sep">|</span><a href="giris.html">ÜYE GİRİŞİ</a>';
     }
   }
 

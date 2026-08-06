@@ -25,9 +25,8 @@
   <!-- ÜST BİLGİ ÇUBUĞU -->
   <div class="topbar">
     <div class="container topbar-inner">
-      <span>Tel: <span data-site="phone">0850 000 00 00</span></span>
-      <span>E-posta: <span data-site="email">info@solararena.store</span></span>
-      <span class="topbar-right" data-site="topNote">Türkiye'nin her yerine hızlı gönderim</span>
+      <span data-site="topNote">Türkiye'nin her yerine hızlı gönderim</span>
+      <span class="topbar-right" id="topbarAccount"></span>
     </div>
   </div>
 
@@ -42,44 +41,26 @@
         <span class="logo-text">Solar<span>Arena</span> <small data-site="brandTagline">Enerji Sistemleri San. Tic. Ltd. Şti.</small></span>
       </a>
       <form class="site-search" id="siteSearch" role="search">
-        <input type="search" id="searchInput" placeholder="Ürün ara: güneş paneli, invertör, akü…" autocomplete="off" aria-label="Ürün ara">
-        <button type="submit" aria-label="Ara">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-        </button>
+        <input type="search" id="searchInput" placeholder="Aramak istediğiniz ürünü yazın…" autocomplete="off" aria-label="Ürün ara">
+        <button type="submit" class="search-btn-text">ARA</button>
       </form>
-      <div class="header-contact">
-        <strong data-site="phone">0850 000 00 00</strong>
-        <span data-site="headerContactNote">Sipariş ve bilgi için hemen arayın</span>
+      <div class="header-actions">
+        <a href="hesap.html" class="header-action" id="headerAccount">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span>Üyelik</span>
+        </a>
+        <a href="sepet.html" class="header-action" id="cartBtn" aria-label="Sepete git">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="9" cy="21" r="1.6"/>
+            <circle cx="19" cy="21" r="1.6"/>
+            <path d="M2.5 3h3l2.6 12.5a2 2 0 0 0 2 1.5h8.7a2 2 0 0 0 2-1.6L22.5 8H6.2"/>
+          </svg>
+          <span>Sepetim</span>
+          <span class="cart-count" id="cartCount" hidden>0</span>
+        </a>
       </div>
     </div>
   </header>
-
-  <!-- ANA MENÜ -->
-  <nav class="mainmenu">
-    <div class="container mainmenu-inner">
-      <button class="hamburger" id="hamburger" aria-label="Menüyü aç">
-        <span></span><span></span><span></span>
-      </button>
-      <div class="nav-links" id="navLinks">
-        <a href="index.html">ANA SAYFA</a>
-        <a href="urunler.html">ÜRÜNLER</a>
-        <a href="blog.html">BİLGİ MERKEZİ</a>
-        <a href="index.html#hesaplayici">TASARRUF HESAPLA</a>
-        <a href="index.html#referanslar">REFERANSLAR</a>
-        <a href="index.html#iletisim">İLETİŞİM</a>
-        <span class="nav-account" id="navAccount"></span>
-      </div>
-      <a class="cart-btn" id="cartBtn" href="sepet.html" aria-label="Sepete git">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="9" cy="21" r="1.6"/>
-          <circle cx="19" cy="21" r="1.6"/>
-          <path d="M2.5 3h3l2.6 12.5a2 2 0 0 0 2 1.5h8.7a2 2 0 0 0 2-1.6L22.5 8H6.2"/>
-        </svg>
-        SEPET
-        <span class="cart-count" id="cartCount" hidden>0</span>
-      </a>
-    </div>
-  </nav>
 
   <!-- MAKALE -->
   <section class="page-band">
