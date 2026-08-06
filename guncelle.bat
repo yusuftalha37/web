@@ -22,7 +22,7 @@ echo.
 echo Guncelleme oncesi verilerinizin yedegi aliniyor...
 if exist data.json copy /y data.json "data.guncelleme-oncesi.json" >nul
 echo Kod dosyalari kopyalaniyor (verileriniz haric tutuluyor)...
-robocopy "!KAYNAK!" "%~dp0." /E /XF data.json data.json.tmp data.yedek.json data.guncelleme-oncesi.json mail-ayarlari.json *.log /XD .git >nul
+robocopy "!KAYNAK!" "%~dp0." /E /XF data.json data.json.tmp data.yedek.json data.guncelleme-oncesi.json mail-ayarlari.json *.log /XD .git uploads >nul
 echo.
 echo ============================================================
 echo    TAMAM - Kodlar guncellendi, verileriniz korundu.

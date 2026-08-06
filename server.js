@@ -29,6 +29,8 @@ const ALLOWED_HOSTS = (process.env.ALLOWED_HOSTS || "solararena.store,www.solara
   .split(",").map((h) => h.trim().toLowerCase()).filter(Boolean);
 const ROOT = __dirname;
 const DATA_FILE = path.join(ROOT, "data.json");
+const UPLOADS_DIR = path.join(ROOT, "uploads");
+try { fs.mkdirSync(UPLOADS_DIR, { recursive: true }); } catch (_) {}
 
 // -------------------- Varsayılan tohum verisi --------------------
 const SEED = {
@@ -671,6 +673,54 @@ async function handleApi(req, res, u) {
     } catch (e) {
       return send(res, 500, { msg: "Mail gönderilemedi: " + e.message });
     }
+  }
+
+  // ---- Resim yükleme (dosya sunucuya kaydedilir) ----
+  if (u.pathname === "/api/upload-image" && req.method === "POST") {
+    if (!isAdmin) return send(res, 401, { error: "unauthorized" });
+    const ct = req.headers["content-type"] || "";
+    const bm = ct.match(/boundary=(?:"([^"]+)"|([^\s;]+))/i);
+    if (!bm) return send(res, 400, { error: "multipart/form-data gerekli" });
+    const boundary = "--" + (bm[1] || bm[2]);
+    const MAX_IMG = 10 * 1024 * 1024;
+    const chunks = [];
+    let size = 0, aborted = false;
+    await new Promise((resolve) => {
+      req.on("data", (c) => {
+        if (aborted) return;
+        size += c.length;
+        if (size > MAX_IMG) { aborted = true; resolve(); try { req.destroy(); } catch (_) {} return; }
+        chunks.push(c);
+      });
+      req.on("end", resolve);
+      req.on("error", resolve);
+    });
+    if (aborted) return send(res, 413, { error: "too_large", error_description: "Dosya çok büyük (maks. 10 MB)." });
+    const raw = Buffer.concat(chunks);
+    const bndBuf = Buffer.from(boundary);
+    let start = -1, end = -1;
+    for (let i = 0; i <= raw.length - bndBuf.length; i++) {
+      if (raw.slice(i, i + bndBuf.length).equals(bndBuf)) {
+        if (start === -1) start = i; else { end = i; break; }
+      }
+    }
+    if (start === -1 || end === -1) return send(res, 400, { error: "Geçersiz multipart verisi" });
+    const part = raw.slice(start + bndBuf.length + 2, end - 2);
+    const headerEnd = part.indexOf("\r\n\r\n");
+    if (headerEnd === -1) return send(res, 400, { error: "Geçersiz multipart verisi" });
+    const partHeaders = part.slice(0, headerEnd).toString("utf8").toLowerCase();
+    const fileData = part.slice(headerEnd + 4);
+    if (!fileData.length) return send(res, 400, { error: "Dosya boş" });
+    const fnMatch = partHeaders.match(/filename="([^"]+)"/);
+    const origName = fnMatch ? fnMatch[1].replace(/[^a-zA-Z0-9._-]/g, "_") : "img";
+    const extMatch = origName.match(/\.(jpe?g|png|webp|gif|svg|avif)$/i);
+    let ext = extMatch ? extMatch[0].toLowerCase() : ".jpg";
+    if (ext === ".jpeg") ext = ".jpg";
+    const uid = crypto.randomBytes(8).toString("hex");
+    const fileName = uid + ext;
+    const filePath = path.join(UPLOADS_DIR, fileName);
+    try { fs.writeFileSync(filePath, fileData); } catch (e) { return send(res, 500, { error: "Dosya kaydedilemedi: " + e.message }); }
+    return send(res, 200, { url: "/uploads/" + fileName });
   }
 
   // ---- Veri (REST) ----

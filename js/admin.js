@@ -140,6 +140,24 @@ function saveErrorText(err) {
 // Görsel dosyasını en fazla 900px olacak şekilde küçültüp JPEG'e çevirir;
 // hem düzenleme penceresi hem ürün yükleme ekranı kullanır.
 function readImageFile(file, cb) {
+  const s = Store.session();
+  const token = s && s.token;
+  if (Store.mode === "supabase" && token) {
+    const fd = new FormData();
+    fd.append("file", file);
+    fetch("/api/upload-image", {
+      method: "POST",
+      headers: { Authorization: "Bearer " + token },
+      body: fd
+    })
+      .then((r) => r.json().then((d) => ({ ok: r.ok, data: d })))
+      .then(({ ok, data }) => {
+        if (ok && data.url) cb(data.url);
+        else alert("Resim yüklenemedi: " + (data.error_description || data.error || "Bilinmeyen hata"));
+      })
+      .catch(() => alert("Resim yüklenirken bağlantı hatası oluştu."));
+    return;
+  }
   const img = new Image();
   img.onload = () => {
     const MAX = 900;

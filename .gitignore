@@ -4,6 +4,9 @@ data.json.tmp
 data.yedek.json
 mail-ayarlari.json
 
+# Kullanıcı tarafından yüklenen görseller (sunucuda kalır)
+uploads/
+
 # Yerel/geçici
 *.log
 .DS_Store
