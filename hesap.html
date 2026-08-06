@@ -7,7 +7,15 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>☀️</text></svg>">
   <link rel="stylesheet" href="css/style.css">
 </head>
-<body class="account-body">
+<body>
+
+  <!-- ÜST BİLGİ ÇUBUĞU -->
+  <div class="topbar">
+    <div class="container topbar-inner">
+      <span data-site="topNote">Türkiye'nin her yerine hızlı gönderim</span>
+      <span class="topbar-right" id="topbarAccount"></span>
+    </div>
+  </div>
 
   <!-- BAŞLIK -->
   <header class="siteheader">
@@ -17,24 +25,129 @@
           <circle cx="12" cy="12" r="4"/>
           <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
         </svg>
-        <span class="logo-text">Solar<span>Arena</span> <small>Enerji Sistemleri San. Tic. Ltd. Şti.</small></span>
+        <span class="logo-text">Solar<span>Arena</span> <small data-site="brandTagline">Enerji Sistemleri San. Tic. Ltd. Şti.</small></span>
       </a>
-      <div class="account-header-links">
-        <a href="index.html">← Alışverişe Dön</a>
-        <a href="#" id="accountLogout">Çıkış Yap</a>
+      <form class="site-search" id="siteSearch" role="search">
+        <input type="search" id="searchInput" placeholder="Aramak istediğiniz ürünü yazın…" autocomplete="off" aria-label="Ürün ara">
+        <button type="submit" class="search-btn-text">ARA</button>
+      </form>
+      <div class="header-actions">
+        <a href="hesap.html" class="header-action" id="headerAccount">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span>Üyelik</span>
+        </a>
+        <a href="sepet.html" class="header-action" id="cartBtn" aria-label="Sepete git">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="9" cy="21" r="1.6"/>
+            <circle cx="19" cy="21" r="1.6"/>
+            <path d="M2.5 3h3l2.6 12.5a2 2 0 0 0 2 1.5h8.7a2 2 0 0 0 2-1.6L22.5 8H6.2"/>
+          </svg>
+          <span>Sepetim</span>
+          <span class="cart-count" id="cartCount" hidden>0</span>
+        </a>
       </div>
     </div>
   </header>
 
-  <div class="container account-page">
-    <h1 class="account-title">Hesabım</h1>
+  <!-- SAYFA BAŞLIĞI -->
+  <section class="page-band">
+    <div class="container">
+      <h1>Hesabım</h1>
+    </div>
+  </section>
 
-    <div class="account-wrap">
-      <div>
-        <!-- HESAP BİLGİLERİ -->
-        <form class="account-box" id="profileForm">
-          <div class="box-title">Hesap Bilgilerim</div>
-          <div class="box-body">
+  <div class="container acc-layout">
+    <!-- SOL MENÜ -->
+    <aside class="acc-sidebar">
+      <div class="acc-sidebar-welcome" id="accWelcome"></div>
+      <nav class="acc-sidebar-menu">
+        <div class="acc-sidebar-title">Hesabım</div>
+        <a href="#" class="acc-menu-item active" data-section="dashboard">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+          Genel Bakış
+        </a>
+        <a href="#" class="acc-menu-item" data-section="profile">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Üye Bilgilerim
+        </a>
+        <a href="#" class="acc-menu-item" data-section="password">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          Şifre Değiştir
+        </a>
+        <a href="#" class="acc-menu-item" data-section="address">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Adres Defteri
+        </a>
+        <a href="sepet.html" class="acc-menu-item">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+          Alışveriş Sepetim
+        </a>
+        <a href="#" class="acc-menu-item" data-section="orders">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          Siparişlerim
+        </a>
+        <a href="#" class="acc-menu-item" data-section="favorites">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          Favori Ürünlerim
+        </a>
+        <a href="#" class="acc-menu-item acc-menu-logout" id="accountLogout">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Güvenli Çıkış
+        </a>
+      </nav>
+    </aside>
+
+    <!-- SAĞ İÇERİK -->
+    <main class="acc-main">
+
+      <!-- GENEL BAKIŞ (Dashboard) -->
+      <div class="acc-section" id="sec-dashboard">
+        <h2 class="acc-section-title">Hesabım</h2>
+        <div class="acc-cards">
+          <a href="#" class="acc-card" data-goto="profile">
+            <div class="acc-card-icon">
+              <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </div>
+            <span>Üye Bilgilerim</span>
+          </a>
+          <a href="#" class="acc-card" data-goto="address">
+            <div class="acc-card-icon">
+              <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            </div>
+            <span>Adres Defteri</span>
+          </a>
+          <a href="sepet.html" class="acc-card">
+            <div class="acc-card-icon">
+              <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+            </div>
+            <span>Alışveriş Sepetim</span>
+          </a>
+          <a href="#" class="acc-card" data-goto="orders">
+            <div class="acc-card-icon">
+              <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            </div>
+            <span>Siparişlerim</span>
+          </a>
+          <a href="#" class="acc-card" data-goto="favorites">
+            <div class="acc-card-icon">
+              <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            </div>
+            <span>Favori Ürünlerim</span>
+          </a>
+          <a href="#" class="acc-card" data-goto="password">
+            <div class="acc-card-icon">
+              <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </div>
+            <span>Şifre Değiştir</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- ÜYE BİLGİLERİ -->
+      <div class="acc-section" id="sec-profile" style="display:none">
+        <h2 class="acc-section-title">Üye Bilgilerim</h2>
+        <form class="acc-form-box" id="profileForm">
+          <div class="form-row">
             <div class="form-group">
               <label for="accName">Ad Soyad</label>
               <input type="text" id="accName" required>
@@ -43,54 +156,127 @@
               <label for="accEmail">E-posta <small>(değiştirilemez)</small></label>
               <input type="email" id="accEmail" readonly>
             </div>
+          </div>
+          <div class="form-row">
             <div class="form-group">
               <label for="accPhone">Telefon</label>
               <input type="tel" id="accPhone" placeholder="05__ ___ __ __">
             </div>
-            <button type="submit" class="btn">Bilgilerimi Güncelle</button>
-            <p class="form-status" id="profileStatus" role="status"></p>
-          </div>
-        </form>
-
-        <!-- ŞİFRE DEĞİŞTİR -->
-        <form class="account-box" id="passwordForm">
-          <div class="box-title">Şifre Değiştir</div>
-          <div class="box-body">
             <div class="form-group">
-              <label for="passOld">Mevcut şifre</label>
-              <input type="password" id="passOld" required autocomplete="current-password">
+              <label for="accCity">Şehir</label>
+              <input type="text" id="accCity" placeholder="Örn. İstanbul">
             </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label for="passNew">Yeni şifre</label>
-                <input type="password" id="passNew" required autocomplete="new-password">
-              </div>
-              <div class="form-group">
-                <label for="passNew2">Yeni şifre (tekrar)</label>
-                <input type="password" id="passNew2" required autocomplete="new-password">
-              </div>
-            </div>
-            <button type="submit" class="btn">Şifreyi Değiştir</button>
-            <p class="form-status" id="passwordStatus" role="status"></p>
           </div>
+          <button type="submit" class="btn">Bilgilerimi Güncelle</button>
+          <p class="form-status" id="profileStatus" role="status"></p>
         </form>
       </div>
 
-      <div>
-        <!-- SİPARİŞLERİM -->
-        <div class="account-box">
-          <div class="box-title">Siparişlerim</div>
-          <div class="box-body" id="myOrders"></div>
-        </div>
-        <p class="account-note">
+      <!-- ŞİFRE DEĞİŞTİR -->
+      <div class="acc-section" id="sec-password" style="display:none">
+        <h2 class="acc-section-title">Şifre Değiştir</h2>
+        <form class="acc-form-box" id="passwordForm">
+          <div class="form-group">
+            <label for="passOld">Mevcut şifre</label>
+            <input type="password" id="passOld" required autocomplete="current-password">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="passNew">Yeni şifre</label>
+              <input type="password" id="passNew" required autocomplete="new-password">
+            </div>
+            <div class="form-group">
+              <label for="passNew2">Yeni şifre (tekrar)</label>
+              <input type="password" id="passNew2" required autocomplete="new-password">
+            </div>
+          </div>
+          <button type="submit" class="btn">Şifreyi Değiştir</button>
+          <p class="form-status" id="passwordStatus" role="status"></p>
+        </form>
+      </div>
+
+      <!-- ADRES DEFTERİ -->
+      <div class="acc-section" id="sec-address" style="display:none">
+        <h2 class="acc-section-title">Adres Defteri</h2>
+        <form class="acc-form-box" id="addressForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="addrTitle">Adres Başlığı</label>
+              <input type="text" id="addrTitle" placeholder="Ev, İş vb.">
+            </div>
+            <div class="form-group">
+              <label for="addrCity">İl</label>
+              <input type="text" id="addrCity" placeholder="Örn. Ankara">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="addrFull">Açık Adres</label>
+            <textarea id="addrFull" rows="3" placeholder="Mahalle, cadde, bina ve daire no"></textarea>
+          </div>
+          <button type="submit" class="btn">Adresi Kaydet</button>
+          <p class="form-status" id="addressStatus" role="status"></p>
+        </form>
+        <div id="addressList"></div>
+      </div>
+
+      <!-- SİPARİŞLERİM -->
+      <div class="acc-section" id="sec-orders" style="display:none">
+        <h2 class="acc-section-title">Siparişlerim</h2>
+        <div id="myOrders"></div>
+        <p class="acc-note">
           Buradaki liste verdiğiniz sipariş taleplerinin kaydıdır. Ödeme
           Havale/EFT ile yapılır; dekontunuzu ilettiğinizde siparişiniz
           hazırlanır. Sorularınız için
           <a href="index.html#iletisim">bize ulaşın</a>.
         </p>
       </div>
-    </div>
+
+      <!-- FAVORİ ÜRÜNLERİM -->
+      <div class="acc-section" id="sec-favorites" style="display:none">
+        <h2 class="acc-section-title">Favori Ürünlerim</h2>
+        <div id="favList"></div>
+      </div>
+
+    </main>
   </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div>
+        <a href="index.html" class="logo logo-light">
+          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <circle cx="12" cy="12" r="4"/>
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+          </svg>
+          Solar<span>Arena</span>
+        </a>
+        <p data-site="footerAbout">Temiz enerjiyle daha aydınlık bir gelecek için 12 yıldır çalışıyoruz.</p>
+      </div>
+      <div>
+        <h4>Hızlı Erişim</h4>
+        <a href="index.html#hizmetler">Hizmetler</a>
+        <a href="urunler.html">Mağaza</a>
+        <a href="blog.html">Bilgi Merkezi</a>
+      </div>
+      <div>
+        <h4>Kategoriler</h4>
+        <a href="urunler.html">Güneş Panelleri</a>
+        <a href="urunler.html">İnvertörler</a>
+        <a href="urunler.html">Aküler</a>
+      </div>
+      <div>
+        <h4>İletişim</h4>
+        <a href="tel:08500000000" data-site="phone">0850 000 00 00</a>
+        <a href="mailto:info@solararena.store" data-site="email">info@solararena.store</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="container">
+        <span data-site="footerCopyright">© 2026 Solar Arena Enerji — Bu site örnek/demo amaçlıdır.</span>
+      </div>
+    </div>
+  </footer>
 
   <script src="js/config.js"></script>
   <script src="js/store.js"></script>
