@@ -10,6 +10,9 @@ uploads/
 # Yerel/geçici
 *.log
 .DS_Store
+node_modules/
+package.json
+package-lock.json
 
 # Teslim/çıktı arşivleri
 *.zip
