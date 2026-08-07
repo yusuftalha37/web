@@ -468,10 +468,10 @@ const Store = (() => {
   async function listUsers() {
     if (persist) {
       const rows = await sbSelect("profiles", "select=*&order=created.desc").catch(() => []);
-      return rows.map((r) => ({ id: r.id, name: r.name || "", email: r.email || "", phone: r.phone || "", role: r.role || "user", blocked: !!r.blocked, created: r.created || 0 }));
+      return rows.map((r) => ({ id: r.id, name: r.name || "", email: r.email || "", phone: r.phone || "", city: r.city || "", role: r.role || "user", blocked: !!r.blocked, created: r.created || 0 }));
     }
     return getUsersLocal()
-      .map((u) => ({ id: u.email, name: u.name || "", email: u.email, phone: u.phone || "", role: u.role || "user", blocked: !!u.blocked, created: u.created || 0 }))
+      .map((u) => ({ id: u.email, name: u.name || "", email: u.email, phone: u.phone || "", city: u.city || "", role: u.role || "user", blocked: !!u.blocked, created: u.created || 0 }))
       .sort((a, b) => (b.created || 0) - (a.created || 0));
   }
   async function setUserRole(id, role) {
@@ -512,9 +512,9 @@ const Store = (() => {
   }
 
   function getUser(email) {
-    if (persist) { const s = session(); return s ? { name: s.name, email: s.email, phone: s.phone || "" } : null; }
+    if (persist) { const s = session(); return s ? { name: s.name, email: s.email, phone: s.phone || "", city: s.city || "" } : null; }
     const u = getUsersLocal().find((x) => x.email === email);
-    return u ? { name: u.name, email: u.email, phone: u.phone || "" } : null;
+    return u ? { name: u.name, email: u.email, phone: u.phone || "", city: u.city || "" } : null;
   }
 
   async function updateProfile(email, data) {
@@ -522,8 +522,11 @@ const Store = (() => {
       const s = session();
       if (!s) return { ok: false, error: "Oturum bulunamadı." };
       const patch = { name: (data.name || "").trim(), phone: (data.phone || "").trim() };
+      if (data.city !== undefined) patch.city = (data.city || "").trim();
       await sbWrite("PATCH", "profiles", "id=eq." + s.uid, patch).catch(logErr);
-      s.name = patch.name || s.name; s.phone = patch.phone; write("gp-session", s);
+      s.name = patch.name || s.name; s.phone = patch.phone;
+      if (patch.city !== undefined) s.city = patch.city;
+      write("gp-session", s);
       return { ok: true };
     }
     const users = getUsersLocal();
@@ -531,10 +534,38 @@ const Store = (() => {
     if (!u) return { ok: false, error: "Kullanıcı bulunamadı." };
     if (data.name && data.name.trim()) u.name = data.name.trim();
     u.phone = (data.phone || "").trim();
+    if (data.city !== undefined) u.city = (data.city || "").trim();
     write("gp-users", users);
     const s = session();
     if (s && s.email === email) { s.name = u.name; write("gp-session", s); }
     return { ok: true };
+  }
+
+  function adminUpdateUser(email, data) {
+    if (persist) {
+      const patch = {};
+      if (data.name !== undefined) patch.name = (data.name || "").trim();
+      if (data.phone !== undefined) patch.phone = (data.phone || "").trim();
+      if (data.city !== undefined) patch.city = (data.city || "").trim();
+      return sbWrite("PATCH", "profiles", "email=eq." + encodeURIComponent(email), patch).catch(logErr);
+    }
+    const users = getUsersLocal();
+    const u = users.find((x) => x.email === email);
+    if (!u) return;
+    if (data.name !== undefined && data.name.trim()) u.name = data.name.trim();
+    if (data.phone !== undefined) u.phone = (data.phone || "").trim();
+    if (data.city !== undefined) u.city = (data.city || "").trim();
+    write("gp-users", users);
+  }
+
+  function getUserAddresses(email) {
+    try { return JSON.parse(localStorage.getItem("gp-addr-" + email)) || []; } catch (_) { return []; }
+  }
+  function setUserAddresses(email, list) {
+    localStorage.setItem("gp-addr-" + email, JSON.stringify(list));
+  }
+  function getUserFavorites() {
+    try { return JSON.parse(localStorage.getItem("gp-fav")) || []; } catch (_) { return []; }
   }
 
   async function changePassword(email, oldPass, newPass) {
@@ -654,7 +685,8 @@ const Store = (() => {
     catDescendantIds, catPath, canReparent,
     getSlides, saveSlide, deleteSlide, moveSlide,
     register, login, logout, session,
-    getUser, updateProfile, changePassword,
+    getUser, updateProfile, changePassword, adminUpdateUser,
+    getUserAddresses, setUserAddresses, getUserFavorites,
     listUsers, setUserRole, setUserBlocked, deleteUser, adminCreateUser,
     addLead, getLeads, deleteLead,
     addOrder, getOrders, getOrdersByEmail, refreshOrders,

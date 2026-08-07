@@ -936,12 +936,12 @@ async function renderUsers() {
   let users;
   try { users = await Store.listUsers(); }
   catch (err) {
-    tbody.innerHTML = '<tr><td colspan="6" class="empty-row">Kullanıcılar yüklenemedi.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7" class="empty-row">Kullanıcılar yüklenemedi.</td></tr>';
     return;
   }
   if (users.length === 0 && Store.mode === "supabase") {
     // Sunucu modunda liste boşsa (admin bile yoksa) oturum jetonu geçersizdir
-    tbody.innerHTML = '<tr><td colspan="6" class="empty-row">Oturumunuz sunucuda geçerli değil. Lütfen <strong>Çıkış Yap</strong> deyip yeniden giriş yapın.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7" class="empty-row">Oturumunuz sunucuda geçerli değil. Lütfen <strong>Çıkış Yap</strong> deyip yeniden giriş yapın.</td></tr>';
     return;
   }
   tbody.innerHTML = users.map((u) => {
@@ -951,22 +951,28 @@ async function renderUsers() {
         <td class="cell-strong">${escHtml(u.name || "—")}${isSelf ? ' <span class="pill pill-ok">siz</span>' : ""}</td>
         <td>${escHtml(u.email || "—")}</td>
         <td>${escHtml(u.phone || "—")}</td>
+        <td>${escHtml(u.city || "—")}</td>
         <td>${u.role === "admin" ? '<span class="pill pill-warn">Yönetici</span>' : "Müşteri"}</td>
         <td>${u.blocked ? '<span class="pill pill-warn">Engelli</span>' : '<span class="pill pill-ok">Aktif</span>'}</td>
         <td class="cell-actions">${isSelf ? "—" : `
+          <button class="row-btn row-btn-info" data-act="detail" data-id="${escHtml(u.id)}" data-email="${escHtml(u.email)}" data-name="${escHtml(u.name || "")}" data-phone="${escHtml(u.phone || "")}" data-city="${escHtml(u.city || "")}" data-role="${escHtml(u.role)}" data-created="${u.created || 0}">Detaylar</button>
           <button class="row-btn" data-act="role" data-id="${escHtml(u.id)}" data-role="${escHtml(u.role)}">${u.role === "admin" ? "Yetkiyi Al" : "Yönetici Yap"}</button>
           <button class="row-btn" data-act="block" data-id="${escHtml(u.id)}" data-blocked="${u.blocked ? 1 : 0}">${u.blocked ? "Engeli Kaldır" : "Engelle"}</button>
           <button class="row-btn row-btn-danger" data-act="deluser" data-id="${escHtml(u.id)}" data-name="${escHtml(u.name || u.email)}">Sil</button>`}
         </td>
       </tr>`;
   }).join("") ||
-  '<tr><td colspan="6" class="empty-row">Henüz kayıtlı kullanıcı yok.</td></tr>';
+  '<tr><td colspan="7" class="empty-row">Henüz kayıtlı kullanıcı yok.</td></tr>';
 }
 
 document.getElementById("userRows").addEventListener("click", async (e) => {
   const btn = e.target.closest(".row-btn");
   if (!btn) return;
   const { id, act } = btn.dataset;
+  if (act === "detail") {
+    openUserDetail(btn.dataset);
+    return;
+  }
   if (act === "role") {
     const makeAdmin = btn.dataset.role !== "admin";
     if (!confirm(makeAdmin
@@ -1018,6 +1024,123 @@ document.getElementById("userForm").addEventListener("submit", async (e) => {
   e.target.reset();
   renderUsers();
 });
+
+// ---------- ÜYE DETAYLARI MODAL ----------
+const userDetailModal = document.getElementById("userDetailModal");
+const udTabs = userDetailModal.querySelectorAll(".ud-tab");
+const udPanels = userDetailModal.querySelectorAll(".ud-panel");
+
+document.getElementById("userDetailClose").addEventListener("click", () => (userDetailModal.hidden = true));
+userDetailModal.addEventListener("click", (e) => { if (e.target === userDetailModal) userDetailModal.hidden = true; });
+
+udTabs.forEach((tab) => {
+  tab.addEventListener("click", () => {
+    udTabs.forEach((t) => t.classList.remove("active"));
+    tab.classList.add("active");
+    udPanels.forEach((p) => (p.hidden = p.id !== tab.dataset.tab));
+  });
+});
+
+function openUserDetail(data) {
+  const email = data.email || "";
+  document.getElementById("userDetailTitle").textContent = (data.name || email) + " — Üye Detayları";
+  document.getElementById("udEmail").value = email;
+  document.getElementById("udName").value = data.name || "";
+  document.getElementById("udEmailShow").value = email;
+  document.getElementById("udPhone").value = data.phone || "";
+  document.getElementById("udCity").value = data.city || "";
+  document.getElementById("udRole").value = data.role === "admin" ? "Yönetici" : "Müşteri";
+  document.getElementById("udCreated").value = data.created && +data.created > 0 ? dateFmt(+data.created) : "—";
+  document.getElementById("udProfileStatus").textContent = "";
+  document.getElementById("udProfileStatus").className = "form-status";
+
+  udTabs[0].click();
+  renderUdAddresses(email);
+  renderUdOrders(email);
+  renderUdFavorites(email);
+  userDetailModal.hidden = false;
+}
+
+document.getElementById("udProfileForm").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const email = document.getElementById("udEmail").value;
+  const status = document.getElementById("udProfileStatus");
+  if (!email) return;
+  Store.adminUpdateUser(email, {
+    name: document.getElementById("udName").value,
+    phone: document.getElementById("udPhone").value,
+    city: document.getElementById("udCity").value
+  });
+  status.textContent = "Profil bilgileri kaydedildi.";
+  status.className = "form-status ok";
+  renderUsers();
+});
+
+function renderUdAddresses(email) {
+  const addrs = Store.getUserAddresses(email);
+  const el = document.getElementById("udAddrList");
+  if (!addrs.length) {
+    el.innerHTML = '<p class="empty-row">Kayıtlı adres bulunmuyor.</p>';
+    return;
+  }
+  el.innerHTML = addrs.map((a, i) => `
+    <div class="ud-addr-card">
+      <div class="ud-addr-head">
+        <strong>${escHtml(a.title || "Adres " + (i + 1))}</strong>
+        <button class="row-btn row-btn-danger row-btn-sm" data-i="${i}" data-email="${escHtml(email)}">Sil</button>
+      </div>
+      <p>${escHtml(a.city || "—")}</p>
+      <p>${escHtml(a.full || "—")}</p>
+    </div>`).join("");
+  el.querySelectorAll(".row-btn-danger").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      if (!confirm("Bu adres silinsin mi?")) return;
+      const list = Store.getUserAddresses(btn.dataset.email);
+      list.splice(+btn.dataset.i, 1);
+      Store.setUserAddresses(btn.dataset.email, list);
+      renderUdAddresses(btn.dataset.email);
+    });
+  });
+}
+
+function renderUdOrders(email) {
+  const orders = Store.getOrders().filter((o) => o.email === email);
+  const el = document.getElementById("udOrderList");
+  if (!orders.length) {
+    el.innerHTML = '<p class="empty-row">Bu üyeye ait sipariş bulunmuyor.</p>';
+    return;
+  }
+  el.innerHTML = orders.map((o) => `
+    <div class="order-card">
+      <div class="order-head">
+        <strong>${escHtml(o.customer || "—")}</strong>
+        <span>${dateFmt(o.date)}</span>
+      </div>
+      <ul class="order-items">
+        ${o.items.map((i) => `<li>${i.qty} &times; ${escHtml(i.name)} <span>${tlFmt(i.price * i.qty)}</span></li>`).join("")}
+      </ul>
+      <div class="order-total">Toplam: <strong>${tlFmt(o.total)}</strong></div>
+    </div>`).join("");
+}
+
+function renderUdFavorites(email) {
+  const favIds = Store.getUserFavorites();
+  const products = Store.getProducts();
+  const favProducts = favIds.map((id) => products.find((p) => p.id === id)).filter(Boolean);
+  const el = document.getElementById("udFavList");
+  if (!favProducts.length) {
+    el.innerHTML = '<p class="empty-row">Bu üyenin favori ürünü bulunmuyor.</p>';
+    return;
+  }
+  el.innerHTML = '<div class="ud-fav-grid">' + favProducts.map((p) => `
+    <div class="ud-fav-item">
+      <div class="ud-fav-thumb">${p.photo ? '<img src="' + escHtml(p.photo) + '" alt="">' : (PRODUCT_ART[p.img] || PRODUCT_ART.panel)}</div>
+      <div class="ud-fav-info">
+        <strong>${escHtml(p.name)}</strong>
+        <span>${tlFmt(p.price)}</span>
+      </div>
+    </div>`).join("") + '</div>';
+}
 
 // ---------- SİTE İÇERİĞİ (şema tabanlı editör) ----------
 // [anahtar, etiket, tip?] — tip "area" ise çok satırlı metin kutusu

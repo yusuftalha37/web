@@ -646,6 +646,98 @@
 
 .slide-row-actions .row-btn[disabled] { opacity: 0.35; cursor: default; }
 
+/* ---- Üye detay butonu ---- */
+.row-btn-info { color: #1d4ed8; border-color: #bfdbfe; }
+.row-btn-info:hover { border-color: #3b82f6; color: #1e40af; }
+
+.row-btn-sm { padding: 4px 8px; font-size: 0.75rem; }
+
+/* ---- Üye detay modal ---- */
+.modal-wide { width: 640px; }
+
+.ud-tabs {
+  display: flex;
+  gap: 2px;
+  border-bottom: 2px solid var(--border);
+  margin-bottom: 18px;
+}
+
+.ud-tab {
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--muted);
+  padding: 8px 16px;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.ud-tab:hover { color: var(--navy); }
+
+.ud-tab.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+.ud-panel { min-height: 120px; }
+
+.ud-addr-card {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+
+.ud-addr-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.ud-addr-head strong { color: var(--navy); font-size: 0.92rem; }
+.ud-addr-card p { font-size: 0.85rem; color: var(--muted); margin: 2px 0; }
+
+.ud-fav-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.ud-fav-item {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+
+.ud-fav-thumb {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #f1f5f9;
+}
+
+.ud-fav-thumb img,
+.ud-fav-thumb svg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.ud-fav-info { min-width: 0; }
+.ud-fav-info strong { display: block; font-size: 0.82rem; color: var(--navy); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ud-fav-info span { font-size: 0.8rem; color: var(--primary); font-weight: 700; }
+
 /* ---- Modal ---- */
 .modal-overlay {
   position: fixed;

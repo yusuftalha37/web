@@ -34,7 +34,7 @@
     <div class="admin-sidebar-foot">
       <a href="index.html">← Siteye Dön</a>
       <a href="#" id="adminLogout">Çıkış Yap</a>
-      <div class="admin-version" id="adminVersion">Sürüm: 2026-08-06 · 15</div>
+      <div class="admin-version" id="adminVersion">Sürüm: 2026-08-07 · 16</div>
     </div>
   </aside>
 
@@ -300,7 +300,7 @@
         <p class="panel-hint">Kayıtlı tüm kullanıcılar. Yönetici yapabilir, yetkisini geri alabilir, hesabı engelleyebilir (giriş yapamaz) veya silebilirsiniz. Kendi hesabınızı bu ekrandan değiştiremezsiniz.</p>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Ad Soyad</th><th>E-posta</th><th>Telefon</th><th>Yetki</th><th>Durum</th><th></th></tr></thead>
+            <thead><tr><th>Ad Soyad</th><th>E-posta</th><th>Telefon</th><th>Şehir</th><th>Yetki</th><th>Durum</th><th></th></tr></thead>
             <tbody id="userRows"></tbody>
           </table>
         </div>
@@ -407,6 +407,72 @@
       </div>
     </section>
   </main>
+
+  <!-- ÜYE DETAYLARI PENCERESİ -->
+  <div class="modal-overlay" id="userDetailModal" hidden>
+    <div class="modal modal-wide">
+      <div class="modal-head">
+        <h2 id="userDetailTitle">Üye Detayları</h2>
+        <button class="modal-close" id="userDetailClose" aria-label="Kapat">&times;</button>
+      </div>
+      <div class="ud-tabs">
+        <button class="ud-tab active" data-tab="udProfile">Profil</button>
+        <button class="ud-tab" data-tab="udAddresses">Adresler</button>
+        <button class="ud-tab" data-tab="udOrders">Siparişler</button>
+        <button class="ud-tab" data-tab="udFavorites">Favoriler</button>
+      </div>
+      <!-- Profil -->
+      <div class="ud-panel" id="udProfile">
+        <form id="udProfileForm">
+          <input type="hidden" id="udEmail">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="udName">Ad Soyad</label>
+              <input type="text" id="udName" placeholder="Ad Soyad">
+            </div>
+            <div class="form-group">
+              <label for="udPhone">Telefon</label>
+              <input type="text" id="udPhone" placeholder="05__ ___ __ __">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="udEmailShow">E-posta</label>
+              <input type="text" id="udEmailShow" disabled>
+            </div>
+            <div class="form-group">
+              <label for="udCity">Şehir</label>
+              <input type="text" id="udCity" placeholder="Şehir">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Yetki</label>
+              <input type="text" id="udRole" disabled>
+            </div>
+            <div class="form-group">
+              <label>Kayıt Tarihi</label>
+              <input type="text" id="udCreated" disabled>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-small">Profili Kaydet</button>
+          <p class="form-status" id="udProfileStatus" role="status"></p>
+        </form>
+      </div>
+      <!-- Adresler -->
+      <div class="ud-panel" id="udAddresses" hidden>
+        <div id="udAddrList"></div>
+      </div>
+      <!-- Siparişler -->
+      <div class="ud-panel" id="udOrders" hidden>
+        <div id="udOrderList"></div>
+      </div>
+      <!-- Favoriler -->
+      <div class="ud-panel" id="udFavorites" hidden>
+        <div id="udFavList"></div>
+      </div>
+    </div>
+  </div>
 
   <!-- ÜRÜN EKLE/DÜZENLE PENCERESİ -->
   <div class="modal-overlay" id="productModal" hidden>
