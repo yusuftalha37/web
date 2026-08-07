@@ -472,7 +472,12 @@ const Store = (() => {
     email = (email || "").trim().toLowerCase();
     if (persist) {
       const r = await gotrue("token?grant_type=password", { email, password: pass });
-      if (!r.ok) return { ok: false, error: "E-posta veya şifre hatalı." };
+      if (!r.ok) {
+        const d = r.data || {};
+        if (r.status === 429) return { ok: false, error: d.error_description || "Çok fazla hatalı deneme. 15 dakika sonra tekrar deneyin." };
+        if (d.error === "blocked") return { ok: false, error: d.error_description || "Bu hesap engellenmiş." };
+        return { ok: false, error: d.error_description || "E-posta veya şifre hatalı." };
+      }
       const tk = r.data.access_token;
       const user = r.data.user || {};
       const meta = user.user_metadata || {};
