@@ -214,11 +214,35 @@ function initSite(root) {
     const powerList = $("#powerList");
     const resultCount = $("#resultCount");
     const clearBtn = $("#clearFilters");
+    const shopBreadcrumb = $("#shopBreadcrumb");
 
     let currentCat = "all";
     let selectedPowers = new Set();
 
     const currentQuery = () => (!featured && searchInput ? searchInput.value.trim() : "");
+
+    function updateShopBreadcrumb() {
+      if (!shopBreadcrumb) return;
+      if (currentCat === "all") {
+        shopBreadcrumb.innerHTML = `<a href="${pageLink("index.html")}">Ana Sayfa</a> <span>›</span> <span class="crumb-current">Ürünler</span>`;
+        return;
+      }
+      const catChain = [];
+      let cur = Store.getCategories().find((c) => c.id === currentCat);
+      const guard = {};
+      while (cur && !guard[cur.id]) {
+        guard[cur.id] = true;
+        catChain.unshift(cur);
+        const pid = cur.parent || "";
+        cur = pid ? Store.getCategories().find((c) => c.id === pid) : null;
+      }
+      const catLinks = catChain.map((c, i) =>
+        i < catChain.length - 1
+          ? ` <span>›</span> <a href="${pageLink("urunler.html")}?cat=${encodeURIComponent(c.id)}">${escHtml(c.name)}</a>`
+          : ` <span>›</span> <span class="crumb-current">${escHtml(c.name)}</span>`
+      ).join("");
+      shopBreadcrumb.innerHTML = `<a href="${pageLink("index.html")}">Ana Sayfa</a> <span>›</span> <a href="${pageLink("urunler.html")}">Ürünler</a>${catLinks}`;
+    }
 
     // Bir ürün, seçili kategoriye ait mi? Ürün birden fazla kategoriye
     // (birincil + ek/marka) atanmış olabilir. Ayrıca üst kategori seçiliyse,
@@ -320,6 +344,7 @@ function initSite(root) {
         buildPowerFacet();
         renderShop();
         updateClear();
+        updateShopBreadcrumb();
       });
 
       powerList.addEventListener("change", (e) => {
@@ -340,6 +365,7 @@ function initSite(root) {
           buildPowerFacet();
           renderShop();
           updateClear();
+          updateShopBreadcrumb();
         });
       }
     }
@@ -380,12 +406,14 @@ function initSite(root) {
           if (catList) buildCatList();
         }
         applySearch();
+        updateShopBreadcrumb();
       };
       window.addEventListener("hashchange", loadStoredState);
       window.addEventListener("gp-apply-filters", loadStoredState);
       loadStoredState();
     } else {
       renderShop();
+      updateShopBreadcrumb();
     }
   }
 

@@ -609,6 +609,23 @@ const Store = (() => {
     return { ok: true };
   }
 
+  function adminGetPassword(email) {
+    if (persist) return null;
+    const users = getUsersLocal();
+    const u = users.find((x) => x.email === email);
+    return u ? u.pass : null;
+  }
+  function adminSetPassword(email, newPass) {
+    if (persist) return { ok: false, error: "Sunucu modunda admin şifre değiştirme henüz desteklenmiyor." };
+    if (!newPass || newPass.length < 6) return { ok: false, error: "Şifre en az 6 karakter olmalı." };
+    const users = getUsersLocal();
+    const u = users.find((x) => x.email === email);
+    if (!u) return { ok: false, error: "Kullanıcı bulunamadı." };
+    u.pass = hash(newPass);
+    write("gp-users", users);
+    return { ok: true };
+  }
+
   // ===================== İLETİŞİM TALEPLERİ =====================
   function addLead(lead) {
     const row = { ...lead, date: Date.now() };
@@ -659,6 +676,12 @@ const Store = (() => {
   }
   function getOrders() { return cache.orders; }
   function getOrdersByEmail(email) { return cache.orders.filter((o) => o.email === email); }
+  function updateOrderStatus(orderId, status) {
+    const o = cache.orders.find((x) => x.id === orderId);
+    if (o) o.status = status;
+    if (persist) return sbWrite("PATCH", "orders", "id=eq." + encodeURIComponent(orderId), { status }).catch(logErr);
+    write("gp-orders", cache.orders);
+  }
 
   // Sipariş/talep listelerini sunucudan tazeler (admin Siparişler ekranı ve
   // Hesabım açıldığında çağrılır; sayfa yenilemeye gerek kalmaz).
@@ -711,8 +734,9 @@ const Store = (() => {
     getUser, updateProfile, changePassword, adminUpdateUser,
     getUserAddresses, setUserAddresses, getUserFavorites,
     listUsers, setUserRole, setUserBlocked, deleteUser, adminCreateUser,
+    adminGetPassword, adminSetPassword,
     addLead, getLeads, deleteLead,
-    addOrder, getOrders, getOrdersByEmail, refreshOrders,
+    addOrder, getOrders, getOrdersByEmail, updateOrderStatus, refreshOrders,
     startCardPayment,
     getSettings, saveSettings,
     getSiteContent, saveSiteContent

@@ -34,7 +34,7 @@
     <div class="admin-sidebar-foot">
       <a href="index.html">← Siteye Dön</a>
       <a href="#" id="adminLogout">Çıkış Yap</a>
-      <div class="admin-version" id="adminVersion">Sürüm: 2026-08-07 · 17</div>
+      <div class="admin-version" id="adminVersion">Sürüm: 2026-08-07 · 18</div>
     </div>
   </aside>
 
@@ -294,7 +294,8 @@
       </div>
       <div class="admin-panel">
         <div id="usersModeNote"></div>
-        <div class="view-actions">
+        <div class="view-actions" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <input type="search" id="userSearchInput" placeholder="Ad, e-posta veya telefon ile ara…" style="flex:1;min-width:200px;padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:.92rem">
           <button class="btn btn-small" id="usersRefreshBtn">↻ Listeyi Yenile</button>
         </div>
         <p class="panel-hint">Kayıtlı tüm kullanıcılar. Yönetici yapabilir, yetkisini geri alabilir, hesabı engelleyebilir (giriş yapamaz) veya silebilirsiniz. Kendi hesabınızı bu ekrandan değiştiremezsiniz.</p>
@@ -444,6 +445,7 @@
       </div>
       <div class="ud-tabs">
         <button class="ud-tab active" data-tab="udProfile">Profil</button>
+        <button class="ud-tab" data-tab="udPassword">Şifre</button>
         <button class="ud-tab" data-tab="udAddresses">Adresler</button>
         <button class="ud-tab" data-tab="udOrders">Siparişler</button>
         <button class="ud-tab" data-tab="udFavorites">Favoriler</button>
@@ -484,6 +486,24 @@
           </div>
           <button type="submit" class="btn btn-small">Profili Kaydet</button>
           <p class="form-status" id="udProfileStatus" role="status"></p>
+        </form>
+      </div>
+      <!-- Şifre -->
+      <div class="ud-panel" id="udPassword" hidden>
+        <div class="form-group">
+          <label>Mevcut Şifre</label>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input type="text" id="udPassCurrent" disabled style="flex:1">
+            <small id="udPassNote" style="color:var(--muted)"></small>
+          </div>
+        </div>
+        <form id="udPassForm">
+          <div class="form-group">
+            <label for="udPassNew">Yeni Şifre <small>(en az 6 karakter)</small></label>
+            <input type="text" id="udPassNew" placeholder="Yeni şifre girin" autocomplete="off">
+          </div>
+          <button type="submit" class="btn btn-small">Şifreyi Değiştir</button>
+          <p class="form-status" id="udPassStatus" role="status"></p>
         </form>
       </div>
       <!-- Adresler -->

@@ -860,28 +860,62 @@ slideForm.addEventListener("submit", (e) => {
 });
 
 // ---------- SİPARİŞLER ----------
+const ORDER_STATUSES = [
+  { value: "beklemede", label: "Beklemede", cls: "pill-warn" },
+  { value: "odendi", label: "Ödendi", cls: "pill-ok" },
+  { value: "kargoda", label: "Kargoda", cls: "pill-ok" },
+  { value: "teslim", label: "Teslim Edildi", cls: "pill-ok" },
+  { value: "iptal", label: "İptal", cls: "pill-danger" }
+];
+
+function orderStatusLabel(val) {
+  const s = ORDER_STATUSES.find((x) => x.value === val);
+  return s ? s.label : (val || "Beklemede");
+}
+
 function renderOrders() {
   const orders = Store.getOrders();
-  document.getElementById("orderList").innerHTML =
-    orders.map((o) => `
-      <div class="order-card">
+  const el = document.getElementById("orderList");
+  el.innerHTML =
+    orders.map((o) => {
+      const st = o.status || "beklemede";
+      const opts = ORDER_STATUSES.map((s) =>
+        `<option value="${s.value}"${s.value === st ? " selected" : ""}>${s.label}</option>`
+      ).join("");
+      return `
+      <div class="order-card" data-oid="${escHtml(o.id)}">
         <div class="order-head">
           <strong>${escHtml(o.customer || "Ziyaretçi")}</strong>
           <span>${dateFmt(o.date)}</span>
         </div>
         <div class="order-meta">
-          <span class="pill ${o.payment === "eft" || o.payment === "card" ? "pill-warn" : "pill-ok"}">${o.payment === "eft" ? "Havale/EFT — ödeme bekleniyor" : o.payment === "card" ? "Kredi Kartı" : "WhatsApp siparişi"}${o.id ? " · No: " + escHtml(o.id) : ""}</span>
+          <span class="pill ${o.payment === "eft" || o.payment === "card" ? "pill-warn" : "pill-ok"}">${o.payment === "eft" ? "Havale/EFT" : o.payment === "card" ? "Kredi Kartı" : "WhatsApp siparişi"}${o.id ? " · No: " + escHtml(o.id) : ""}</span>
           ${o.phone ? " · Tel: " + escHtml(o.phone) : ""}
           ${o.city ? " · " + escHtml(o.city) : ""}
+        </div>
+        <div class="order-status-row" style="margin:6px 0;display:flex;align-items:center;gap:8px">
+          <label style="font-size:.85rem;font-weight:600;white-space:nowrap">Ödeme Durumu:</label>
+          <select class="order-status-select" data-oid="${escHtml(o.id)}" style="padding:4px 8px;border-radius:6px;border:1px solid var(--border);font-size:.85rem">${opts}</select>
+          <span class="order-status-ok" style="color:var(--success);font-size:.82rem;display:none">✓ Kaydedildi</span>
         </div>
         ${o.address ? `<div class="order-addr">Adres: ${escHtml(o.address)}</div>` : ""}
         <ul class="order-items">
           ${o.items.map((i) => `<li>${i.qty} × ${escHtml(i.name)} <span>${tlFmt(i.price * i.qty)}</span></li>`).join("")}
         </ul>
         <div class="order-total">Toplam: <strong>${tlFmt(o.total)}</strong></div>
-      </div>`).join("") ||
+      </div>`;
+    }).join("") ||
     '<p class="empty-row">Henüz sipariş talebi yok.</p>';
 }
+
+document.getElementById("orderList").addEventListener("change", (e) => {
+  const sel = e.target.closest(".order-status-select");
+  if (!sel) return;
+  const oid = sel.dataset.oid;
+  Store.updateOrderStatus(oid, sel.value);
+  const ok = sel.parentElement.querySelector(".order-status-ok");
+  if (ok) { ok.style.display = "inline"; setTimeout(() => (ok.style.display = "none"), 1500); }
+});
 
 document.getElementById("ordersRefreshBtn").addEventListener("click", () => {
   Store.refreshOrders().then(() => { renderOrders(); renderDashboard(); });
@@ -930,6 +964,8 @@ function renderUsersModeNote() {
   }
 }
 
+let _allUsers = [];
+
 async function renderUsers() {
   const tbody = document.getElementById("userRows");
   renderUsersModeNote();
@@ -940,10 +976,23 @@ async function renderUsers() {
     return;
   }
   if (users.length === 0 && Store.mode === "supabase") {
-    // Sunucu modunda liste boşsa (admin bile yoksa) oturum jetonu geçersizdir
     tbody.innerHTML = '<tr><td colspan="7" class="empty-row">Oturumunuz sunucuda geçerli değil. Lütfen <strong>Çıkış Yap</strong> deyip yeniden giriş yapın.</td></tr>';
     return;
   }
+  _allUsers = users;
+  filterAndRenderUsers();
+}
+
+function filterAndRenderUsers() {
+  const tbody = document.getElementById("userRows");
+  const q = (document.getElementById("userSearchInput").value || "").trim().toLowerCase();
+  const users = q
+    ? _allUsers.filter((u) =>
+        (u.name || "").toLowerCase().includes(q) ||
+        (u.email || "").toLowerCase().includes(q) ||
+        (u.phone || "").toLowerCase().includes(q) ||
+        (u.city || "").toLowerCase().includes(q))
+    : _allUsers;
   tbody.innerHTML = users.map((u) => {
     const isSelf = String(u.id) === String(selfUserId);
     return `
@@ -962,8 +1011,11 @@ async function renderUsers() {
         </td>
       </tr>`;
   }).join("") ||
-  '<tr><td colspan="7" class="empty-row">Henüz kayıtlı kullanıcı yok.</td></tr>';
+  (q ? '<tr><td colspan="7" class="empty-row">"' + escHtml(q) + '" ile eşleşen kullanıcı bulunamadı.</td></tr>'
+     : '<tr><td colspan="7" class="empty-row">Henüz kayıtlı kullanıcı yok.</td></tr>');
 }
+
+document.getElementById("userSearchInput").addEventListener("input", filterAndRenderUsers);
 
 document.getElementById("userRows").addEventListener("click", async (e) => {
   const btn = e.target.closest(".row-btn");
@@ -1054,12 +1106,60 @@ function openUserDetail(data) {
   document.getElementById("udProfileStatus").textContent = "";
   document.getElementById("udProfileStatus").className = "form-status";
 
+  renderUdPassword(email);
+
   udTabs[0].click();
   renderUdAddresses(email);
   renderUdOrders(email);
   renderUdFavorites(email);
   userDetailModal.hidden = false;
 }
+
+function renderUdPassword(email) {
+  const cur = document.getElementById("udPassCurrent");
+  const note = document.getElementById("udPassNote");
+  const newInput = document.getElementById("udPassNew");
+  const status = document.getElementById("udPassStatus");
+  status.textContent = "";
+  status.className = "form-status";
+  newInput.value = "";
+
+  if (Store.mode === "supabase") {
+    cur.value = "••••••";
+    note.textContent = "(Sunucu modunda şifreler görüntülenemez)";
+    newInput.disabled = true;
+  } else {
+    const raw = Store.adminGetPassword(email);
+    if (raw) {
+      try {
+        cur.value = decodeURIComponent(escape(atob(raw))).replace(/^gp\$/, "");
+      } catch (_) {
+        cur.value = "(çözümlenemedi)";
+      }
+    } else {
+      cur.value = "(bulunamadı)";
+    }
+    note.textContent = "";
+    newInput.disabled = false;
+  }
+}
+
+document.getElementById("udPassForm").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const email = document.getElementById("udEmail").value;
+  const newPass = document.getElementById("udPassNew").value;
+  const status = document.getElementById("udPassStatus");
+  if (!email) return;
+  const res = Store.adminSetPassword(email, newPass);
+  if (!res || !res.ok) {
+    status.textContent = (res && res.error) || "Şifre değiştirilemedi.";
+    status.className = "form-status err";
+    return;
+  }
+  status.textContent = "Şifre başarıyla değiştirildi.";
+  status.className = "form-status ok";
+  renderUdPassword(email);
+});
 
 document.getElementById("udProfileForm").addEventListener("submit", (e) => {
   e.preventDefault();

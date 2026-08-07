@@ -62,10 +62,22 @@ function initProductPage(root) {
   const authLabel = Store.getSiteContent().authorizedLabel || "Yetkili Satıcı";
 
   if (crumb) {
+    const catChain = [];
+    let cur = Store.getCategories().find((c) => c.id === p.cat);
+    const guard = {};
+    while (cur && !guard[cur.id]) {
+      guard[cur.id] = true;
+      catChain.unshift(cur);
+      const pid = cur.parent || "";
+      cur = pid ? Store.getCategories().find((c) => c.id === pid) : null;
+    }
+    const catLinks = catChain.map((c) =>
+      ` <span>›</span> <a href="${link("urunler.html")}?cat=${encodeURIComponent(c.id)}" class="crumb-cat">${escHtml(c.name)}</a>`
+    ).join("");
     crumb.innerHTML =
       `<a href="${link("index.html")}">Ana Sayfa</a> <span>›</span> ` +
       `<a href="${link("urunler.html")}">Ürünler</a>` +
-      (p.cat ? ` <span>›</span> <span class="crumb-cat">${escHtml(catName(p.cat))}</span>` : "") +
+      catLinks +
       ` <span>›</span> <span class="crumb-current">${escHtml(p.name)}</span>`;
   }
 

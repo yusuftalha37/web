@@ -861,6 +861,13 @@ async function handleApi(req, res, u) {
       if (b.city != null) caller.city = String(b.city).slice(0, 80);
       saveDB(); return send(res, 204, null);
     }
+    if (table === "orders") {
+      if (!isAdmin) return send(res, 403, {});
+      const idf = params.get("id"); const id = idf ? decodeURIComponent(idf.replace("eq.", "")) : null;
+      const row = DB.orders.find((r) => String(r.id) === id);
+      if (row && b.status != null) row.status = String(b.status).slice(0, 40);
+      saveDB(); return send(res, 204, null);
+    }
     if (PUBLIC_READ.includes(table)) {
       if (!isAdmin) return send(res, 403, {});
       const idf = params.get("id"); const id = idf ? decodeURIComponent(idf.replace("eq.", "")) : null;

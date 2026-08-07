@@ -487,6 +487,7 @@
 }
 
 .pill-ok { background: #dcfce7; color: #15803d; }
+.pill-danger { background: #fee2e2; color: #b91c1c; }
 
 .order-items {
   list-style: none;
