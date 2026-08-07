@@ -127,6 +127,30 @@ function loadDB() {
     console.log("  Giriş yaptıktan sonra Hesabım > Şifre Değiştir ile değiştirin.");
     console.log("============================================================\n");
   }
+
+  // --reset-admin: admin şifresini sıfırla ve konsola yaz, sonra çık
+  if (process.argv.includes("--reset-admin")) {
+    const admin = DB.users.find((u) => u.role === "admin");
+    if (!admin) { console.log("Admin kullanıcı bulunamadı."); process.exit(1); }
+    const newPass = crypto.randomBytes(9).toString("base64").replace(/[+/=]/g, "").slice(0, 12);
+    const salt = crypto.randomBytes(16).toString("hex");
+    const hash = crypto.scryptSync(newPass, salt, 64).toString("hex");
+    admin.pass = salt + ":" + hash;
+    // Mevcut token'ları sil
+    if (DB.tokens) {
+      Object.entries(DB.tokens).forEach(([tk, v]) => { if (v.uid === admin.id) { delete DB.tokens[tk]; tokens.delete(tk); } });
+    }
+    const tmp = DATA_FILE + ".tmp";
+    fs.writeFileSync(tmp, JSON.stringify(DB));
+    fs.renameSync(tmp, DATA_FILE);
+    console.log("\n============================================================");
+    console.log("  ADMİN ŞİFRESİ SIFIRLANDI");
+    console.log("  E-posta: " + admin.email);
+    console.log("  Yeni şifre: " + newPass);
+    console.log("  Bu şifreyi bir yere not edin!");
+    console.log("============================================================\n");
+    process.exit(0);
+  }
 }
 let saveTimer = null;
 const BACKUP_FILE = path.join(ROOT, "data.yedek.json");
