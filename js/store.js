@@ -200,7 +200,12 @@ const Store = (() => {
         Prefer: "return=minimal,resolution=merge-duplicates"
       },
       body: body ? JSON.stringify(body) : undefined
-    }).then((r) => { if (!r.ok) return r.text().then((t) => { throw new Error(t); }); });
+    }).then((r) => {
+      if (!r.ok) {
+        if (r.status === 401 || r.status === 403) throw new Error("Oturum süresi dolmuş veya yetkiniz yok. Lütfen çıkış yapıp tekrar giriş yapın.");
+        return r.text().then((t) => { throw new Error(t || "Sunucu hatası (" + r.status + ")"); });
+      }
+    });
   }
   function sbKv(k, v) { return sbWrite("POST", "kv", "", { k, v }); }
   async function gotrue(path, body) {
@@ -300,7 +305,7 @@ const Store = (() => {
   }
   function deleteProduct(id) {
     cache.products = cache.products.filter((p) => p.id !== id);
-    if (persist) return sbWrite("DELETE", "products", "id=eq." + encodeURIComponent(id)).catch(logErr);
+    if (persist) return sbWrite("DELETE", "products", "id=eq." + encodeURIComponent(id));
     write("gp-products", cache.products);
   }
 
@@ -381,7 +386,7 @@ const Store = (() => {
       if (cat.image !== undefined) row.image = cat.image;
       if (cat.kind !== undefined) row.kind = cat.kind;
       if (cat.parent !== undefined) row.parent = ex ? ex.parent : "";
-      if (persist) return sbWrite("POST", "categories", "", row).catch(logErr);
+      if (persist) return sbWrite("POST", "categories", "", row);
     } else {
       const kind = cat.kind || "";
       const nc = {
@@ -389,7 +394,7 @@ const Store = (() => {
         parent: kind === "brand" ? "" : (cat.parent || "")
       };
       cache.categories.push(nc);
-      if (persist) return sbWrite("POST", "categories", "", { id: nc.id, name: nc.name, image: nc.image, kind: nc.kind, parent: nc.parent, sort: cache.categories.length }).catch(logErr);
+      if (persist) return sbWrite("POST", "categories", "", { id: nc.id, name: nc.name, image: nc.image, kind: nc.kind, parent: nc.parent, sort: cache.categories.length });
     }
     write("gp-cats", cache.categories);
   }
@@ -403,7 +408,7 @@ const Store = (() => {
     if (persist) {
       const jobs = orphans.map((c) => sbWrite("POST", "categories", "", { id: c.id, name: c.name, parent: newParent }));
       jobs.push(sbWrite("DELETE", "categories", "id=eq." + encodeURIComponent(id)));
-      return Promise.all(jobs).catch(logErr);
+      return Promise.all(jobs);
     }
     write("gp-cats", cache.categories);
   }
@@ -415,19 +420,19 @@ const Store = (() => {
       const i = cache.slides.findIndex((s) => s.id === slide.id);
       if (i >= 0) cache.slides[i] = slide;
     } else { slide.id = "sl-" + Date.now(); cache.slides.push(slide); }
-    if (persist) return sbWrite("POST", "slides", "", toDbSlide(slide, cache.slides.findIndex((s) => s.id === slide.id))).catch(logErr);
+    if (persist) return sbWrite("POST", "slides", "", toDbSlide(slide, cache.slides.findIndex((s) => s.id === slide.id)));
     write("gp-slides", cache.slides);
   }
   function deleteSlide(id) {
     cache.slides = cache.slides.filter((s) => s.id !== id);
-    if (persist) return sbWrite("DELETE", "slides", "id=eq." + encodeURIComponent(id)).catch(logErr);
+    if (persist) return sbWrite("DELETE", "slides", "id=eq." + encodeURIComponent(id));
     write("gp-slides", cache.slides);
   }
   function moveSlide(id, dir) {
     const i = cache.slides.findIndex((s) => s.id === id), j = i + dir;
     if (i < 0 || j < 0 || j >= cache.slides.length) return;
     const t = cache.slides[i]; cache.slides[i] = cache.slides[j]; cache.slides[j] = t;
-    if (persist) { cache.slides.forEach((s, k) => sbWrite("POST", "slides", "", toDbSlide(s, k)).catch(logErr)); return; }
+    if (persist) { cache.slides.forEach((s, k) => sbWrite("POST", "slides", "", toDbSlide(s, k))); return; }
     write("gp-slides", cache.slides);
   }
 
@@ -498,21 +503,21 @@ const Store = (() => {
       .sort((a, b) => (b.created || 0) - (a.created || 0));
   }
   async function setUserRole(id, role) {
-    if (persist) { await sbWrite("PATCH", "profiles", "id=eq." + encodeURIComponent(id), { role }).catch(logErr); return { ok: true }; }
+    if (persist) { await sbWrite("PATCH", "profiles", "id=eq." + encodeURIComponent(id), { role }); return { ok: true }; }
     const users = getUsersLocal();
     const u = users.find((x) => x.email === id);
     if (u) { u.role = role; write("gp-users", users); }
     return { ok: true };
   }
   async function setUserBlocked(id, blocked) {
-    if (persist) { await sbWrite("PATCH", "profiles", "id=eq." + encodeURIComponent(id), { blocked: !!blocked }).catch(logErr); return { ok: true }; }
+    if (persist) { await sbWrite("PATCH", "profiles", "id=eq." + encodeURIComponent(id), { blocked: !!blocked }); return { ok: true }; }
     const users = getUsersLocal();
     const u = users.find((x) => x.email === id);
     if (u) { u.blocked = !!blocked; write("gp-users", users); }
     return { ok: true };
   }
   async function deleteUser(id) {
-    if (persist) { await sbWrite("DELETE", "profiles", "id=eq." + encodeURIComponent(id)).catch(logErr); return { ok: true }; }
+    if (persist) { await sbWrite("DELETE", "profiles", "id=eq." + encodeURIComponent(id)); return { ok: true }; }
     write("gp-users", getUsersLocal().filter((x) => x.email !== id));
     return { ok: true };
   }
@@ -524,7 +529,7 @@ const Store = (() => {
       const r = await gotrue("signup", { email, password: pass, data: { name: (name || "").trim(), phone: (phone || "").trim() } });
       if (!r.ok) return { ok: false, error: (r.data && (r.data.msg || r.data.error_description)) || "Kullanıcı oluşturulamadı." };
       const uid = r.data && r.data.user && r.data.user.id;
-      if (role === "admin" && uid) await sbWrite("PATCH", "profiles", "id=eq." + uid, { role: "admin" }).catch(logErr);
+      if (role === "admin" && uid) await sbWrite("PATCH", "profiles", "id=eq." + uid, { role: "admin" });
       return { ok: true };
     }
     const users = getUsersLocal();
@@ -546,7 +551,7 @@ const Store = (() => {
       if (!s) return { ok: false, error: "Oturum bulunamadı." };
       const patch = { name: (data.name || "").trim(), phone: (data.phone || "").trim() };
       if (data.city !== undefined) patch.city = (data.city || "").trim();
-      await sbWrite("PATCH", "profiles", "id=eq." + s.uid, patch).catch(logErr);
+      await sbWrite("PATCH", "profiles", "id=eq." + s.uid, patch);
       s.name = patch.name || s.name; s.phone = patch.phone;
       if (patch.city !== undefined) s.city = patch.city;
       write("gp-session", s);
@@ -570,7 +575,7 @@ const Store = (() => {
       if (data.name !== undefined) patch.name = (data.name || "").trim();
       if (data.phone !== undefined) patch.phone = (data.phone || "").trim();
       if (data.city !== undefined) patch.city = (data.city || "").trim();
-      return sbWrite("PATCH", "profiles", "email=eq." + encodeURIComponent(email), patch).catch(logErr);
+      return sbWrite("PATCH", "profiles", "email=eq." + encodeURIComponent(email), patch);
     }
     const users = getUsersLocal();
     const u = users.find((x) => x.email === email);
@@ -635,14 +640,14 @@ const Store = (() => {
       name: lead.name, phone: lead.phone, city: lead.city || "",
       type: lead.type || "", message: lead.message || "",
       website: lead.website || ""             // sunucu bot tuzağını kontrol eder
-    }).catch(logErr);
+    });
     write("gp-leads", cache.leads);
   }
   function getLeads() { return cache.leads; }
   function deleteLead(index) {
     const lead = cache.leads[index];
     cache.leads.splice(index, 1);
-    if (persist) { if (lead && lead.id) sbWrite("DELETE", "leads", "id=eq." + encodeURIComponent(lead.id)).catch(logErr); return; }
+    if (persist) { if (lead && lead.id) sbWrite("DELETE", "leads", "id=eq." + encodeURIComponent(lead.id)); return; }
     write("gp-leads", cache.leads);
   }
 
@@ -679,7 +684,7 @@ const Store = (() => {
   function updateOrderStatus(orderId, status) {
     const o = cache.orders.find((x) => x.id === orderId);
     if (o) o.status = status;
-    if (persist) return sbWrite("PATCH", "orders", "id=eq." + encodeURIComponent(orderId), { status }).catch(logErr);
+    if (persist) return sbWrite("PATCH", "orders", "id=eq." + encodeURIComponent(orderId), { status });
     write("gp-orders", cache.orders);
   }
 
@@ -714,13 +719,15 @@ const Store = (() => {
   function saveSettings(settings) {
     cache.settings = { ...cache.settings, ...settings };
     write("gp-settings", cache.settings);
-    if (persist) return sbKv("settings", cache.settings).catch(logErr);
+    if (persist) return sbKv("settings", cache.settings);
+    return Promise.resolve();
   }
   function getSiteContent() { return { ...DEFAULT_SITE, ...cache.site }; }
   function saveSiteContent(data) {
     cache.site = { ...cache.site, ...data };
     write("gp-site", cache.site);
-    if (persist) return sbKv("site", cache.site).catch(logErr);
+    if (persist) return sbKv("site", cache.site);
+    return Promise.resolve();
   }
 
   return {

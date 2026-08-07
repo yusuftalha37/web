@@ -1310,18 +1310,23 @@ function loadContentForm() {
   }).join("");
 }
 
-document.getElementById("contentForm").addEventListener("submit", (e) => {
+document.getElementById("contentForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   const data = {};
   CONTENT_KEYS.forEach((key) => {
     const el = document.getElementById("ct_" + key);
     if (el) data[key] = el.value.trim();
   });
-  Store.saveSiteContent(data);
-  applySiteContent(document); // admin sayfasındaki data-site öğeleri varsa güncelle
   const status = document.getElementById("contentStatus");
-  status.textContent = "Tüm site içeriği kaydedildi. Sitede otomatik güncellenecektir.";
-  status.className = "form-status ok";
+  try {
+    await Store.saveSiteContent(data);
+    applySiteContent(document);
+    status.textContent = "Tüm site içeriği kaydedildi. Sitede otomatik güncellenecektir.";
+    status.className = "form-status ok";
+  } catch (err) {
+    status.textContent = "Kaydetme başarısız: " + (err.message || "Sunucu hatası. Oturumunuz geçerli mi kontrol edin.");
+    status.className = "form-status err";
+  }
   window.scrollTo(0, 0);
 });
 
@@ -1338,7 +1343,7 @@ function loadSettingsForm() {
 }
 loadSettingsForm();
 
-document.getElementById("settingsForm").addEventListener("submit", (e) => {
+document.getElementById("settingsForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   const status = document.getElementById("settingsStatus");
   const num = document.getElementById("waNumber").value.replace(/\D/g, "");
@@ -1347,16 +1352,21 @@ document.getElementById("settingsForm").addEventListener("submit", (e) => {
     status.className = "form-status err";
     return;
   }
-  Store.saveSettings({
-    whatsapp: num,
-    bankName: document.getElementById("bankName").value.trim(),
-    bankHolder: document.getElementById("bankHolder").value.trim(),
-    iban: document.getElementById("iban").value.trim(),
-    bankNote: document.getElementById("bankNote").value.trim()
-  });
-  document.getElementById("waNumber").value = num;
-  status.textContent = "Kaydedildi.";
-  status.className = "form-status ok";
+  try {
+    await Store.saveSettings({
+      whatsapp: num,
+      bankName: document.getElementById("bankName").value.trim(),
+      bankHolder: document.getElementById("bankHolder").value.trim(),
+      iban: document.getElementById("iban").value.trim(),
+      bankNote: document.getElementById("bankNote").value.trim()
+    });
+    document.getElementById("waNumber").value = num;
+    status.textContent = "Kaydedildi.";
+    status.className = "form-status ok";
+  } catch (err) {
+    status.textContent = "Kaydetme başarısız: " + (err.message || "Sunucu hatası.");
+    status.className = "form-status err";
+  }
 });
 
 // ---------- MAİL AYARLARI ----------
@@ -1486,13 +1496,18 @@ document.getElementById("faqAddBtn").addEventListener("click", () => {
   if (items.length) items[items.length - 1].focus();
 });
 
-document.getElementById("faqSaveBtn").addEventListener("click", () => {
+document.getElementById("faqSaveBtn").addEventListener("click", async () => {
   const faqs = collectFaqs();
-  Store.saveSiteContent({ faqs });
-  renderFaqManager();
   const s = document.getElementById("faqStatus");
-  s.textContent = faqs.length + " soru kaydedildi.";
-  s.className = "form-status ok";
+  try {
+    await Store.saveSiteContent({ faqs });
+    renderFaqManager();
+    s.textContent = faqs.length + " soru kaydedildi.";
+    s.className = "form-status ok";
+  } catch (err) {
+    s.textContent = "Kaydetme başarısız: " + (err.message || "Sunucu hatası.");
+    s.className = "form-status err";
+  }
 });
 
 document.getElementById("faqManager").addEventListener("click", (e) => {
@@ -1556,13 +1571,18 @@ document.getElementById("testiAddBtn").addEventListener("click", () => {
   if (items.length) items[items.length - 1].focus();
 });
 
-document.getElementById("testiSaveBtn").addEventListener("click", () => {
+document.getElementById("testiSaveBtn").addEventListener("click", async () => {
   const list = collectTestimonials();
-  Store.saveSiteContent({ testimonials: list });
-  renderTestiManager();
   const s = document.getElementById("testiStatus");
-  s.textContent = list.length + " yorum kaydedildi.";
-  s.className = "form-status ok";
+  try {
+    await Store.saveSiteContent({ testimonials: list });
+    renderTestiManager();
+    s.textContent = list.length + " yorum kaydedildi.";
+    s.className = "form-status ok";
+  } catch (err) {
+    s.textContent = "Kaydetme başarısız: " + (err.message || "Sunucu hatası.");
+    s.className = "form-status err";
+  }
 });
 
 document.getElementById("testiManager").addEventListener("click", (e) => {
@@ -1622,13 +1642,18 @@ document.getElementById("whyAddBtn").addEventListener("click", () => {
   if (items.length) items[items.length - 1].focus();
 });
 
-document.getElementById("whySaveBtn").addEventListener("click", () => {
+document.getElementById("whySaveBtn").addEventListener("click", async () => {
   const cards = collectWhyCards();
-  Store.saveSiteContent({ whyCards: cards });
-  renderWhyManager();
   const s = document.getElementById("whyStatus");
-  s.textContent = cards.length + " kart kaydedildi.";
-  s.className = "form-status ok";
+  try {
+    await Store.saveSiteContent({ whyCards: cards });
+    renderWhyManager();
+    s.textContent = cards.length + " kart kaydedildi.";
+    s.className = "form-status ok";
+  } catch (err) {
+    s.textContent = "Kaydetme başarısız: " + (err.message || "Sunucu hatası.");
+    s.className = "form-status err";
+  }
 });
 
 document.getElementById("whyManager").addEventListener("click", (e) => {
