@@ -148,7 +148,30 @@ const Store = (() => {
     why6Text: "Ürünler kapınıza sorunsuz ulaşmazsa veya vazgeçerseniz 14 gün içinde koşulsuz iade ve değişim hakkınız var.",
     // ---- Footer ----
     footerAbout: "Temiz enerjiyle daha aydınlık bir gelecek için 12 yıldır çalışıyoruz.",
-    footerCopyright: "© 2026 Solar Arena Enerji — Bu site örnek/demo amaçlıdır."
+    footerCopyright: "© 2026 Solar Arena Enerji — Bu site örnek/demo amaçlıdır.",
+    // ---- Dinamik listeler ----
+    faqs: [
+      { q: "Güneş paneli sistemi kendini ne kadar sürede amorti eder?", a: "Tüketiminize ve bulunduğunuz bölgeye göre değişmekle birlikte, konut sistemleri ortalama 4-6 yılda, ticari sistemler 3-5 yılda kendini amorti eder. Paneller 25+ yıl üretim yaptığı için kalan yıllar net kazançtır." },
+      { q: "Elektrik kesildiğinde sistemim çalışır mı?", a: "Standart on-grid sistemler güvenlik gereği kesintide durur. Batarya destekli hibrit sistem tercih ederseniz kesintilerde de elektriğiniz olur." },
+      { q: "Ürettiğim fazla elektriği satabilir miyim?", a: "Evet. Aylık mahsuplaşma modeliyle tükettiğinizden fazla ürettiğiniz elektrik şebekeye verilir ve dağıtım şirketi tarafından size ödeme yapılır." },
+      { q: "Çatım güneş enerjisi için uygun mu?", a: "Güney, güneydoğu veya güneybatı cepheli, gölgelenmesi az çatılar idealdir; doğu-batı yönlü çatılarda da verimli sistemler kurulabilir. Çatınızın fotoğrafını ve aylık faturanızı WhatsApp'tan gönderin, uzmanlarımız ücretsiz değerlendirsin." },
+      { q: "Kargo ne kadar sürer, ücreti nedir?", a: "Stoktaki ürünler aynı gün kargoya verilir; teslimat Türkiye genelinde ortalama 1-3 iş günüdür. Tüm gönderiler sigortalıdır. Kargo ücreti sipariş onayında bildirilir; belirli tutarın üzerindeki siparişlerde gönderim ücretsizdir." },
+      { q: "Kurulumu kendim yapabilir miyim?", a: "Evet. Tüm paketlerle birlikte adım adım montaj kılavuzu ve bağlantı şeması gönderiyoruz; kurulum sırasında telefonla ücretsiz teknik destek veriyoruz. Dilerseniz bulunduğunuz bölgedeki anlaşmalı ustaları da önerebiliriz." },
+      { q: "Bakım masrafı var mı?", a: "Güneş panellerinin hareketli parçası olmadığı için bakım ihtiyacı minimumdur. Yılda 1-2 kez panel temizliği ve periyodik kontrol yeterlidir." }
+    ],
+    testimonials: [
+      { text: "\"Panelleri öğlen sipariş verdim, ertesi gün elimdeydi. Paketleme çok sağlamdı, tek çizik bile yoktu. Faturam 3.500 TL'den 250 TL'ye düştü.\"", name: "Mehmet K.", role: "— Antalya, 8 kW malzeme seti" },
+      { text: "\"Fabrikamız için toptan panel aldık; piyasadaki en iyi fiyatı verdiler, teslimat sözünde durdular. İkinci partiyi de buradan alacağız.\"", name: "Ayşe T.", role: "— İzmir, toptan alım (120 kW)" },
+      { text: "\"Bağ evi paketini kendim kurdum; gönderdikleri şema çok anlaşılırdı, takıldığım yerde telefonla adım adım yardımcı oldular.\"", name: "Hüseyin D.", role: "— Konya, Bağ Evi Off-Grid Paketi" }
+    ],
+    whyCards: [
+      { title: "Türkiye'nin Her Yerine Gönderim", text: "81 ilin tamamına sigortalı ve sağlam paketlenmiş kargo. Stoktaki ürünler aynı gün yola çıkar, 1-3 iş gününde teslim edilir." },
+      { title: "Orijinal & Garantili Ürünler", text: "Tüm ürünler faturalı ve distribütör garantilidir. Panellerde 25 yıla varan performans garantisi sunuyoruz." },
+      { title: "Ücretsiz Sistem Planlama", text: "Fatura ve ihtiyaç bilginizi iletin; size uygun panel + invertör + akü kombinasyonunu uzmanlarımız ücretsiz planlasın." },
+      { title: "Montaj Kılavuzu & Teknik Destek", text: "Her paketle birlikte adım adım montaj şeması gönderiyoruz. Kurulum sırasında telefonla ücretsiz teknik destek alırsınız." },
+      { title: "Toptan Satış & Bayilik", text: "Elektrikçiler, müteahhitler ve işletmeler için özel toptan fiyat listesi ve bayilik imkânı sunuyoruz." },
+      { title: "Kolay İade & Değişim", text: "Ürünler kapınıza sorunsuz ulaşmazsa veya vazgeçerseniz 14 gün içinde koşulsuz iade ve değişim hakkınız var." }
+    ]
   };
   const DEFAULT_SETTINGS = { whatsapp: "908500000000", bankName: "", bankHolder: "", iban: "", bankNote: "" };
   const SEED_VERSION = 3;

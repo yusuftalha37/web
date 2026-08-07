@@ -808,3 +808,58 @@
   .stat-grid { grid-template-columns: repeat(2, 1fr); }
   .upload-grid { grid-template-columns: 1fr; }
 }
+
+/* ============ DİNAMİK LİSTE YÖNETİCİLERİ ============ */
+.dyn-item {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.dyn-item-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.dyn-item-num {
+  background: #1e293b;
+  color: #fff;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+}
+.dyn-item-actions {
+  display: flex;
+  gap: 4px;
+}
+.dyn-item-actions button {
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  font-size: 11px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.dyn-item-actions button:hover:not(:disabled) { background: #e2e8f0; }
+.dyn-item-actions button:disabled { opacity: .35; cursor: default; }
+.dyn-del { color: #dc2626 !important; }
+.dyn-del:hover:not(:disabled) { background: #fee2e2 !important; }
+.dyn-add-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+.btn-save { background: #16a34a !important; color: #fff !important; }
+.btn-save:hover { background: #15803d !important; }

@@ -1174,20 +1174,10 @@ const CONTENT_SCHEMA = [
     ["gal4", "4. görsel yazısı"], ["gal5", "5. görsel yazısı"]
   ]},
   { group: "Referanslar (Yorumlar)", fields: [
-    ["refTitle", "Bölüm başlığı"],
-    ["testi1Text", "1. yorum", "area"], ["testi1Name", "1. isim"], ["testi1Role", "1. bilgi (şehir/sistem)"],
-    ["testi2Text", "2. yorum", "area"], ["testi2Name", "2. isim"], ["testi2Role", "2. bilgi"],
-    ["testi3Text", "3. yorum", "area"], ["testi3Name", "3. isim"], ["testi3Role", "3. bilgi"]
+    ["refTitle", "Bölüm başlığı"]
   ]},
   { group: "Sık Sorulan Sorular", fields: [
-    ["faqTitle", "Bölüm başlığı"],
-    ["faqQ1", "1. soru"], ["faqA1", "1. cevap", "area"],
-    ["faqQ2", "2. soru"], ["faqA2", "2. cevap", "area"],
-    ["faqQ3", "3. soru"], ["faqA3", "3. cevap", "area"],
-    ["faqQ4", "4. soru"], ["faqA4", "4. cevap", "area"],
-    ["faqQ5", "5. soru"], ["faqA5", "5. cevap", "area"],
-    ["faqQ6", "6. soru"], ["faqA6", "6. cevap", "area"],
-    ["faqQ7", "7. soru"], ["faqA7", "7. cevap", "area"]
+    ["faqTitle", "Bölüm başlığı"]
   ]},
   { group: "Alt Çağrı (CTA)", fields: [
     ["ctaTitle", "Başlık"], ["ctaText", "Açıklama", "area"]
@@ -1195,14 +1185,8 @@ const CONTENT_SCHEMA = [
   { group: "İletişim Bölümü", fields: [
     ["contactTitle", "Başlık"], ["contactText", "Açıklama", "area"]
   ]},
-  { group: "Neden Biz (6 Kart)", fields: [
-    ["whyTitle", "Bölüm başlığı"], ["whyText", "Açıklama", "area"],
-    ["why1Title", "1. kart başlık"], ["why1Text", "1. kart metin", "area"],
-    ["why2Title", "2. kart başlık"], ["why2Text", "2. kart metin", "area"],
-    ["why3Title", "3. kart başlık"], ["why3Text", "3. kart metin", "area"],
-    ["why4Title", "4. kart başlık"], ["why4Text", "4. kart metin", "area"],
-    ["why5Title", "5. kart başlık"], ["why5Text", "5. kart metin", "area"],
-    ["why6Title", "6. kart başlık"], ["why6Text", "6. kart metin", "area"]
+  { group: "Neden Biz", fields: [
+    ["whyTitle", "Bölüm başlığı"], ["whyText", "Açıklama", "area"]
   ]},
   { group: "Footer (Sayfa Altı)", fields: [
     ["footerAbout", "Açıklama metni", "area"], ["footerCopyright", "En alt satır (telif)"]
@@ -1334,6 +1318,242 @@ document.getElementById("smtpTestBtn").addEventListener("click", async () => {
     status.className = "form-status err";
   }
 });
+
+// ---------- DİNAMİK LİSTE YÖNETİCİLERİ (SSS, Yorumlar, Neden Biz) ----------
+
+function migrateLegacyLists() {
+  const site = Store.getSiteContent();
+  let changed = false;
+  if (!site.faqs || !Array.isArray(site.faqs)) {
+    const faqs = [];
+    for (let i = 1; i <= 20; i++) {
+      if (site["faqQ" + i]) faqs.push({ q: site["faqQ" + i], a: site["faqA" + i] || "" });
+    }
+    if (faqs.length) { Store.saveSiteContent({ faqs: faqs }); changed = true; }
+  }
+  if (!site.testimonials || !Array.isArray(site.testimonials)) {
+    const list = [];
+    for (let i = 1; i <= 10; i++) {
+      if (site["testi" + i + "Text"]) list.push({ text: site["testi" + i + "Text"], name: site["testi" + i + "Name"] || "", role: site["testi" + i + "Role"] || "" });
+    }
+    if (list.length) { Store.saveSiteContent({ testimonials: list }); changed = true; }
+  }
+  if (!site.whyCards || !Array.isArray(site.whyCards)) {
+    const cards = [];
+    for (let i = 1; i <= 10; i++) {
+      if (site["why" + i + "Title"]) cards.push({ title: site["why" + i + "Title"], text: site["why" + i + "Text"] || "" });
+    }
+    if (cards.length) { Store.saveSiteContent({ whyCards: cards }); changed = true; }
+  }
+  return changed;
+}
+migrateLegacyLists();
+
+// --- SSS Yöneticisi ---
+function renderFaqManager() {
+  const site = Store.getSiteContent();
+  const faqs = site.faqs || [];
+  const el = document.getElementById("faqManager");
+  el.innerHTML = faqs.map((f, i) => `
+    <div class="dyn-item" data-i="${i}">
+      <div class="dyn-item-head">
+        <span class="dyn-item-num">${i + 1}</span>
+        <div class="dyn-item-actions">
+          <button type="button" class="dyn-move" data-dir="up" data-i="${i}" title="Yukarı" ${i === 0 ? "disabled" : ""}>▲</button>
+          <button type="button" class="dyn-move" data-dir="down" data-i="${i}" title="Aşağı" ${i === faqs.length - 1 ? "disabled" : ""}>▼</button>
+          <button type="button" class="dyn-del" data-i="${i}" title="Sil">✕</button>
+        </div>
+      </div>
+      <div class="form-group"><label>Soru</label><input type="text" class="faq-q" value="${escHtml(f.q)}"></div>
+      <div class="form-group"><label>Cevap</label><textarea class="faq-a" rows="2">${escHtml(f.a)}</textarea></div>
+    </div>`).join("") || '<p class="acc-empty">Henüz soru eklenmemiş.</p>';
+}
+
+function collectFaqs() {
+  return [...document.querySelectorAll("#faqManager .dyn-item")].map((el) => ({
+    q: el.querySelector(".faq-q").value.trim(),
+    a: el.querySelector(".faq-a").value.trim()
+  })).filter((f) => f.q);
+}
+
+document.getElementById("faqAddBtn").addEventListener("click", () => {
+  const site = Store.getSiteContent();
+  const faqs = site.faqs || [];
+  faqs.push({ q: "", a: "" });
+  Store.saveSiteContent({ faqs });
+  renderFaqManager();
+  const items = document.querySelectorAll("#faqManager .faq-q");
+  if (items.length) items[items.length - 1].focus();
+});
+
+document.getElementById("faqSaveBtn").addEventListener("click", () => {
+  const faqs = collectFaqs();
+  Store.saveSiteContent({ faqs });
+  renderFaqManager();
+  const s = document.getElementById("faqStatus");
+  s.textContent = faqs.length + " soru kaydedildi.";
+  s.className = "form-status ok";
+});
+
+document.getElementById("faqManager").addEventListener("click", (e) => {
+  const del = e.target.closest(".dyn-del");
+  const move = e.target.closest(".dyn-move");
+  if (del) {
+    const faqs = collectFaqs();
+    faqs.splice(+del.dataset.i, 1);
+    Store.saveSiteContent({ faqs });
+    renderFaqManager();
+  }
+  if (move) {
+    const faqs = collectFaqs();
+    const i = +move.dataset.i;
+    const j = move.dataset.dir === "up" ? i - 1 : i + 1;
+    if (j < 0 || j >= faqs.length) return;
+    [faqs[i], faqs[j]] = [faqs[j], faqs[i]];
+    Store.saveSiteContent({ faqs });
+    renderFaqManager();
+  }
+});
+
+// --- Referanslar (Yorumlar) Yöneticisi ---
+function renderTestiManager() {
+  const site = Store.getSiteContent();
+  const list = site.testimonials || [];
+  const el = document.getElementById("testiManager");
+  el.innerHTML = list.map((t, i) => `
+    <div class="dyn-item" data-i="${i}">
+      <div class="dyn-item-head">
+        <span class="dyn-item-num">${i + 1}</span>
+        <div class="dyn-item-actions">
+          <button type="button" class="dyn-move" data-dir="up" data-i="${i}" title="Yukarı" ${i === 0 ? "disabled" : ""}>▲</button>
+          <button type="button" class="dyn-move" data-dir="down" data-i="${i}" title="Aşağı" ${i === list.length - 1 ? "disabled" : ""}>▼</button>
+          <button type="button" class="dyn-del" data-i="${i}" title="Sil">✕</button>
+        </div>
+      </div>
+      <div class="form-group"><label>Yorum</label><textarea class="testi-text" rows="2">${escHtml(t.text)}</textarea></div>
+      <div class="form-row">
+        <div class="form-group"><label>İsim</label><input type="text" class="testi-name" value="${escHtml(t.name)}"></div>
+        <div class="form-group"><label>Bilgi (şehir/sistem)</label><input type="text" class="testi-role" value="${escHtml(t.role)}"></div>
+      </div>
+    </div>`).join("") || '<p class="acc-empty">Henüz yorum eklenmemiş.</p>';
+}
+
+function collectTestimonials() {
+  return [...document.querySelectorAll("#testiManager .dyn-item")].map((el) => ({
+    text: el.querySelector(".testi-text").value.trim(),
+    name: el.querySelector(".testi-name").value.trim(),
+    role: el.querySelector(".testi-role").value.trim()
+  })).filter((t) => t.text);
+}
+
+document.getElementById("testiAddBtn").addEventListener("click", () => {
+  const site = Store.getSiteContent();
+  const list = site.testimonials || [];
+  list.push({ text: "", name: "", role: "" });
+  Store.saveSiteContent({ testimonials: list });
+  renderTestiManager();
+  const items = document.querySelectorAll("#testiManager .testi-text");
+  if (items.length) items[items.length - 1].focus();
+});
+
+document.getElementById("testiSaveBtn").addEventListener("click", () => {
+  const list = collectTestimonials();
+  Store.saveSiteContent({ testimonials: list });
+  renderTestiManager();
+  const s = document.getElementById("testiStatus");
+  s.textContent = list.length + " yorum kaydedildi.";
+  s.className = "form-status ok";
+});
+
+document.getElementById("testiManager").addEventListener("click", (e) => {
+  const del = e.target.closest(".dyn-del");
+  const move = e.target.closest(".dyn-move");
+  if (del) {
+    const list = collectTestimonials();
+    list.splice(+del.dataset.i, 1);
+    Store.saveSiteContent({ testimonials: list });
+    renderTestiManager();
+  }
+  if (move) {
+    const list = collectTestimonials();
+    const i = +move.dataset.i;
+    const j = move.dataset.dir === "up" ? i - 1 : i + 1;
+    if (j < 0 || j >= list.length) return;
+    [list[i], list[j]] = [list[j], list[i]];
+    Store.saveSiteContent({ testimonials: list });
+    renderTestiManager();
+  }
+});
+
+// --- Neden Biz Kartları Yöneticisi ---
+function renderWhyManager() {
+  const site = Store.getSiteContent();
+  const cards = site.whyCards || [];
+  const el = document.getElementById("whyManager");
+  el.innerHTML = cards.map((c, i) => `
+    <div class="dyn-item" data-i="${i}">
+      <div class="dyn-item-head">
+        <span class="dyn-item-num">${i + 1}</span>
+        <div class="dyn-item-actions">
+          <button type="button" class="dyn-move" data-dir="up" data-i="${i}" title="Yukarı" ${i === 0 ? "disabled" : ""}>▲</button>
+          <button type="button" class="dyn-move" data-dir="down" data-i="${i}" title="Aşağı" ${i === cards.length - 1 ? "disabled" : ""}>▼</button>
+          <button type="button" class="dyn-del" data-i="${i}" title="Sil">✕</button>
+        </div>
+      </div>
+      <div class="form-group"><label>Başlık</label><input type="text" class="why-title" value="${escHtml(c.title)}"></div>
+      <div class="form-group"><label>Açıklama</label><textarea class="why-text" rows="2">${escHtml(c.text)}</textarea></div>
+    </div>`).join("") || '<p class="acc-empty">Henüz kart eklenmemiş.</p>';
+}
+
+function collectWhyCards() {
+  return [...document.querySelectorAll("#whyManager .dyn-item")].map((el) => ({
+    title: el.querySelector(".why-title").value.trim(),
+    text: el.querySelector(".why-text").value.trim()
+  })).filter((c) => c.title);
+}
+
+document.getElementById("whyAddBtn").addEventListener("click", () => {
+  const site = Store.getSiteContent();
+  const cards = site.whyCards || [];
+  cards.push({ title: "", text: "" });
+  Store.saveSiteContent({ whyCards: cards });
+  renderWhyManager();
+  const items = document.querySelectorAll("#whyManager .why-title");
+  if (items.length) items[items.length - 1].focus();
+});
+
+document.getElementById("whySaveBtn").addEventListener("click", () => {
+  const cards = collectWhyCards();
+  Store.saveSiteContent({ whyCards: cards });
+  renderWhyManager();
+  const s = document.getElementById("whyStatus");
+  s.textContent = cards.length + " kart kaydedildi.";
+  s.className = "form-status ok";
+});
+
+document.getElementById("whyManager").addEventListener("click", (e) => {
+  const del = e.target.closest(".dyn-del");
+  const move = e.target.closest(".dyn-move");
+  if (del) {
+    const cards = collectWhyCards();
+    cards.splice(+del.dataset.i, 1);
+    Store.saveSiteContent({ whyCards: cards });
+    renderWhyManager();
+  }
+  if (move) {
+    const cards = collectWhyCards();
+    const i = +move.dataset.i;
+    const j = move.dataset.dir === "up" ? i - 1 : i + 1;
+    if (j < 0 || j >= cards.length) return;
+    [cards[i], cards[j]] = [cards[j], cards[i]];
+    Store.saveSiteContent({ whyCards: cards });
+    renderWhyManager();
+  }
+});
+
+renderFaqManager();
+renderTestiManager();
+renderWhyManager();
 
 // ---------- TÜMÜNÜ ÇİZ ----------
 function renderAll() {

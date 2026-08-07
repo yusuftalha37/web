@@ -737,7 +737,7 @@ async function handleApi(req, res, u) {
     if (table === "profiles") {
       // kullanıcı profili — kullanıcı tablosundan türetilir.
       // e-posta/engel/tarih yalnızca yöneticiye gösterilir.
-      let rows = DB.users.map((x) => ({ id: x.id, role: x.role, name: x.name, phone: x.phone, email: x.email, blocked: !!x.blocked, created: x.created || 0 }));
+      let rows = DB.users.map((x) => ({ id: x.id, role: x.role, name: x.name, phone: x.phone, city: x.city || "", email: x.email, blocked: !!x.blocked, created: x.created || 0 }));
       rows = eqFilter(rows, params);
       if (!caller) return send(res, 200, []);
       if (!isAdmin) rows = rows.filter((r) => r.id === caller.id);
@@ -830,7 +830,7 @@ async function handleApi(req, res, u) {
     }
     if (table === "profiles") {
       if (!caller) return send(res, 401, {});
-      Object.assign(caller, { name: b.name != null ? b.name : caller.name, phone: b.phone != null ? b.phone : caller.phone });
+      Object.assign(caller, { name: b.name != null ? b.name : caller.name, phone: b.phone != null ? b.phone : caller.phone, city: b.city != null ? b.city : (caller.city || "") });
       saveDB(); return send(res, 201, null);
     }
     return send(res, 403, { error: "izin yok" });
@@ -851,12 +851,14 @@ async function handleApi(req, res, u) {
           if (b.blocked != null) { target.blocked = !!b.blocked; if (target.blocked) revokeUserTokens(target.id); }
           if (b.name != null) target.name = String(b.name).slice(0, 120);
           if (b.phone != null) target.phone = String(b.phone).slice(0, 40);
+          if (b.city != null) target.city = String(b.city).slice(0, 80);
         }
         saveDB(); return send(res, 204, null);
       }
       // Aksi halde yalnızca kendi profilini günceller (rol/engel değiştirilemez)
       if (b.name != null) caller.name = String(b.name).slice(0, 120);
       if (b.phone != null) caller.phone = String(b.phone).slice(0, 40);
+      if (b.city != null) caller.city = String(b.city).slice(0, 80);
       saveDB(); return send(res, 204, null);
     }
     if (PUBLIC_READ.includes(table)) {

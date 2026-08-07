@@ -25,6 +25,31 @@ function initSite(root) {
   // Admin panelinden düzenlenen iletişim/footer metinlerini yerleştir
   applySiteContent(root);
 
+  // ============ DİNAMİK BÖLÜMLER (SSS, Referanslar, Neden Biz) ============
+  const _site = Store.getSiteContent();
+
+  const _faqBox = $("#faqItems");
+  if (_faqBox) {
+    const faqs = _site.faqs || [];
+    _faqBox.innerHTML = faqs.map((f) => `<details class="faq"><summary>${escHtml(f.q)}</summary><p>${escHtml(f.a)}</p></details>`).join("");
+  }
+
+  const _testiBox = $("#testimonialItems");
+  if (_testiBox) {
+    const list = _site.testimonials || [];
+    _testiBox.innerHTML = list.map((t) =>
+      `<blockquote class="testimonial"><div class="stars">★★★★★</div><p>${escHtml(t.text)}</p><footer><strong>${escHtml(t.name)}</strong> <span>${escHtml(t.role)}</span></footer></blockquote>`
+    ).join("");
+  }
+
+  const _whyBox = $("#whyCardItems");
+  if (_whyBox) {
+    const cards = _site.whyCards || [];
+    _whyBox.innerHTML = cards.map((c) =>
+      `<article class="card"><h3>${escHtml(c.title)}</h3><p>${escHtml(c.text)}</p></article>`
+    ).join("");
+  }
+
   // ============ MOBİL MENÜ ============
   const hamburger = $("#hamburger");
   const navLinks = $("#navLinks");

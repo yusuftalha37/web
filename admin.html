@@ -34,7 +34,7 @@
     <div class="admin-sidebar-foot">
       <a href="index.html">← Siteye Dön</a>
       <a href="#" id="adminLogout">Çıkış Yap</a>
-      <div class="admin-version" id="adminVersion">Sürüm: 2026-08-07 · 16</div>
+      <div class="admin-version" id="adminVersion">Sürüm: 2026-08-07 · 17</div>
     </div>
   </aside>
 
@@ -329,6 +329,33 @@
           <button type="submit" class="btn btn-small">Tümünü Kaydet</button>
           <p class="form-status" id="contentStatus" role="status"></p>
         </form>
+
+        <h2 class="content-group-title" style="margin-top:2rem">Sık Sorulan Sorular (Dinamik)</h2>
+        <p class="panel-hint">Soru ekleyin, silin veya sırasını değiştirin.</p>
+        <div id="faqManager"></div>
+        <div class="dyn-add-row">
+          <button type="button" class="btn btn-small" id="faqAddBtn">+ Yeni Soru Ekle</button>
+          <button type="button" class="btn btn-small btn-save" id="faqSaveBtn">SSS Kaydet</button>
+        </div>
+        <p class="form-status" id="faqStatus" role="status"></p>
+
+        <h2 class="content-group-title" style="margin-top:2rem">Müşteri Yorumları (Dinamik)</h2>
+        <p class="panel-hint">Müşteri yorumlarını ekleyin, silin veya düzenleyin.</p>
+        <div id="testiManager"></div>
+        <div class="dyn-add-row">
+          <button type="button" class="btn btn-small" id="testiAddBtn">+ Yeni Yorum Ekle</button>
+          <button type="button" class="btn btn-small btn-save" id="testiSaveBtn">Yorumları Kaydet</button>
+        </div>
+        <p class="form-status" id="testiStatus" role="status"></p>
+
+        <h2 class="content-group-title" style="margin-top:2rem">Neden Biz Kartları (Dinamik)</h2>
+        <p class="panel-hint">Avantaj kartlarını ekleyin, silin veya düzenleyin.</p>
+        <div id="whyManager"></div>
+        <div class="dyn-add-row">
+          <button type="button" class="btn btn-small" id="whyAddBtn">+ Yeni Kart Ekle</button>
+          <button type="button" class="btn btn-small btn-save" id="whySaveBtn">Kartları Kaydet</button>
+        </div>
+        <p class="form-status" id="whyStatus" role="status"></p>
       </div>
     </section>
 
