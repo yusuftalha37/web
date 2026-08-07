@@ -173,7 +173,6 @@ function initSite(root) {
           <span class="product-cat">${escHtml(catName(p.cat))}</span>
           ${authBadge}
           <h3><a href="${href}" class="product-titlelink">${escHtml(p.name)}</a></h3>
-          <ul class="product-specs">${p.specs.map((s) => `<li>${escHtml(s)}</li>`).join("")}</ul>
           <div class="product-foot">
             <div class="product-price">${tlFmt(p.price)}<span>KDV dahil</span></div>
             <button class="add-btn" data-id="${p.id}">Sepete Ekle</button>
