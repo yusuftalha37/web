@@ -222,6 +222,7 @@ const Store = (() => {
   let loadPromise = null;
   function load() { return loadPromise || (loadPromise = doLoad().catch((e) => { logErr(e); fallbackLocal(); })); }
   function ready(fn) { return load().then(fn); }
+  function reload() { loadPromise = null; return load(); }
 
   async function doLoad() {
     if (MODE === "supabase") {
@@ -296,17 +297,20 @@ const Store = (() => {
     if (p && Array.isArray(p.cats)) p.cats.forEach((c) => { if (c && ids.indexOf(c) === -1) ids.push(c); });
     return ids;
   }
-  function saveProduct(product) {
+  async function saveProduct(product) {
+    if (persist) await sbWrite("POST", "products", "", toDbProduct(product));
     const i = cache.products.findIndex((p) => p.id === product.id);
     if (i >= 0) cache.products[i] = product; else cache.products.unshift(product);
-    if (persist) return sbWrite("POST", "products", "", toDbProduct(product));
-    write("gp-products", cache.products);
-    return Promise.resolve();
+    if (!persist) write("gp-products", cache.products);
   }
-  function deleteProduct(id) {
-    cache.products = cache.products.filter((p) => p.id !== id);
-    if (persist) return sbWrite("DELETE", "products", "id=eq." + encodeURIComponent(id));
-    write("gp-products", cache.products);
+  async function deleteProduct(id) {
+    if (persist) {
+      await sbWrite("DELETE", "products", "id=eq." + encodeURIComponent(id));
+      cache.products = cache.products.filter((p) => p.id !== id);
+    } else {
+      cache.products = cache.products.filter((p) => p.id !== id);
+      write("gp-products", cache.products);
+    }
   }
 
   // ===================== KATEGORİLER =====================
@@ -367,7 +371,7 @@ const Store = (() => {
     if (newParent === id) return false;
     return catDescendantIds(id).indexOf(newParent) === -1;
   }
-  function saveCategory(cat) {
+  async function saveCategory(cat) {
     const name = (cat.name || "").trim();
     if (cat.id) {
       const ex = cache.categories.find((c) => c.id === cat.id);
@@ -376,8 +380,6 @@ const Store = (() => {
         if (cat.image !== undefined) ex.image = cat.image;
         if (cat.kind !== undefined) ex.kind = cat.kind;
         if (cat.parent !== undefined) {
-          // Marka hiyerarşi dışıdır: üst kategori tutmaz.
-          // Ayrıca bir kategori kendi altına taşınamaz (döngü olurdu).
           ex.parent = isBrandCat(ex) || !canReparent(cat.id, cat.parent) ? "" : cat.parent;
         }
         if (isBrandCat(ex)) ex.parent = "";
@@ -386,47 +388,49 @@ const Store = (() => {
       if (cat.image !== undefined) row.image = cat.image;
       if (cat.kind !== undefined) row.kind = cat.kind;
       if (cat.parent !== undefined) row.parent = ex ? ex.parent : "";
-      if (persist) return sbWrite("POST", "categories", "", row);
+      if (persist) { await sbWrite("POST", "categories", "", row); return; }
     } else {
       const kind = cat.kind || "";
       const nc = {
         id: "c-" + Date.now(), name, image: cat.image || "", kind,
         parent: kind === "brand" ? "" : (cat.parent || "")
       };
+      if (persist) { await sbWrite("POST", "categories", "", { id: nc.id, name: nc.name, image: nc.image, kind: nc.kind, parent: nc.parent, sort: cache.categories.length }); }
       cache.categories.push(nc);
-      if (persist) return sbWrite("POST", "categories", "", { id: nc.id, name: nc.name, image: nc.image, kind: nc.kind, parent: nc.parent, sort: cache.categories.length });
     }
-    write("gp-cats", cache.categories);
+    if (!persist) write("gp-cats", cache.categories);
   }
-  function deleteCategory(id) {
-    // Silinen kategorinin alt kategorileri boşta kalmasın: bir üst seviyeye taşınır
+  async function deleteCategory(id) {
     const victim = cache.categories.find((c) => c.id === id);
     const newParent = victim ? parentOf(victim) : "";
     const orphans = cache.categories.filter((c) => !isBrandCat(c) && (c.parent || "") === id);
-    cache.categories = cache.categories.filter((c) => c.id !== id);
-    orphans.forEach((c) => { c.parent = newParent; });
     if (persist) {
       const jobs = orphans.map((c) => sbWrite("POST", "categories", "", { id: c.id, name: c.name, parent: newParent }));
       jobs.push(sbWrite("DELETE", "categories", "id=eq." + encodeURIComponent(id)));
-      return Promise.all(jobs);
+      await Promise.all(jobs);
     }
-    write("gp-cats", cache.categories);
+    cache.categories = cache.categories.filter((c) => c.id !== id);
+    orphans.forEach((c) => { c.parent = newParent; });
+    if (!persist) write("gp-cats", cache.categories);
   }
 
   // ===================== SLAYTLAR =====================
   function getSlides() { return cache.slides; }
-  function saveSlide(slide) {
-    if (slide.id) {
-      const i = cache.slides.findIndex((s) => s.id === slide.id);
-      if (i >= 0) cache.slides[i] = slide;
-    } else { slide.id = "sl-" + Date.now(); cache.slides.push(slide); }
-    if (persist) return sbWrite("POST", "slides", "", toDbSlide(slide, cache.slides.findIndex((s) => s.id === slide.id)));
-    write("gp-slides", cache.slides);
+  async function saveSlide(slide) {
+    if (!slide.id) slide.id = "sl-" + Date.now();
+    const isNew = !cache.slides.some((s) => s.id === slide.id);
+    if (persist) {
+      const sort = isNew ? cache.slides.length : cache.slides.findIndex((s) => s.id === slide.id);
+      await sbWrite("POST", "slides", "", toDbSlide(slide, sort));
+    }
+    if (isNew) cache.slides.push(slide);
+    else { const i = cache.slides.findIndex((s) => s.id === slide.id); if (i >= 0) cache.slides[i] = slide; }
+    if (!persist) write("gp-slides", cache.slides);
   }
-  function deleteSlide(id) {
+  async function deleteSlide(id) {
+    if (persist) await sbWrite("DELETE", "slides", "id=eq." + encodeURIComponent(id));
     cache.slides = cache.slides.filter((s) => s.id !== id);
-    if (persist) return sbWrite("DELETE", "slides", "id=eq." + encodeURIComponent(id));
-    write("gp-slides", cache.slides);
+    if (!persist) write("gp-slides", cache.slides);
   }
   function moveSlide(id, dir) {
     const i = cache.slides.findIndex((s) => s.id === id), j = i + dir;
@@ -731,7 +735,7 @@ const Store = (() => {
   }
 
   return {
-    mode: MODE, load, ready,
+    mode: MODE, load, ready, reload,
     getProducts, saveProduct, deleteProduct, productCatIds,
     getCategories, saveCategory, deleteCategory,
     getBrands, getTreeCategories, isBrandCat, catChildren, catTree,

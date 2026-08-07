@@ -316,15 +316,21 @@ productModal.addEventListener("click", (e) => {
   if (e.target === productModal) productModal.hidden = true;
 });
 
-document.getElementById("productRows").addEventListener("click", (e) => {
+document.getElementById("productRows").addEventListener("click", async (e) => {
   const btn = e.target.closest(".row-btn");
   if (!btn) return;
   const { id, act } = btn.dataset;
   const product = Store.getProducts().find((p) => p.id === id);
   if (act === "edit" && product) openProductModal(product);
   if (act === "del" && product && confirm(`"${product.name}" silinsin mi?`)) {
-    Store.deleteProduct(id);
-    renderAll();
+    try {
+      await Store.deleteProduct(id);
+      renderAll();
+    } catch (err) {
+      alert("Silme başarısız: " + (err.message || "Sunucu hatası. Oturumunuzu kontrol edin."));
+      await Store.reload();
+      renderAll();
+    }
   }
 });
 
@@ -645,7 +651,7 @@ catImgFile.addEventListener("change", () => {
   });
 });
 
-document.getElementById("catRows").addEventListener("click", (e) => {
+document.getElementById("catRows").addEventListener("click", async (e) => {
   const btn = e.target.closest(".row-btn");
   if (!btn) return;
   const { id, act } = btn.dataset;
@@ -713,8 +719,13 @@ document.getElementById("catRows").addEventListener("click", (e) => {
     const kids = Store.catChildren(id);
     const note = kids.length ? "\n\nAltındaki " + kids.length + " alt kategori bir üst seviyeye taşınacak." : "";
     if (confirm('"' + cat.name + '" silinsin mi?' + note)) {
-      Store.deleteCategory(id);
-      renderAll();
+      try {
+        await Store.deleteCategory(id);
+        renderAll();
+      } catch (err) {
+        alert("Silme başarısız: " + (err.message || "Sunucu hatası."));
+        await Store.reload(); renderAll();
+      }
     }
   }
 });
@@ -814,7 +825,7 @@ function renderSlides() {
     '<p class="empty-row">Henüz slayt yok. Soldaki formdan ekleyin.</p>';
 }
 
-document.getElementById("slideList").addEventListener("click", (e) => {
+document.getElementById("slideList").addEventListener("click", async (e) => {
   const btn = e.target.closest(".row-btn");
   if (!btn) return;
   const { id, act } = btn.dataset;
@@ -823,13 +834,18 @@ document.getElementById("slideList").addEventListener("click", (e) => {
   if (act === "down") { Store.moveSlide(id, 1); renderSlides(); }
   if (act === "edit" && slide) editSlide(slide);
   if (act === "del" && slide && confirm("Bu slayt silinsin mi?")) {
-    Store.deleteSlide(id);
-    if (document.getElementById("slId").value === id) resetSlideForm();
-    renderSlides();
+    try {
+      await Store.deleteSlide(id);
+      if (document.getElementById("slId").value === id) resetSlideForm();
+      renderSlides();
+    } catch (err) {
+      alert("Silme başarısız: " + (err.message || "Sunucu hatası."));
+      await Store.reload(); renderSlides();
+    }
   }
 });
 
-slideForm.addEventListener("submit", (e) => {
+slideForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   const status = document.getElementById("slStatus");
   const title = document.getElementById("slTitle").value.trim();
@@ -839,7 +855,7 @@ slideForm.addEventListener("submit", (e) => {
     return;
   }
   try {
-    Store.saveSlide({
+    await Store.saveSlide({
       id: document.getElementById("slId").value || "",
       image: slidePhoto,
       art: document.getElementById("slArt").value,
@@ -849,7 +865,7 @@ slideForm.addEventListener("submit", (e) => {
       btnLink: document.getElementById("slBtnLink").value.trim() || "urunler.html"
     });
   } catch (err) {
-    status.textContent = "Kayıt başarısız: tarayıcı depolama alanı doldu. Daha küçük görsel kullanın.";
+    status.textContent = "Kaydetme başarısız: " + (err.message || "Sunucu hatası veya depolama alanı doldu.");
     status.className = "form-status err";
     return;
   }
