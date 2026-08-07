@@ -690,14 +690,14 @@ const Store = (() => {
   function getSettings() { return cache.settings; }
   function saveSettings(settings) {
     cache.settings = { ...cache.settings, ...settings };
-    if (persist) return sbKv("settings", cache.settings).catch(logErr);
     write("gp-settings", cache.settings);
+    if (persist) return sbKv("settings", cache.settings).catch(logErr);
   }
   function getSiteContent() { return { ...DEFAULT_SITE, ...cache.site }; }
   function saveSiteContent(data) {
     cache.site = { ...cache.site, ...data };
-    if (persist) return sbKv("site", cache.site).catch(logErr);
     write("gp-site", cache.site);
+    if (persist) return sbKv("site", cache.site).catch(logErr);
   }
 
   return {
@@ -905,7 +905,13 @@ function escHtml(s) {
 function applySiteContent(root) {
   root = root || document;
   if (typeof Store === "undefined") return;
-  const site = Store.getSiteContent();
+  var site;
+  try {
+    var saved = JSON.parse(localStorage.getItem("gp-site") || "{}");
+    site = Object.assign({}, Store.getSiteContent(), saved);
+  } catch (_) {
+    site = Store.getSiteContent();
+  }
   root.querySelectorAll("[data-site]").forEach((el) => {
     const key = el.getAttribute("data-site");
     if (site[key] != null) el.textContent = site[key];
@@ -917,3 +923,31 @@ function applySiteContent(root) {
     a.href = "mailto:" + site.email;
   });
 }
+
+// Sayfa yüklenirken sunucu yanıtını beklemeden localStorage'daki
+// site içeriğini anında uygula (titreşim/flaş önlemi).
+(function earlySiteApply() {
+  applySiteContent(document);
+  try {
+    var saved = JSON.parse(localStorage.getItem("gp-site") || "{}");
+    var site = saved;
+    var faqBox = document.getElementById("faqItems");
+    if (faqBox && site.faqs && site.faqs.length) {
+      faqBox.innerHTML = site.faqs.map(function (f) {
+        return '<details class="faq"><summary>' + escHtml(f.q) + '</summary><p>' + escHtml(f.a) + '</p></details>';
+      }).join("");
+    }
+    var testiBox = document.getElementById("testimonialItems");
+    if (testiBox && site.testimonials && site.testimonials.length) {
+      testiBox.innerHTML = site.testimonials.map(function (t) {
+        return '<blockquote class="testimonial"><div class="stars">★★★★★</div><p>' + escHtml(t.text) + '</p><footer><strong>' + escHtml(t.name) + '</strong> <span>' + escHtml(t.role) + '</span></footer></blockquote>';
+      }).join("");
+    }
+    var whyBox = document.getElementById("whyCardItems");
+    if (whyBox && site.whyCards && site.whyCards.length) {
+      whyBox.innerHTML = site.whyCards.map(function (c) {
+        return '<article class="card"><h3>' + escHtml(c.title) + '</h3><p>' + escHtml(c.text) + '</p></article>';
+      }).join("");
+    }
+  } catch (_) {}
+})();
