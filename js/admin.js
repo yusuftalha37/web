@@ -1122,7 +1122,8 @@ function openUserDetail(data) {
   document.getElementById("udProfileStatus").textContent = "";
   document.getElementById("udProfileStatus").className = "form-status";
 
-  renderUdPassword(email);
+  document.getElementById("udUserId").value = data.id || email;
+  renderUdPassword();
 
   udTabs[0].click();
   renderUdAddresses(email);
@@ -1131,7 +1132,7 @@ function openUserDetail(data) {
   userDetailModal.hidden = false;
 }
 
-function renderUdPassword(email) {
+function renderUdPassword() {
   const cur = document.getElementById("udPassCurrent");
   const note = document.getElementById("udPassNote");
   const newInput = document.getElementById("udPassNew");
@@ -1139,12 +1140,13 @@ function renderUdPassword(email) {
   status.textContent = "";
   status.className = "form-status";
   newInput.value = "";
+  newInput.disabled = false;
 
   if (Store.mode === "supabase") {
     cur.value = "••••••";
-    note.textContent = "(Sunucu modunda şifreler görüntülenemez)";
-    newInput.disabled = true;
+    note.textContent = "(Şifreler güvenlik nedeniyle görüntülenemez — yeni şifre belirleyebilirsiniz)";
   } else {
+    const email = document.getElementById("udEmail").value;
     const raw = Store.adminGetPassword(email);
     if (raw) {
       try {
@@ -1156,25 +1158,29 @@ function renderUdPassword(email) {
       cur.value = "(bulunamadı)";
     }
     note.textContent = "";
-    newInput.disabled = false;
   }
 }
 
-document.getElementById("udPassForm").addEventListener("submit", (e) => {
+document.getElementById("udPassForm").addEventListener("submit", async (e) => {
   e.preventDefault();
-  const email = document.getElementById("udEmail").value;
+  const userId = document.getElementById("udUserId").value;
   const newPass = document.getElementById("udPassNew").value;
   const status = document.getElementById("udPassStatus");
-  if (!email) return;
-  const res = Store.adminSetPassword(email, newPass);
-  if (!res || !res.ok) {
-    status.textContent = (res && res.error) || "Şifre değiştirilemedi.";
+  if (!userId) return;
+  try {
+    const res = await Store.adminSetPassword(userId, newPass);
+    if (!res || !res.ok) {
+      status.textContent = (res && res.error) || "Şifre değiştirilemedi.";
+      status.className = "form-status err";
+      return;
+    }
+    status.textContent = "Şifre başarıyla değiştirildi.";
+    status.className = "form-status ok";
+    renderUdPassword();
+  } catch (err) {
+    status.textContent = "Hata: " + (err.message || "Şifre değiştirilemedi.");
     status.className = "form-status err";
-    return;
   }
-  status.textContent = "Şifre başarıyla değiştirildi.";
-  status.className = "form-status ok";
-  renderUdPassword(email);
 });
 
 document.getElementById("udProfileForm").addEventListener("submit", (e) => {

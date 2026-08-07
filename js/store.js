@@ -629,11 +629,19 @@ const Store = (() => {
     const u = users.find((x) => x.email === email);
     return u ? u.pass : null;
   }
-  function adminSetPassword(email, newPass) {
-    if (persist) return { ok: false, error: "Sunucu modunda admin şifre değiştirme henüz desteklenmiyor." };
+  async function adminSetPassword(userId, newPass) {
     if (!newPass || newPass.length < 6) return { ok: false, error: "Şifre en az 6 karakter olmalı." };
+    if (persist) {
+      const r = await fetch(SB_URL + "/api/admin-set-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: "Bearer " + token() },
+        body: JSON.stringify({ userId, password: newPass })
+      });
+      if (!r.ok) { const d = await r.json().catch(() => ({})); return { ok: false, error: d.msg || "Şifre değiştirilemedi." }; }
+      return { ok: true };
+    }
     const users = getUsersLocal();
-    const u = users.find((x) => x.email === email);
+    const u = users.find((x) => x.email === userId);
     if (!u) return { ok: false, error: "Kullanıcı bulunamadı." };
     u.pass = hash(newPass);
     write("gp-users", users);

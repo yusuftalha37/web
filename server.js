@@ -620,6 +620,23 @@ async function handleApi(req, res, u) {
     return send(res, 200, {});
   }
 
+  // ---- Admin: kullanıcı şifresini değiştir ----
+  if (u.pathname === "/api/admin-set-password" && req.method === "POST") {
+    if (!isAdmin) return send(res, 403, { error: "forbidden" });
+    const b = await readBody(req, MAX_BODY_SMALL);
+    const targetId = String(b.userId || "");
+    const newPass = String(b.password || "");
+    if (!targetId) return send(res, 400, { msg: "Kullanıcı belirtilmedi." });
+    if (newPass.length < 6 || newPass.length > 200) return send(res, 400, { msg: "Şifre en az 6 karakter olmalıdır." });
+    const usr = DB.users.find((x) => x.id === targetId);
+    if (!usr) return send(res, 404, { msg: "Kullanıcı bulunamadı." });
+    const nu = makeUser(usr.email, newPass, usr.name, usr.phone, usr.role);
+    usr.pass = nu.pass;
+    revokeUserTokens(usr.id);
+    saveDB();
+    return send(res, 200, { ok: true });
+  }
+
   // ---- Şifremi unuttum ----
   if (u.pathname === "/auth/v1/forgot-password" && req.method === "POST") {
     if (tooManyRequests("forgot:" + ip, 5, 60 * 60 * 1000)) return send(res, 429, { msg: "Çok fazla deneme. Bir saat sonra tekrar deneyin." });
