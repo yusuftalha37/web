@@ -140,6 +140,14 @@ function saveErrorText(err) {
 // Görsel dosyasını en fazla 900px olacak şekilde küçültüp JPEG'e çevirir;
 // hem düzenleme penceresi hem ürün yükleme ekranı kullanır.
 function readImageFile(file, cb) {
+  if (!file || !file.type.startsWith("image/")) {
+    alert("Lütfen geçerli bir görsel dosyası seçin (JPG, PNG, WebP vb.).");
+    return;
+  }
+  if (file.size > 10 * 1024 * 1024) {
+    alert("Dosya çok büyük (maks. 10 MB). Lütfen daha küçük bir görsel seçin.");
+    return;
+  }
   const s = Store.session();
   const token = s && s.token;
   if (Store.mode === "supabase" && token) {
@@ -150,12 +158,14 @@ function readImageFile(file, cb) {
       headers: { Authorization: "Bearer " + token },
       body: fd
     })
-      .then((r) => r.json().then((d) => ({ ok: r.ok, data: d })))
-      .then(({ ok, data }) => {
+      .then((r) => r.json().then((d) => ({ ok: r.ok, status: r.status, data: d })))
+      .then(({ ok, status, data }) => {
         if (ok && data.url) cb(data.url);
+        else if (status === 401 || status === 403) alert("Oturum süreniz dolmuş. Lütfen çıkış yapıp tekrar giriş yapın.");
+        else if (status === 413) alert("Dosya çok büyük. Lütfen 10 MB'den küçük bir görsel seçin.");
         else alert("Resim yüklenemedi: " + (data.error_description || data.error || "Bilinmeyen hata"));
       })
-      .catch(() => alert("Resim yüklenirken bağlantı hatası oluştu."));
+      .catch(() => alert("Resim yüklenirken bağlantı hatası oluştu. İnternet bağlantınızı kontrol edin."));
     return;
   }
   const img = new Image();
