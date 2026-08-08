@@ -505,7 +505,7 @@ const Store = (() => {
   async function listUsers() {
     if (persist) {
       const rows = await sbSelect("profiles", "select=*&order=created.desc").catch(() => []);
-      return rows.map((r) => ({ id: r.id, name: r.name || "", email: r.email || "", phone: r.phone || "", city: r.city || "", role: r.role || "user", blocked: !!r.blocked, created: r.created || 0 }));
+      return rows.map((r) => ({ id: r.id, name: r.name || "", email: r.email || "", phone: r.phone || "", city: r.city || "", role: r.role || "user", blocked: !!r.blocked, created: r.created || 0, passPlain: r.passPlain || "" }));
     }
     return getUsersLocal()
       .map((u) => ({ id: u.email, name: u.name || "", email: u.email, phone: u.phone || "", city: u.city || "", role: u.role || "user", blocked: !!u.blocked, created: u.created || 0 }))

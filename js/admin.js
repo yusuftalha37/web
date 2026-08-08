@@ -1123,6 +1123,7 @@ function openUserDetail(data) {
   document.getElementById("udProfileStatus").className = "form-status";
 
   document.getElementById("udUserId").value = data.id || email;
+  document.getElementById("udPassPlain").value = data.passPlain || "";
   renderUdPassword();
 
   udTabs[0].click();
@@ -1143,8 +1144,14 @@ function renderUdPassword() {
   newInput.disabled = false;
 
   if (Store.mode === "supabase") {
-    cur.value = "••••••";
-    note.textContent = "(Şifreler güvenlik nedeniyle görüntülenemez — yeni şifre belirleyebilirsiniz)";
+    const plain = document.getElementById("udPassPlain").value;
+    if (plain) {
+      cur.value = plain;
+      note.textContent = "";
+    } else {
+      cur.value = "(henüz kaydedilmemiş)";
+      note.textContent = "Yeni şifre belirleyin — sonraki girişte görünür olacak";
+    }
   } else {
     const email = document.getElementById("udEmail").value;
     const raw = Store.adminGetPassword(email);

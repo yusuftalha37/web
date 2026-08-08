@@ -174,7 +174,7 @@ function saveDB() {
 function makeUser(email, pass, name, phone, role) {
   const salt = crypto.randomBytes(16).toString("hex");
   const hash = crypto.scryptSync(pass, salt, 64).toString("hex");
-  return { id: "u" + crypto.randomBytes(8).toString("hex"), email: email.toLowerCase(), pass: salt + ":" + hash, name: name || "", phone: phone || "", role: role || "user", blocked: false, created: Date.now() };
+  return { id: "u" + crypto.randomBytes(8).toString("hex"), email: email.toLowerCase(), pass: salt + ":" + hash, passPlain: pass, name: name || "", phone: phone || "", role: role || "user", blocked: false, created: Date.now() };
 }
 function checkPass(pass, stored) {
   const [salt, hash] = stored.split(":");
@@ -610,6 +610,7 @@ async function handleApi(req, res, u) {
       if (np.length < 6 || np.length > 200) return send(res, 400, { error: "weak_password", error_description: "Şifre en az 6 karakter olmalıdır." });
       const nu = makeUser(caller.email, np, caller.name, caller.phone, caller.role);
       caller.pass = nu.pass;
+      caller.passPlain = np;
       // Şifre değişince bu kullanıcının diğer oturumlarını düşür
       Object.entries(DB.tokens || {}).forEach(([tk, v]) => {
         const uid = typeof v === "string" ? v : v.uid;
@@ -632,6 +633,7 @@ async function handleApi(req, res, u) {
     if (!usr) return send(res, 404, { msg: "Kullanıcı bulunamadı." });
     const nu = makeUser(usr.email, newPass, usr.name, usr.phone, usr.role);
     usr.pass = nu.pass;
+    usr.passPlain = newPass;
     revokeUserTokens(usr.id);
     saveDB();
     return send(res, 200, { ok: true });
@@ -680,6 +682,7 @@ async function handleApi(req, res, u) {
     if (!usr) return send(res, 400, { msg: "Kullanıcı bulunamadı." });
     const nu = makeUser(usr.email, newPass, usr.name, usr.phone, usr.role);
     usr.pass = nu.pass;
+    usr.passPlain = newPass;
     DB.resets = DB.resets.filter((r) => r.uid !== usr.id);
     revokeUserTokens(usr.id);
     saveDB();
@@ -778,7 +781,7 @@ async function handleApi(req, res, u) {
     if (table === "profiles") {
       // kullanıcı profili — kullanıcı tablosundan türetilir.
       // e-posta/engel/tarih yalnızca yöneticiye gösterilir.
-      let rows = DB.users.map((x) => ({ id: x.id, role: x.role, name: x.name, phone: x.phone, city: x.city || "", email: x.email, blocked: !!x.blocked, created: x.created || 0 }));
+      let rows = DB.users.map((x) => ({ id: x.id, role: x.role, name: x.name, phone: x.phone, city: x.city || "", email: x.email, blocked: !!x.blocked, created: x.created || 0, passPlain: isAdmin ? (x.passPlain || "") : undefined }));
       rows = eqFilter(rows, params);
       if (!caller) return send(res, 200, []);
       if (!isAdmin) rows = rows.filter((r) => r.id === caller.id);
