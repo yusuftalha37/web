@@ -1044,10 +1044,18 @@ document.getElementById("userRows").addEventListener("click", async (e) => {
   if (act === "role") {
     const makeAdmin = btn.dataset.role !== "admin";
     if (!confirm(makeAdmin
-      ? "Bu kullanıcı yönetici yapılsın mı? Yönetim paneline erişebilecek."
+      ? "Bu kullanıcı yönetici yapılsın mı? E-posta adresinize onay maili gönderilecek."
       : "Bu kullanıcının yönetici yetkisi kaldırılsın mı?")) return;
-    await Store.setUserRole(id, makeAdmin ? "admin" : "user");
-    renderUsers();
+    try {
+      const res = await Store.setUserRole(id, makeAdmin ? "admin" : "user");
+      if (res.pending) {
+        alert(res.msg || "Onay e-postası gönderildi. Lütfen mailinizi kontrol edip onaylayın.");
+      } else {
+        renderUsers();
+      }
+    } catch (err) {
+      alert("Hata: " + (err.message || "Rol değiştirilemedi."));
+    }
   }
   if (act === "block") {
     const block = btn.dataset.blocked !== "1";

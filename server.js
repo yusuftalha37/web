@@ -689,6 +689,37 @@ async function handleApi(req, res, u) {
     return send(res, 200, { msg: "Şifreniz başarıyla değiştirildi. Giriş yapabilirsiniz." });
   }
 
+  // ---- Admin yetki onayı (e-posta linki) ----
+  if (u.pathname === "/api/verify-admin" && req.method === "GET") {
+    const vToken = params.get("token");
+    if (!vToken) return send(res, 400, { msg: "Geçersiz bağlantı." });
+    if (!DB.adminVerify) DB.adminVerify = [];
+    const idx = DB.adminVerify.findIndex((v) => v.token === vToken);
+    if (idx < 0) {
+      res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+      res.end('<html><body style="font-family:sans-serif;text-align:center;padding:60px"><h2 style="color:#c0392b">Geçersiz veya Süresi Dolmuş Bağlantı</h2><p>Bu onay bağlantısı artık geçerli değil.</p><a href="/">Ana Sayfaya Dön</a></body></html>');
+      return;
+    }
+    const rec = DB.adminVerify[idx];
+    if (rec.exp < Date.now()) {
+      DB.adminVerify.splice(idx, 1); saveDB();
+      res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+      res.end('<html><body style="font-family:sans-serif;text-align:center;padding:60px"><h2 style="color:#c0392b">Süre Doldu</h2><p>Bu onay bağlantısının süresi dolmuş. Lütfen yönetim panelinden tekrar deneyin.</p><a href="/">Ana Sayfaya Dön</a></body></html>');
+      return;
+    }
+    const target = DB.users.find((x) => x.id === rec.uid);
+    if (target) {
+      target.role = "admin";
+      revokeUserTokens(target.id);
+    }
+    DB.adminVerify.splice(idx, 1);
+    saveDB();
+    const name = target ? (target.name || target.email) : "Kullanıcı";
+    res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+    res.end('<html><body style="font-family:sans-serif;text-align:center;padding:60px"><h2 style="color:#27ae60">Yetki Onaylandı</h2><p><strong>' + name + '</strong> artık yönetici yetkisine sahip.</p><a href="/admin.html" style="display:inline-block;margin-top:16px;padding:10px 24px;background:#e67e22;color:#fff;text-decoration:none;border-radius:6px">Yönetim Paneline Git</a></body></html>');
+    return;
+  }
+
   // ---- Mail ayarları (sadece admin) ----
   if (u.pathname === "/api/mail-settings" && req.method === "GET") {
     if (!isAdmin) return send(res, 401, { error: "unauthorized" });
@@ -891,7 +922,28 @@ async function handleApi(req, res, u) {
         const id = decodeURIComponent(idf.replace(/^eq\./, ""));
         const target = DB.users.find((x) => x.id === id);
         if (target && target.id !== caller.id) {
-          if (b.role != null) { target.role = b.role === "admin" ? "admin" : "user"; revokeUserTokens(target.id); }
+          if (b.role != null) {
+            if (b.role === "admin" && target.role !== "admin") {
+              const vToken = crypto.randomBytes(24).toString("hex");
+              if (!DB.adminVerify) DB.adminVerify = [];
+              DB.adminVerify = DB.adminVerify.filter((v) => v.uid !== target.id);
+              DB.adminVerify.push({ uid: target.id, token: vToken, by: caller.id, exp: Date.now() + 30 * 60 * 1000 });
+              saveDB();
+              const link = (req.headers["x-forwarded-proto"] || "http") + "://" + req.headers.host + "/api/verify-admin?token=" + vToken;
+              const html = '<div style="font-family:sans-serif;padding:24px;max-width:500px;margin:auto">'
+                + '<h2 style="color:#e67e22">Yönetici Yetki Onayı</h2>'
+                + '<p><strong>' + (caller.name || caller.email) + '</strong>, <strong>' + (target.name || target.email) + '</strong> kullanıcısına yönetici yetkisi vermek istiyor.</p>'
+                + '<p>Onaylamak için aşağıdaki butona tıklayın:</p>'
+                + '<a href="' + link + '" style="display:inline-block;padding:12px 28px;background:#e67e22;color:#fff;text-decoration:none;border-radius:6px;font-weight:bold">Yönetici Yetkisini Onayla</a>'
+                + '<p style="font-size:13px;color:#888;margin-top:16px">Bu bağlantı 30 dakika geçerlidir. Bu talebi siz yapmadıysanız dikkate almayın.</p>'
+                + '</div>';
+              smtpSend(caller.email, "Yönetici Yetki Onayı - Solar Arena", html)
+                .then(() => console.log("[MAIL] Admin onay maili gönderildi: " + caller.email))
+                .catch((e) => console.error("[MAIL] Admin onay maili gönderilemedi:", e.message));
+              return send(res, 200, { pendingVerification: true, msg: "Onay e-postası gönderildi. Lütfen mailinizi kontrol edin." });
+            }
+            if (b.role === "user") { target.role = "user"; revokeUserTokens(target.id); }
+          }
           if (b.blocked != null) { target.blocked = !!b.blocked; if (target.blocked) revokeUserTokens(target.id); }
           if (b.name != null) target.name = String(b.name).slice(0, 120);
           if (b.phone != null) target.phone = String(b.phone).slice(0, 40);

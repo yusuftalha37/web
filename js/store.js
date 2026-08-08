@@ -512,7 +512,22 @@ const Store = (() => {
       .sort((a, b) => (b.created || 0) - (a.created || 0));
   }
   async function setUserRole(id, role) {
-    if (persist) { await sbWrite("PATCH", "profiles", "id=eq." + encodeURIComponent(id), { role }); return { ok: true }; }
+    if (persist) {
+      const r = await fetch(SB_URL + "/rest/v1/profiles?id=eq." + encodeURIComponent(id), {
+        method: "PATCH",
+        headers: { apikey: SB_KEY, Authorization: "Bearer " + token(), "Content-Type": "application/json", Prefer: "return=minimal,resolution=merge-duplicates" },
+        body: JSON.stringify({ role })
+      });
+      if (r.status === 200) {
+        const d = await r.json().catch(() => ({}));
+        if (d.pendingVerification) return { ok: true, pending: true, msg: d.msg };
+      }
+      if (!r.ok && r.status !== 204) {
+        const t = await r.text().catch(() => "");
+        throw new Error(t || "Rol değiştirilemedi.");
+      }
+      return { ok: true };
+    }
     const users = getUsersLocal();
     const u = users.find((x) => x.email === id);
     if (u) { u.role = role; write("gp-users", users); }
