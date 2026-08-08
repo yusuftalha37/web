@@ -759,18 +759,16 @@ async function handleApi(req, res, u) {
     const boundary = "--" + (bm[1] || bm[2]);
     const MAX_IMG = 10 * 1024 * 1024;
     const chunks = [];
-    let size = 0, aborted = false;
+    let size = 0, tooLarge = false;
     await new Promise((resolve) => {
       req.on("data", (c) => {
-        if (aborted) return;
         size += c.length;
-        if (size > MAX_IMG) { aborted = true; resolve(); try { req.destroy(); } catch (_) {} return; }
-        chunks.push(c);
+        if (size > MAX_IMG) { tooLarge = true; } else { chunks.push(c); }
       });
       req.on("end", resolve);
       req.on("error", resolve);
     });
-    if (aborted) return send(res, 413, { error: "too_large", error_description: "Dosya çok büyük (maks. 10 MB)." });
+    if (tooLarge) return send(res, 413, { error: "too_large", error_description: "Dosya çok büyük (maks. 10 MB)." });
     const raw = Buffer.concat(chunks);
     const bndBuf = Buffer.from(boundary);
     let start = -1, end = -1;

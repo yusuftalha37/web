@@ -137,9 +137,7 @@ function saveErrorText(err) {
   return "Kayıt başarısız: " + (msg || "bilinmeyen hata") + ". Sunucunun çalıştığından ve dosyaların güncel olduğundan emin olun.";
 }
 
-// Görsel dosyasını en fazla 900px olacak şekilde küçültüp JPEG'e çevirir;
-// hem düzenleme penceresi hem ürün yükleme ekranı kullanır.
-function readImageFile(file, cb) {
+function readImageFile(file, cb, maxSize) {
   if (!file || !file.type.startsWith("image/")) {
     alert("Lütfen geçerli bir görsel dosyası seçin (JPG, PNG, WebP vb.).");
     return;
@@ -148,36 +146,41 @@ function readImageFile(file, cb) {
     alert("Dosya çok büyük (maks. 10 MB). Lütfen daha küçük bir görsel seçin.");
     return;
   }
-  const s = Store.session();
-  const token = s && s.token;
-  if (Store.mode === "supabase" && token) {
-    const fd = new FormData();
-    fd.append("file", file);
-    fetch("/api/upload-image", {
-      method: "POST",
-      headers: { Authorization: "Bearer " + token },
-      body: fd
-    })
-      .then((r) => r.json().then((d) => ({ ok: r.ok, status: r.status, data: d })))
-      .then(({ ok, status, data }) => {
-        if (ok && data.url) cb(data.url);
-        else if (status === 401 || status === 403) alert("Oturum süreniz dolmuş. Lütfen çıkış yapıp tekrar giriş yapın.");
-        else if (status === 413) alert("Dosya çok büyük. Lütfen 10 MB'den küçük bir görsel seçin.");
-        else alert("Resim yüklenemedi: " + (data.error_description || data.error || "Bilinmeyen hata"));
-      })
-      .catch(() => alert("Resim yüklenirken bağlantı hatası oluştu. İnternet bağlantınızı kontrol edin."));
-    return;
-  }
+  const MAX = maxSize || 900;
   const img = new Image();
   img.onload = () => {
-    const MAX = 900;
     const scale = Math.min(1, MAX / Math.max(img.width, img.height));
     const canvas = document.createElement("canvas");
     canvas.width = Math.round(img.width * scale);
     canvas.height = Math.round(img.height * scale);
     canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
     URL.revokeObjectURL(img.src);
-    cb(canvas.toDataURL("image/jpeg", 0.82));
+
+    const s = Store.session();
+    const token = s && s.token;
+    if (Store.mode === "supabase" && token) {
+      canvas.toBlob((blob) => {
+        if (!blob) { alert("Görsel işlenemedi."); return; }
+        const fd = new FormData();
+        const ext = (file.name.match(/\.(jpe?g|png|webp)$/i) || [".jpg"])[0];
+        fd.append("file", blob, "img" + ext);
+        fetch("/api/upload-image", {
+          method: "POST",
+          headers: { Authorization: "Bearer " + token },
+          body: fd
+        })
+          .then((r) => r.json().then((d) => ({ ok: r.ok, status: r.status, data: d })))
+          .then(({ ok, status, data }) => {
+            if (ok && data.url) cb(data.url);
+            else if (status === 401 || status === 403) alert("Oturum süreniz dolmuş. Lütfen çıkış yapıp tekrar giriş yapın.");
+            else if (status === 413) alert("Dosya çok büyük. Lütfen 10 MB'den küçük bir görsel seçin.");
+            else alert("Resim yüklenemedi: " + (data.error_description || data.error || "Bilinmeyen hata"));
+          })
+          .catch(() => alert("Resim yüklenirken bağlantı hatası oluştu. İnternet bağlantınızı kontrol edin."));
+      }, "image/jpeg", 0.85);
+    } else {
+      cb(canvas.toDataURL("image/jpeg", 0.82));
+    }
   };
   img.onerror = () => alert("Bu dosya bir görsel olarak okunamadı.");
   img.src = URL.createObjectURL(file);
@@ -764,11 +767,11 @@ slDrop.addEventListener("drop", (e) => {
   e.preventDefault();
   slDrop.classList.remove("drag");
   const file = e.dataTransfer.files[0];
-  if (file) readImageFile(file, (d) => { setSlidePhoto(d); slPhotoUrl.value = ""; });
+  if (file) readImageFile(file, (d) => { setSlidePhoto(d); slPhotoUrl.value = ""; }, 1920);
 });
 slPhotoFile.addEventListener("change", () => {
   const file = slPhotoFile.files[0];
-  if (file) readImageFile(file, (d) => { setSlidePhoto(d); slPhotoUrl.value = ""; });
+  if (file) readImageFile(file, (d) => { setSlidePhoto(d); slPhotoUrl.value = ""; }, 1920);
 });
 slPhotoUrl.addEventListener("change", () => {
   const url = slPhotoUrl.value.trim();
