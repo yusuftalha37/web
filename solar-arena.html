@@ -619,7 +619,10 @@ img, svg { max-width: 100%; }
   inset: 0;
   background-size: cover;
   background-position: center;
+  background-repeat: no-repeat;
 }
+
+.slide-bg-contain { background-size: contain; }
 
 .slide-bg-art svg { width: 100%; height: 100%; display: block; }
 
@@ -2748,6 +2751,20 @@ img, svg { max-width: 100%; }
   font-size: 0.85rem;
   font-family: inherit;
 }
+.sl-fit-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.sl-fit-row label { font-size: 13px; font-weight: 600; color: #475569; white-space: nowrap; }
+.sl-fit-select {
+  flex: 1;
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 13px;
+  background: #fff;
+}
 
 #upPhotoRemove { margin-top: 8px; margin-left: 0; }
 
@@ -4202,6 +4219,13 @@ img, svg { max-width: 100%; }
               </div>
               <input type="text" id="slPhotoUrl" class="up-url" placeholder="veya görsel bağlantısı: https://...">
               <button type="button" class="row-btn row-btn-danger" id="slPhotoRemove">Görseli Kaldır</button>
+              <div id="slFitPanel" class="sl-fit-row" style="margin-top:10px" hidden>
+                <label>Görüntüleme:</label>
+                <select id="slImgFit" class="sl-fit-select">
+                  <option value="cover">Kapla (görseli kırparak doldur)</option>
+                  <option value="contain">Sığdır (görselin tamamını göster)</option>
+                </select>
+              </div>
               <small class="photo-hint">Görsel yüklemezseniz kategoriye uygun hazır çizim gösterilir.</small>
             </div>
             <div class="form-group">
@@ -4759,8 +4783,8 @@ const Store = (() => {
   // ---- DB satırı <-> uygulama nesnesi ----
   function fromDbProduct(r) { return { id: r.id, cat: r.cat, cats: Array.isArray(r.cats) ? r.cats : [], img: r.img, photo: r.photo || "", name: r.name, specs: r.specs || [], price: r.price, stock: r.stock, hit: !!r.hit, authorized: !!r.authorized }; }
   function toDbProduct(p, sort) { return { id: p.id, cat: p.cat, cats: Array.isArray(p.cats) ? p.cats : [], img: p.img, photo: p.photo || "", name: p.name, specs: p.specs || [], price: p.price, stock: p.stock, hit: !!p.hit, authorized: !!p.authorized, sort: sort == null ? 0 : sort }; }
-  function fromDbSlide(r) { return { id: r.id, image: r.image || "", imgPos: r.imgPos || "50% 50%", art: r.art, title: r.title, subtitle: r.subtitle || "", btnText: r.btnText || "", btnLink: r.btnLink || "urunler.html" }; }
-  function toDbSlide(s, sort) { return { id: s.id, image: s.image || "", imgPos: s.imgPos || "center center", art: s.art, title: s.title, subtitle: s.subtitle || "", btnText: s.btnText || "", btnLink: s.btnLink || "urunler.html", sort: sort == null ? 0 : sort }; }
+  function fromDbSlide(r) { return { id: r.id, image: r.image || "", imgPos: r.imgPos || "50% 50%", imgFit: r.imgFit || "cover", art: r.art, title: r.title, subtitle: r.subtitle || "", btnText: r.btnText || "", btnLink: r.btnLink || "urunler.html" }; }
+  function toDbSlide(s, sort) { return { id: s.id, image: s.image || "", imgPos: s.imgPos || "center center", imgFit: s.imgFit || "cover", art: s.art, title: s.title, subtitle: s.subtitle || "", btnText: s.btnText || "", btnLink: s.btnLink || "urunler.html", sort: sort == null ? 0 : sort }; }
   function fromDbOrder(r) { return { id: r.id, customer: r.customer, phone: r.phone, email: r.email, city: r.city, address: r.address, payment: r.payment, status: r.status, items: r.items || [], total: r.total, date: r.created }; }
   function fromDbLead(r) { return { id: r.id, name: r.name, phone: r.phone, city: r.city, type: r.type, message: r.message, date: r.created }; }
 
@@ -5841,8 +5865,9 @@ function initSite(root) {
     showroomTrack.innerHTML = slides
       .map((s) => {
         const pos = s.imgPos || "center center";
+        const fit = s.imgFit || "cover";
         const bg = s.image
-          ? `<div class="slide-bg" style="background-image:url('${String(s.image).replace(/'/g, "%27")}');background-position:${pos}"></div>`
+          ? `<div class="slide-bg${fit === "contain" ? " slide-bg-contain" : ""}" style="background-image:url('${String(s.image).replace(/'/g, "%27")}');background-position:${pos};background-size:${fit}"></div>`
           : `<div class="slide-bg slide-bg-art">${SLIDE_ART[s.art] || SLIDE_ART.roof}</div>`;
         return `
         <div class="slide">
@@ -7300,12 +7325,16 @@ const slPhotoUrl = document.getElementById("slPhotoUrl");
 let slidePhoto = "";
 const SL_DROP_DEFAULT = slDropInner.innerHTML;
 
+const slFitPanel = document.getElementById("slFitPanel");
+const slImgFitSelect = document.getElementById("slImgFit");
+
 function setSlidePhoto(src) {
   slidePhoto = src || "";
   slDropInner.innerHTML = slidePhoto
     ? `<img src="${escHtml(slidePhoto)}" alt="Önizleme"><span>Değiştirmek için tıklayın veya yeni görsel sürükleyin</span>`
     : SL_DROP_DEFAULT;
   slDrop.classList.toggle("has-photo", !!slidePhoto);
+  if (slFitPanel) slFitPanel.hidden = !slidePhoto;
 }
 
 slDrop.addEventListener("click", () => slPhotoFile.click());
@@ -7345,6 +7374,7 @@ function resetSlideForm() {
   slPhotoFile.value = "";
   slPhotoUrl.value = "";
   setSlidePhoto("");
+  slImgFitSelect.value = "cover";
   document.getElementById("slCancel").hidden = true;
 }
 
@@ -7360,6 +7390,7 @@ function editSlide(s) {
   document.getElementById("slArt").value = s.art || "roof";
   slPhotoUrl.value = s.image && !String(s.image).startsWith("data:") ? s.image : "";
   setSlidePhoto(s.image || "");
+  slImgFitSelect.value = s.imgFit || "cover";
   document.getElementById("slCancel").hidden = false;
   window.scrollTo(0, 0);
 }
@@ -7414,6 +7445,7 @@ slideForm.addEventListener("submit", (e) => {
     Store.saveSlide({
       id: document.getElementById("slId").value || "",
       image: slidePhoto,
+      imgFit: slImgFitSelect.value || "cover",
       art: document.getElementById("slArt").value,
       title,
       subtitle: document.getElementById("slSub").value.trim(),

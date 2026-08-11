@@ -756,6 +756,7 @@ const slPosImg = document.getElementById("slPosImg");
 const slPosViewport = document.getElementById("slPosViewport");
 const slPosInfo = document.getElementById("slPosInfo");
 const slImgPosInput = document.getElementById("slImgPos");
+const slImgFitSelect = document.getElementById("slImgFit");
 let slPosXVal = 50, slPosYVal = 50;
 
 function setSlidePhoto(src) {
@@ -867,6 +868,7 @@ function resetSlideForm() {
   slPhotoUrl.value = "";
   setSlidePhoto("");
   applySlidePos("50% 50%");
+  slImgFitSelect.value = "cover";
   document.getElementById("slCancel").hidden = true;
 }
 
@@ -883,6 +885,7 @@ function editSlide(s) {
   slPhotoUrl.value = s.image && !String(s.image).startsWith("data:") ? s.image : "";
   setSlidePhoto(s.image || "");
   applySlidePos(s.imgPos || "50% 50%");
+  slImgFitSelect.value = s.imgFit || "cover";
   document.getElementById("slCancel").hidden = false;
   window.scrollTo(0, 0);
 }
@@ -943,6 +946,7 @@ slideForm.addEventListener("submit", async (e) => {
       id: document.getElementById("slId").value || "",
       image: slidePhoto,
       imgPos: slImgPosInput.value || "50% 50%",
+      imgFit: slImgFitSelect.value || "cover",
       art: document.getElementById("slArt").value,
       title,
       subtitle: document.getElementById("slSub").value.trim(),
