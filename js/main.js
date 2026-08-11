@@ -495,7 +495,7 @@ function initSite(root) {
 
     showroomTrack.innerHTML = slides
       .map((s) => {
-        const pos = s.imgPos || "center center";
+        const pos = s.imgPos || "50% 50%";
         const bg = s.image
           ? `<div class="slide-bg" style="background-image:url('${String(s.image).replace(/'/g, "%27")}');background-position:${pos}"></div>`
           : `<div class="slide-bg slide-bg-art">${SLIDE_ART[s.art] || SLIDE_ART.roof}</div>`;

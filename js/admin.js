@@ -753,9 +753,10 @@ let slidePhoto = "";
 const SL_DROP_DEFAULT = slDropInner.innerHTML;
 const slPosPanel = document.getElementById("slPosPanel");
 const slPosFrame = document.getElementById("slPosFrame");
-const slPosCross = document.getElementById("slPosCross");
 const slPosPreview = document.getElementById("slPosPreview");
 const slImgPosInput = document.getElementById("slImgPos");
+const slPosX = document.getElementById("slPosX");
+const slPosY = document.getElementById("slPosY");
 
 function setSlidePhoto(src) {
   slidePhoto = src || "";
@@ -766,37 +767,55 @@ function setSlidePhoto(src) {
   slPosPanel.hidden = !slidePhoto;
   if (slidePhoto) {
     slPosFrame.style.backgroundImage = "url('" + slidePhoto.replace(/'/g, "%27") + "')";
-    setSlidePos(slImgPosInput.value || "center center");
+    applySlidePos(slImgPosInput.value || "50% 50%");
   }
 }
 
-function setSlidePos(pos) {
-  slImgPosInput.value = pos;
-  slPosFrame.style.backgroundPosition = pos;
-  const parts = pos.split(" ");
-  const xMap = { left: "14px", center: "50%", right: "calc(100% - 14px)" };
-  const yMap = { top: "14px", center: "50%", bottom: "calc(100% - 14px)" };
-  slPosCross.style.left = xMap[parts[0]] || "50%";
-  slPosCross.style.top = yMap[parts[1]] || "50%";
-  slPosPanel.querySelectorAll(".sl-pos-grid button").forEach((b) => {
-    b.classList.toggle("active", b.dataset.pos === pos);
-  });
+function applySlidePos(pos) {
+  const m = pos.match(/(\d+)%\s+(\d+)%/);
+  const x = m ? parseInt(m[1]) : 50;
+  const y = m ? parseInt(m[2]) : 50;
+  slPosX.value = x;
+  slPosY.value = y;
+  updateSlidePos();
 }
 
-slPosPanel.querySelector(".sl-pos-grid").addEventListener("click", (e) => {
-  const btn = e.target.closest("button[data-pos]");
-  if (btn) setSlidePos(btn.dataset.pos);
+function updateSlidePos() {
+  const x = slPosX.value;
+  const y = slPosY.value;
+  const pos = x + "% " + y + "%";
+  slImgPosInput.value = pos;
+  slPosFrame.style.backgroundPosition = pos;
+}
+
+slPosX.addEventListener("input", updateSlidePos);
+slPosY.addEventListener("input", updateSlidePos);
+document.getElementById("slPosReset").addEventListener("click", () => {
+  slPosX.value = 50;
+  slPosY.value = 50;
+  updateSlidePos();
 });
 
-slPosPreview.addEventListener("click", (e) => {
-  if (e.target.closest(".sl-pos-grid")) return;
-  const rect = slPosPreview.getBoundingClientRect();
-  const xPct = (e.clientX - rect.left) / rect.width * 100;
-  const yPct = (e.clientY - rect.top) / rect.height * 100;
-  const xLabel = xPct < 33 ? "left" : xPct > 66 ? "right" : "center";
-  const yLabel = yPct < 33 ? "top" : yPct > 66 ? "bottom" : "center";
-  setSlidePos(xLabel + " " + yLabel);
-});
+(function () {
+  let dragging = false;
+  function onMove(e) {
+    if (!dragging) return;
+    e.preventDefault();
+    const rect = slPosPreview.getBoundingClientRect();
+    const cx = (e.touches ? e.touches[0].clientX : e.clientX);
+    const cy = (e.touches ? e.touches[0].clientY : e.clientY);
+    slPosX.value = Math.round(Math.max(0, Math.min(100, (cx - rect.left) / rect.width * 100)));
+    slPosY.value = Math.round(Math.max(0, Math.min(100, (cy - rect.top) / rect.height * 100)));
+    updateSlidePos();
+  }
+  function onUp() { dragging = false; }
+  slPosPreview.addEventListener("mousedown", (e) => { dragging = true; onMove(e); });
+  slPosPreview.addEventListener("touchstart", (e) => { dragging = true; onMove(e); }, { passive: false });
+  document.addEventListener("mousemove", onMove);
+  document.addEventListener("touchmove", onMove, { passive: false });
+  document.addEventListener("mouseup", onUp);
+  document.addEventListener("touchend", onUp);
+})();
 
 slDrop.addEventListener("click", () => slPhotoFile.click());
 slDrop.addEventListener("dragover", (e) => { e.preventDefault(); slDrop.classList.add("drag"); });
@@ -835,7 +854,7 @@ function resetSlideForm() {
   slPhotoFile.value = "";
   slPhotoUrl.value = "";
   setSlidePhoto("");
-  setSlidePos("center center");
+  applySlidePos("50% 50%");
   document.getElementById("slCancel").hidden = true;
 }
 
@@ -851,7 +870,7 @@ function editSlide(s) {
   document.getElementById("slArt").value = s.art || "roof";
   slPhotoUrl.value = s.image && !String(s.image).startsWith("data:") ? s.image : "";
   setSlidePhoto(s.image || "");
-  setSlidePos(s.imgPos || "center center");
+  applySlidePos(s.imgPos || "50% 50%");
   document.getElementById("slCancel").hidden = false;
   window.scrollTo(0, 0);
 }
@@ -911,7 +930,7 @@ slideForm.addEventListener("submit", async (e) => {
     await Store.saveSlide({
       id: document.getElementById("slId").value || "",
       image: slidePhoto,
-      imgPos: slImgPosInput.value || "center center",
+      imgPos: slImgPosInput.value || "50% 50%",
       art: document.getElementById("slArt").value,
       title,
       subtitle: document.getElementById("slSub").value.trim(),
