@@ -752,11 +752,11 @@ const slPhotoUrl = document.getElementById("slPhotoUrl");
 let slidePhoto = "";
 const SL_DROP_DEFAULT = slDropInner.innerHTML;
 const slPosPanel = document.getElementById("slPosPanel");
-const slPosFrame = document.getElementById("slPosFrame");
-const slPosPreview = document.getElementById("slPosPreview");
+const slPosImg = document.getElementById("slPosImg");
+const slPosViewport = document.getElementById("slPosViewport");
+const slPosInfo = document.getElementById("slPosInfo");
 const slImgPosInput = document.getElementById("slImgPos");
-const slPosX = document.getElementById("slPosX");
-const slPosY = document.getElementById("slPosY");
+let slPosXVal = 50, slPosYVal = 50;
 
 function setSlidePhoto(src) {
   slidePhoto = src || "";
@@ -766,55 +766,67 @@ function setSlidePhoto(src) {
   slDrop.classList.toggle("has-photo", !!slidePhoto);
   slPosPanel.hidden = !slidePhoto;
   if (slidePhoto) {
-    slPosFrame.style.backgroundImage = "url('" + slidePhoto.replace(/'/g, "%27") + "')";
-    applySlidePos(slImgPosInput.value || "50% 50%");
+    slPosImg.style.backgroundImage = "url('" + slidePhoto.replace(/'/g, "%27") + "')";
+    slPosViewport.classList.remove("dragged");
   }
 }
 
 function applySlidePos(pos) {
-  const m = pos.match(/(\d+)%\s+(\d+)%/);
-  const x = m ? parseInt(m[1]) : 50;
-  const y = m ? parseInt(m[2]) : 50;
-  slPosX.value = x;
-  slPosY.value = y;
-  updateSlidePos();
+  const m = pos.match(/([\d.]+)%\s+([\d.]+)%/);
+  slPosXVal = m ? parseFloat(m[1]) : 50;
+  slPosYVal = m ? parseFloat(m[2]) : 50;
+  renderSlidePos();
 }
 
-function updateSlidePos() {
-  const x = slPosX.value;
-  const y = slPosY.value;
-  const pos = x + "% " + y + "%";
+function renderSlidePos() {
+  slPosXVal = Math.max(0, Math.min(100, slPosXVal));
+  slPosYVal = Math.max(0, Math.min(100, slPosYVal));
+  const pos = Math.round(slPosXVal) + "% " + Math.round(slPosYVal) + "%";
   slImgPosInput.value = pos;
-  slPosFrame.style.backgroundPosition = pos;
+  slPosImg.style.backgroundPosition = pos;
+  const xL = slPosXVal < 33 ? "sol" : slPosXVal > 66 ? "sag" : "orta";
+  const yL = slPosYVal < 33 ? "ust" : slPosYVal > 66 ? "alt" : "orta";
+  slPosInfo.textContent = "Konum: " + (xL === "orta" && yL === "orta" ? "orta" : yL + " " + xL);
 }
 
-slPosX.addEventListener("input", updateSlidePos);
-slPosY.addEventListener("input", updateSlidePos);
 document.getElementById("slPosReset").addEventListener("click", () => {
-  slPosX.value = 50;
-  slPosY.value = 50;
-  updateSlidePos();
+  slPosXVal = 50;
+  slPosYVal = 50;
+  renderSlidePos();
 });
 
 (function () {
-  let dragging = false;
-  function onMove(e) {
+  let dragging = false, startX = 0, startY = 0, startPosX = 0, startPosY = 0;
+
+  function begin(e) {
+    dragging = true;
+    const t = e.touches ? e.touches[0] : e;
+    startX = t.clientX;
+    startY = t.clientY;
+    startPosX = slPosXVal;
+    startPosY = slPosYVal;
+    slPosViewport.classList.add("dragged");
+    e.preventDefault();
+  }
+  function move(e) {
     if (!dragging) return;
     e.preventDefault();
-    const rect = slPosPreview.getBoundingClientRect();
-    const cx = (e.touches ? e.touches[0].clientX : e.clientX);
-    const cy = (e.touches ? e.touches[0].clientY : e.clientY);
-    slPosX.value = Math.round(Math.max(0, Math.min(100, (cx - rect.left) / rect.width * 100)));
-    slPosY.value = Math.round(Math.max(0, Math.min(100, (cy - rect.top) / rect.height * 100)));
-    updateSlidePos();
+    const t = e.touches ? e.touches[0] : e;
+    const rect = slPosViewport.getBoundingClientRect();
+    const dx = t.clientX - startX;
+    const dy = t.clientY - startY;
+    slPosXVal = startPosX - (dx / rect.width) * 120;
+    slPosYVal = startPosY - (dy / rect.height) * 120;
+    renderSlidePos();
   }
-  function onUp() { dragging = false; }
-  slPosPreview.addEventListener("mousedown", (e) => { dragging = true; onMove(e); });
-  slPosPreview.addEventListener("touchstart", (e) => { dragging = true; onMove(e); }, { passive: false });
-  document.addEventListener("mousemove", onMove);
-  document.addEventListener("touchmove", onMove, { passive: false });
-  document.addEventListener("mouseup", onUp);
-  document.addEventListener("touchend", onUp);
+  function end() { dragging = false; }
+
+  slPosViewport.addEventListener("mousedown", begin);
+  slPosViewport.addEventListener("touchstart", begin, { passive: false });
+  document.addEventListener("mousemove", move);
+  document.addEventListener("touchmove", move, { passive: false });
+  document.addEventListener("mouseup", end);
+  document.addEventListener("touchend", end);
 })();
 
 slDrop.addEventListener("click", () => slPhotoFile.click());

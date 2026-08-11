@@ -205,20 +205,13 @@
               <input type="text" id="slPhotoUrl" class="up-url" placeholder="veya görsel bağlantısı: https://...">
               <button type="button" class="row-btn row-btn-danger" id="slPhotoRemove">Görseli Kaldır</button>
               <div id="slPosPanel" class="sl-pos-panel" hidden>
-                <label>Görsel konumu <small>(sürükleyerek veya kaydırıcılarla ayarlayın)</small></label>
-                <div class="sl-pos-preview" id="slPosPreview">
-                  <div class="sl-pos-frame" id="slPosFrame"></div>
-                  <div class="sl-pos-overlay"><span>Sürükleyerek konumlandırın</span></div>
+                <label>Görseli sürükleyerek konumlandırın</label>
+                <div class="sl-pos-viewport" id="slPosViewport">
+                  <div class="sl-pos-img" id="slPosImg"></div>
+                  <div class="sl-pos-hint" id="slPosHint">Tutup sürükleyin</div>
                 </div>
-                <div class="sl-pos-controls">
-                  <div class="sl-pos-range-group">
-                    <label>Yatay</label>
-                    <input type="range" id="slPosX" min="0" max="100" value="50">
-                  </div>
-                  <div class="sl-pos-range-group">
-                    <label>Dikey</label>
-                    <input type="range" id="slPosY" min="0" max="100" value="50">
-                  </div>
+                <div class="sl-pos-bar">
+                  <span class="sl-pos-info" id="slPosInfo">Konum: orta</span>
                   <button type="button" class="sl-pos-reset" id="slPosReset">Ortala</button>
                 </div>
                 <input type="hidden" id="slImgPos" value="50% 50%">
