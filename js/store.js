@@ -283,8 +283,8 @@ const Store = (() => {
   // ---- DB satırı <-> uygulama nesnesi ----
   function fromDbProduct(r) { return { id: r.id, cat: r.cat, cats: Array.isArray(r.cats) ? r.cats : [], img: r.img, photo: r.photo || "", name: r.name, specs: r.specs || [], price: r.price, stock: r.stock, hit: !!r.hit, authorized: !!r.authorized }; }
   function toDbProduct(p, sort) { return { id: p.id, cat: p.cat, cats: Array.isArray(p.cats) ? p.cats : [], img: p.img, photo: p.photo || "", name: p.name, specs: p.specs || [], price: p.price, stock: p.stock, hit: !!p.hit, authorized: !!p.authorized, sort: sort == null ? 0 : sort }; }
-  function fromDbSlide(r) { return { id: r.id, image: r.image || "", art: r.art, title: r.title, subtitle: r.subtitle || "", btnText: r.btnText || "", btnLink: r.btnLink || "urunler.html" }; }
-  function toDbSlide(s, sort) { return { id: s.id, image: s.image || "", art: s.art, title: s.title, subtitle: s.subtitle || "", btnText: s.btnText || "", btnLink: s.btnLink || "urunler.html", sort: sort == null ? 0 : sort }; }
+  function fromDbSlide(r) { return { id: r.id, image: r.image || "", imgPos: r.imgPos || "center center", art: r.art, title: r.title, subtitle: r.subtitle || "", btnText: r.btnText || "", btnLink: r.btnLink || "urunler.html" }; }
+  function toDbSlide(s, sort) { return { id: s.id, image: s.image || "", imgPos: s.imgPos || "center center", art: s.art, title: s.title, subtitle: s.subtitle || "", btnText: s.btnText || "", btnLink: s.btnLink || "urunler.html", sort: sort == null ? 0 : sort }; }
   function fromDbOrder(r) { return { id: r.id, customer: r.customer, phone: r.phone, email: r.email, city: r.city, address: r.address, payment: r.payment, status: r.status, items: r.items || [], total: r.total, date: r.created }; }
   function fromDbLead(r) { return { id: r.id, name: r.name, phone: r.phone, city: r.city, type: r.type, message: r.message, date: r.created }; }
 

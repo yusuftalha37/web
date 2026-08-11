@@ -204,6 +204,25 @@
               </div>
               <input type="text" id="slPhotoUrl" class="up-url" placeholder="veya görsel bağlantısı: https://...">
               <button type="button" class="row-btn row-btn-danger" id="slPhotoRemove">Görseli Kaldır</button>
+              <div id="slPosPanel" class="sl-pos-panel" hidden>
+                <label>Görsel konumu <small>(görünecek kısmı seçin)</small></label>
+                <div class="sl-pos-preview" id="slPosPreview">
+                  <div class="sl-pos-frame" id="slPosFrame"></div>
+                  <div class="sl-pos-crosshair" id="slPosCross">+</div>
+                </div>
+                <div class="sl-pos-grid">
+                  <button type="button" data-pos="left top" title="Sol Üst">&#8598;</button>
+                  <button type="button" data-pos="center top" title="Orta Üst">&#8593;</button>
+                  <button type="button" data-pos="right top" title="Sağ Üst">&#8599;</button>
+                  <button type="button" data-pos="left center" title="Sol Orta">&#8592;</button>
+                  <button type="button" data-pos="center center" title="Orta" class="active">&#9679;</button>
+                  <button type="button" data-pos="right center" title="Sağ Orta">&#8594;</button>
+                  <button type="button" data-pos="left bottom" title="Sol Alt">&#8601;</button>
+                  <button type="button" data-pos="center bottom" title="Orta Alt">&#8595;</button>
+                  <button type="button" data-pos="right bottom" title="Sağ Alt">&#8600;</button>
+                </div>
+                <input type="hidden" id="slImgPos" value="center center">
+              </div>
               <small class="photo-hint">Görsel yüklemezseniz kategoriye uygun hazır çizim gösterilir.</small>
             </div>
             <div class="form-group">
