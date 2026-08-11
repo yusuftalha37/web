@@ -570,7 +570,14 @@ img, svg { max-width: 100%; }
   background-repeat: no-repeat;
 }
 
-.slide-bg-contain { background-size: contain; }
+.slide-bg-blur {
+  position: absolute;
+  inset: -30px;
+  background-size: cover;
+  background-position: center;
+  filter: blur(25px) brightness(0.45);
+}
+.slide-bg-contain { background-size: contain; background-repeat: no-repeat; }
 
 .slide-bg-art svg { width: 100%; height: 100%; display: block; }
 

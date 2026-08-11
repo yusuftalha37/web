@@ -622,7 +622,14 @@ img, svg { max-width: 100%; }
   background-repeat: no-repeat;
 }
 
-.slide-bg-contain { background-size: contain; }
+.slide-bg-blur {
+  position: absolute;
+  inset: -30px;
+  background-size: cover;
+  background-position: center;
+  filter: blur(25px) brightness(0.45);
+}
+.slide-bg-contain { background-size: contain; background-repeat: no-repeat; }
 
 .slide-bg-art svg { width: 100%; height: 100%; display: block; }
 
@@ -5866,8 +5873,11 @@ function initSite(root) {
       .map((s) => {
         const pos = s.imgPos || "center center";
         const fit = s.imgFit || "cover";
+        const imgUrl = String(s.image).replace(/'/g, "%27");
         const bg = s.image
-          ? `<div class="slide-bg${fit === "contain" ? " slide-bg-contain" : ""}" style="background-image:url('${String(s.image).replace(/'/g, "%27")}');background-position:${pos};background-size:${fit}"></div>`
+          ? (fit === "contain"
+            ? `<div class="slide-bg slide-bg-blur" style="background-image:url('${imgUrl}')"></div><div class="slide-bg slide-bg-contain" style="background-image:url('${imgUrl}');background-position:${pos}"></div>`
+            : `<div class="slide-bg" style="background-image:url('${imgUrl}');background-position:${pos}"></div>`)
           : `<div class="slide-bg slide-bg-art">${SLIDE_ART[s.art] || SLIDE_ART.roof}</div>`;
         return `
         <div class="slide">

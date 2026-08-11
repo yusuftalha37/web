@@ -497,8 +497,11 @@ function initSite(root) {
       .map((s) => {
         const pos = s.imgPos || "50% 50%";
         const fit = s.imgFit || "cover";
+        const imgUrl = String(s.image).replace(/'/g, "%27");
         const bg = s.image
-          ? `<div class="slide-bg${fit === "contain" ? " slide-bg-contain" : ""}" style="background-image:url('${String(s.image).replace(/'/g, "%27")}');background-position:${pos};background-size:${fit}"></div>`
+          ? (fit === "contain"
+            ? `<div class="slide-bg slide-bg-blur" style="background-image:url('${imgUrl}')"></div><div class="slide-bg slide-bg-contain" style="background-image:url('${imgUrl}');background-position:${pos}"></div>`
+            : `<div class="slide-bg" style="background-image:url('${imgUrl}');background-position:${pos}"></div>`)
           : `<div class="slide-bg slide-bg-art">${SLIDE_ART[s.art] || SLIDE_ART.roof}</div>`;
         return `
         <div class="slide">
