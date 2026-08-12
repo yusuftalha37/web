@@ -28,6 +28,25 @@ function initProductPage(root) {
       let cn = document.querySelector('link[rel="canonical"]');
       if (!cn) { cn = document.createElement("link"); cn.rel = "canonical"; document.head.appendChild(cn); }
       cn.href = "https://solararena.store/urun.html?id=" + encodeURIComponent(p.id);
+      // Open Graph / sosyal paylaşım
+      const prodUrl = "https://solararena.store/urun.html?id=" + encodeURIComponent(p.id);
+      const ogImg = (p.photo && /^https?:\/\//.test(p.photo)) ? p.photo
+        : (p.photo && p.photo.indexOf("/uploads/") === 0) ? "https://solararena.store" + p.photo
+        : "https://solararena.store/og-image.jpg";
+      const setMeta = (attr, key, val) => {
+        let el = document.querySelector('meta[' + attr + '="' + key + '"]');
+        if (!el) { el = document.createElement("meta"); el.setAttribute(attr, key); document.head.appendChild(el); }
+        el.setAttribute("content", val);
+      };
+      setMeta("property", "og:type", "product");
+      setMeta("property", "og:title", p.name + " | Solar Arena");
+      setMeta("property", "og:description", md.content);
+      setMeta("property", "og:url", prodUrl);
+      setMeta("property", "og:image", ogImg);
+      setMeta("property", "og:locale", "tr_TR");
+      setMeta("name", "twitter:card", "summary_large_image");
+      setMeta("name", "twitter:title", p.name + " | Solar Arena");
+      setMeta("name", "twitter:image", ogImg);
       const ld = document.createElement("script");
       ld.type = "application/ld+json";
       ld.textContent = JSON.stringify({

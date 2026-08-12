@@ -1425,11 +1425,13 @@ img, svg { max-width: 100%; }
   overflow: hidden;
 }
 
-.gallery-item svg {
+.gallery-item svg,
+.gallery-item img.gal-photo {
   display: block;
   width: 100%;
   height: auto;
 }
+.gallery-item img.gal-photo { aspect-ratio: 16/10; object-fit: cover; }
 
 .gallery-item:hover { border-color: #b8b8b8; }
 

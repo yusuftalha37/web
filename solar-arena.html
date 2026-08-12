@@ -1496,11 +1496,13 @@ img, svg { max-width: 100%; }
   overflow: hidden;
 }
 
-.gallery-item svg {
+.gallery-item svg,
+.gallery-item img.gal-photo {
   display: block;
   width: 100%;
   height: auto;
 }
+.gallery-item img.gal-photo { aspect-ratio: 16/10; object-fit: cover; }
 
 .gallery-item:hover { border-color: #b8b8b8; }
 
@@ -2772,6 +2774,11 @@ img, svg { max-width: 100%; }
   font-size: 13px;
   background: #fff;
 }
+.ct-img-wrap { display: flex; flex-direction: column; gap: 8px; }
+.ct-img-preview { width: 100%; max-width: 320px; height: 180px; border: 2px dashed var(--border); border-radius: var(--radius); background-size: cover; background-position: center; background-repeat: no-repeat; display: flex; align-items: center; justify-content: center; }
+.ct-img-placeholder { color: #94a3b8; font-size: 13px; }
+.ct-img-actions { display: flex; gap: 8px; }
+.ct-img-btn { font-size: 12px !important; padding: 5px 12px !important; }
 
 #upPhotoRemove { margin-top: 8px; margin-left: 0; }
 
@@ -3107,7 +3114,7 @@ img, svg { max-width: 100%; }
         <p data-site="galText">Ürünlerimizle kurulan sistemlerden örnekler — müşterilerimizin gönderdiği kareler.</p>
       </div>
       <div class="gallery">
-        <figure class="gallery-item">
+        <figure class="gallery-item" data-site-img="galImg1">
           <svg viewBox="0 0 320 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Konut çatı kurulumu">
             <rect width="320" height="130" fill="#bcd7ec"/>
             <circle cx="268" cy="38" r="20" fill="#f5c542"/>
@@ -3125,7 +3132,7 @@ img, svg { max-width: 100%; }
           </svg>
           <figcaption class="gallery-caption" data-site="gal1">Antalya — 8 kW konut çatı GES</figcaption>
         </figure>
-        <figure class="gallery-item">
+        <figure class="gallery-item" data-site-img="galImg2">
           <svg viewBox="0 0 320 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Fabrika çatısı kurulumu">
             <rect width="320" height="130" fill="#c3d9e9"/>
             <circle cx="52" cy="36" r="17" fill="#f5c542"/>
@@ -3142,7 +3149,7 @@ img, svg { max-width: 100%; }
           </svg>
           <figcaption class="gallery-caption" data-site="gal2">İzmir — 120 kW endüstriyel çatı GES</figcaption>
         </figure>
-        <figure class="gallery-item">
+        <figure class="gallery-item" data-site-img="galImg3">
           <svg viewBox="0 0 320 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Tarımsal sulama sistemi">
             <rect width="320" height="120" fill="#c8e0ef"/>
             <circle cx="270" cy="34" r="18" fill="#f5c542"/>
@@ -3167,7 +3174,7 @@ img, svg { max-width: 100%; }
           </svg>
           <figcaption class="gallery-caption" data-site="gal3">Konya — şebekeden bağımsız sulama sistemi</figcaption>
         </figure>
-        <figure class="gallery-item">
+        <figure class="gallery-item" data-site-img="galImg4">
           <svg viewBox="0 0 320 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Arazi tipi güneş santrali">
             <rect width="320" height="120" fill="#cfe2ee"/>
             <circle cx="48" cy="40" r="18" fill="#f5c542"/>
@@ -3183,7 +3190,7 @@ img, svg { max-width: 100%; }
           </svg>
           <figcaption class="gallery-caption" data-site="gal4">Ankara — 1,2 MW arazi tipi GES</figcaption>
         </figure>
-        <figure class="gallery-item">
+        <figure class="gallery-item" data-site-img="galImg5">
           <svg viewBox="0 0 320 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Solar otopark kurulumu">
             <rect width="320" height="140" fill="#c9deee"/>
             <circle cx="270" cy="36" r="18" fill="#f5c542"/>
@@ -5396,6 +5403,26 @@ function applySiteContent(root) {
   });
   root.querySelectorAll('a[data-site="email"]').forEach((a) => {
     a.href = "mailto:" + site.email;
+  });
+  root.querySelectorAll("[data-site-img]").forEach((el) => {
+    const key = el.getAttribute("data-site-img");
+    const url = site[key];
+    if (url && url.trim()) {
+      let img = el.querySelector("img.gal-photo");
+      if (!img) {
+        const svg = el.querySelector("svg");
+        if (svg) svg.style.display = "none";
+        img = document.createElement("img");
+        img.className = "gal-photo";
+        img.alt = el.querySelector(".gallery-caption") ? el.querySelector(".gallery-caption").textContent : "";
+        img.loading = "lazy";
+        el.insertBefore(img, el.firstChild);
+      }
+      if (img.src !== url) img.src = url;
+    } else {
+      const existing = el.querySelector("img.gal-photo");
+      if (existing) { existing.remove(); const s = el.querySelector("svg"); if (s) s.style.display = ""; }
+    }
   });
 }
 
@@ -7661,8 +7688,11 @@ const CONTENT_SCHEMA = [
   ]},
   { group: "Proje Galerisi", fields: [
     ["galTitle", "Başlık"], ["galText", "Açıklama", "area"],
-    ["gal1", "1. görsel yazısı"], ["gal2", "2. görsel yazısı"], ["gal3", "3. görsel yazısı"],
-    ["gal4", "4. görsel yazısı"], ["gal5", "5. görsel yazısı"]
+    ["galImg1", "1. görsel", "image"], ["gal1", "1. görsel yazısı"],
+    ["galImg2", "2. görsel", "image"], ["gal2", "2. görsel yazısı"],
+    ["galImg3", "3. görsel", "image"], ["gal3", "3. görsel yazısı"],
+    ["galImg4", "4. görsel", "image"], ["gal4", "4. görsel yazısı"],
+    ["galImg5", "5. görsel", "image"], ["gal5", "5. görsel yazısı"]
   ]},
   { group: "Referanslar (Yorumlar)", fields: [
     ["refTitle", "Bölüm başlığı"],
@@ -7708,13 +7738,52 @@ function loadContentForm() {
     const rows = sec.fields.map(([key, label, type]) => {
       CONTENT_KEYS.push(key);
       const val = escHtml(site[key] != null ? site[key] : "");
-      const input = type === "area"
-        ? `<textarea id="ct_${key}" rows="2">${val}</textarea>`
-        : `<input type="text" id="ct_${key}" value="${val}">`;
+      let input;
+      if (type === "area") {
+        input = `<textarea id="ct_${key}" rows="2">${val}</textarea>`;
+      } else if (type === "image") {
+        const hasImg = site[key] && site[key].trim();
+        input = `<div class="ct-img-wrap">
+          <div class="ct-img-preview" id="ct_${key}_preview"${hasImg ? ` style="background-image:url('${val}')"` : ""}>${hasImg ? "" : '<span class="ct-img-placeholder">Görsel yükleyin</span>'}</div>
+          <input type="hidden" id="ct_${key}" value="${val}">
+          <div class="ct-img-actions">
+            <label class="btn btn-small btn-outline ct-img-btn"><input type="file" accept="image/*" data-ct-img="${key}" hidden>Görsel Seç</label>
+            <button type="button" class="btn btn-small ct-img-btn" data-ct-img-clear="${key}"${hasImg ? "" : " hidden"}>Kaldır</button>
+          </div>
+        </div>`;
+      } else {
+        input = `<input type="text" id="ct_${key}" value="${val}">`;
+      }
       return `<div class="form-group"><label for="ct_${key}">${escHtml(label)}</label>${input}</div>`;
     }).join("");
     return `<h2 class="content-group-title">${escHtml(sec.group)}</h2>${rows}`;
   }).join("");
+
+  document.querySelectorAll("[data-ct-img]").forEach((fileInput) => {
+    fileInput.addEventListener("change", (e) => {
+      const key = fileInput.getAttribute("data-ct-img");
+      const file = e.target.files[0];
+      if (!file) return;
+      readImageFile(file, (url) => {
+        document.getElementById("ct_" + key).value = url;
+        const preview = document.getElementById("ct_" + key + "_preview");
+        preview.style.backgroundImage = "url('" + url + "')";
+        preview.innerHTML = "";
+        const clearBtn = document.querySelector(`[data-ct-img-clear="${key}"]`);
+        if (clearBtn) clearBtn.hidden = false;
+      }, 1200);
+    });
+  });
+  document.querySelectorAll("[data-ct-img-clear]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const key = btn.getAttribute("data-ct-img-clear");
+      document.getElementById("ct_" + key).value = "";
+      const preview = document.getElementById("ct_" + key + "_preview");
+      preview.style.backgroundImage = "";
+      preview.innerHTML = '<span class="ct-img-placeholder">Görsel yükleyin</span>';
+      btn.hidden = true;
+    });
+  });
 }
 
 document.getElementById("contentForm").addEventListener("submit", (e) => {

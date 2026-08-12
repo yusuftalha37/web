@@ -7,5 +7,7 @@ Disallow: /admin.html
 Disallow: /giris.html
 Disallow: /hesap.html
 Disallow: /sepet.html
+Disallow: /sifre-sifirla.html
+Disallow: /solar-arena.html
 
 Sitemap: https://solararena.store/sitemap.xml

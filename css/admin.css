@@ -667,6 +667,11 @@
   font-size: 13px;
   background: #fff;
 }
+.ct-img-wrap { display: flex; flex-direction: column; gap: 8px; }
+.ct-img-preview { width: 100%; max-width: 320px; height: 180px; border: 2px dashed var(--border); border-radius: var(--radius); background-size: cover; background-position: center; background-repeat: no-repeat; display: flex; align-items: center; justify-content: center; }
+.ct-img-placeholder { color: #94a3b8; font-size: 13px; }
+.ct-img-actions { display: flex; gap: 8px; }
+.ct-img-btn { font-size: 12px !important; padding: 5px 12px !important; }
 
 .up-url {
   width: 100%;

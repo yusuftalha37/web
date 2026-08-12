@@ -1396,8 +1396,11 @@ const CONTENT_SCHEMA = [
   ]},
   { group: "Proje Galerisi", fields: [
     ["galTitle", "Başlık"], ["galText", "Açıklama", "area"],
-    ["gal1", "1. görsel yazısı"], ["gal2", "2. görsel yazısı"], ["gal3", "3. görsel yazısı"],
-    ["gal4", "4. görsel yazısı"], ["gal5", "5. görsel yazısı"]
+    ["galImg1", "1. görsel", "image"], ["gal1", "1. görsel yazısı"],
+    ["galImg2", "2. görsel", "image"], ["gal2", "2. görsel yazısı"],
+    ["galImg3", "3. görsel", "image"], ["gal3", "3. görsel yazısı"],
+    ["galImg4", "4. görsel", "image"], ["gal4", "4. görsel yazısı"],
+    ["galImg5", "5. görsel", "image"], ["gal5", "5. görsel yazısı"]
   ]},
   { group: "Referanslar (Yorumlar)", fields: [
     ["refTitle", "Bölüm başlığı"]
@@ -1427,13 +1430,52 @@ function loadContentForm() {
     const rows = sec.fields.map(([key, label, type]) => {
       CONTENT_KEYS.push(key);
       const val = escHtml(site[key] != null ? site[key] : "");
-      const input = type === "area"
-        ? `<textarea id="ct_${key}" rows="2">${val}</textarea>`
-        : `<input type="text" id="ct_${key}" value="${val}">`;
+      let input;
+      if (type === "area") {
+        input = `<textarea id="ct_${key}" rows="2">${val}</textarea>`;
+      } else if (type === "image") {
+        const hasImg = site[key] && site[key].trim();
+        input = `<div class="ct-img-wrap">
+          <div class="ct-img-preview" id="ct_${key}_preview"${hasImg ? ` style="background-image:url('${val}')"` : ""}>${hasImg ? "" : '<span class="ct-img-placeholder">Görsel yükleyin</span>'}</div>
+          <input type="hidden" id="ct_${key}" value="${val}">
+          <div class="ct-img-actions">
+            <label class="btn btn-small btn-outline ct-img-btn"><input type="file" accept="image/*" data-ct-img="${key}" hidden>Görsel Seç</label>
+            <button type="button" class="btn btn-small ct-img-btn" data-ct-img-clear="${key}"${hasImg ? "" : " hidden"}>Kaldır</button>
+          </div>
+        </div>`;
+      } else {
+        input = `<input type="text" id="ct_${key}" value="${val}">`;
+      }
       return `<div class="form-group"><label for="ct_${key}">${escHtml(label)}</label>${input}</div>`;
     }).join("");
     return `<h2 class="content-group-title">${escHtml(sec.group)}</h2>${rows}`;
   }).join("");
+
+  document.querySelectorAll("[data-ct-img]").forEach((fileInput) => {
+    fileInput.addEventListener("change", (e) => {
+      const key = fileInput.getAttribute("data-ct-img");
+      const file = e.target.files[0];
+      if (!file) return;
+      readImageFile(file, (url) => {
+        document.getElementById("ct_" + key).value = url;
+        const preview = document.getElementById("ct_" + key + "_preview");
+        preview.style.backgroundImage = "url('" + url + "')";
+        preview.innerHTML = "";
+        const clearBtn = document.querySelector(`[data-ct-img-clear="${key}"]`);
+        if (clearBtn) clearBtn.hidden = false;
+      }, 1200);
+    });
+  });
+  document.querySelectorAll("[data-ct-img-clear]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const key = btn.getAttribute("data-ct-img-clear");
+      document.getElementById("ct_" + key).value = "";
+      const preview = document.getElementById("ct_" + key + "_preview");
+      preview.style.backgroundImage = "";
+      preview.innerHTML = '<span class="ct-img-placeholder">Görsel yükleyin</span>';
+      btn.hidden = true;
+    });
+  });
 }
 
 document.getElementById("contentForm").addEventListener("submit", async (e) => {

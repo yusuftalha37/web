@@ -985,6 +985,26 @@ function applySiteContent(root) {
   root.querySelectorAll('a[data-site="email"]').forEach((a) => {
     a.href = "mailto:" + site.email;
   });
+  root.querySelectorAll("[data-site-img]").forEach((el) => {
+    var key = el.getAttribute("data-site-img");
+    var url = site[key];
+    if (url && url.trim()) {
+      var img = el.querySelector("img.gal-photo");
+      if (!img) {
+        var svg = el.querySelector("svg");
+        if (svg) svg.style.display = "none";
+        img = document.createElement("img");
+        img.className = "gal-photo";
+        img.alt = el.querySelector(".gallery-caption") ? el.querySelector(".gallery-caption").textContent : "";
+        img.loading = "lazy";
+        el.insertBefore(img, el.firstChild);
+      }
+      if (img.src !== url) img.src = url;
+    } else {
+      var existing = el.querySelector("img.gal-photo");
+      if (existing) { existing.remove(); var s = el.querySelector("svg"); if (s) s.style.display = ""; }
+    }
+  });
 }
 
 // Sayfa yüklenirken sunucu yanıtını beklemeden localStorage'daki
