@@ -487,7 +487,7 @@ function readBody(req, limit) {
       if (size > max) { done = true; resolve({ __tooLarge: true }); try { req.destroy(); } catch (_) {} return; }
       d += c;
     });
-    req.on("end", () => { if (done) return; done = true; try { resolve(d ? JSON.parse(d) : {}); } catch (_) { resolve({}); } });
+    req.on("end", () => { if (done) return; done = true; try { resolve(d ? sanitizeBody(JSON.parse(d)) : {}); } catch (_) { resolve({}); } });
     req.on("error", () => { if (!done) { done = true; resolve({}); } });
   });
 }
@@ -510,9 +510,18 @@ const SECURITY_HEADERS = {
     "object-src 'none'"
   ].join("; ")
 };
+// Prototype pollution koruması: kullanıcı girdisinden tehlikeli anahtarları sil
+function sanitizeBody(obj) {
+  if (obj == null || typeof obj !== "object") return obj;
+  delete obj.__proto__;
+  delete obj.constructor;
+  delete obj.prototype;
+  return obj;
+}
 function eqFilter(rows, params) {
   for (const [k, val] of params) {
     if (k === "select" || k === "order") continue;
+    if (k === "__proto__" || k === "constructor" || k === "prototype") continue;
     const m = String(val).match(/^eq\.(.*)$/);
     if (m) rows = rows.filter((r) => String(r[k]) === decodeURIComponent(m[1]));
   }
@@ -847,8 +856,8 @@ async function handleApi(req, res, u) {
       if (!isAdmin) return send(res, 403, { error: "yalnızca yönetici" });
       const key = table === "kv" ? "k" : "id";
       const i = DB[table].findIndex((r) => r[key] === b[key]);
-      // Birleştir: gövdede olmayan alanlar (örn. sort) korunur
-      if (i >= 0) DB[table][i] = Object.assign({}, DB[table][i], b); else DB[table].push(b);
+      // Birleştir: gövdede olmayan alanlar (örn. sort) korunur; id üzerine yazılamaz
+      if (i >= 0) { const origId = DB[table][i][key]; DB[table][i] = Object.assign({}, DB[table][i], b); DB[table][i][key] = origId; } else DB[table].push(b);
       saveDB(); return send(res, 201, null);
     }
     if (PUBLIC_INSERT.includes(table)) {
@@ -883,7 +892,7 @@ async function handleApi(req, res, u) {
         const row = {
           id: "SA" + crypto.randomBytes(5).toString("hex").toUpperCase(), // sipariş no sunucuda üretilir
           customer: S(b.customer, 120), phone: S(b.phone, 40),
-          email: caller ? caller.email : S(b.email, 190),   // giriş yapılmışsa oturum e-postası esas
+          email: caller ? caller.email : (EMAIL_RE.test(S(b.email, 190)) ? S(b.email, 190) : ""),
           city: S(b.city, 80), address: S(b.address, 400),
           payment: "eft", status: "Havale/EFT bekleniyor",
           items: safeItems, total, created: Date.now()
@@ -903,7 +912,9 @@ async function handleApi(req, res, u) {
     }
     if (table === "profiles") {
       if (!caller) return send(res, 401, {});
-      Object.assign(caller, { name: b.name != null ? b.name : caller.name, phone: b.phone != null ? b.phone : caller.phone, city: b.city != null ? b.city : (caller.city || "") });
+      if (b.name != null) caller.name = String(b.name).slice(0, 120);
+      if (b.phone != null) caller.phone = String(b.phone).slice(0, 40);
+      if (b.city != null) caller.city = String(b.city).slice(0, 80);
       saveDB(); return send(res, 201, null);
     }
     return send(res, 403, { error: "izin yok" });
@@ -966,7 +977,11 @@ async function handleApi(req, res, u) {
       if (!isAdmin) return send(res, 403, {});
       const idf = params.get("id"); const id = idf ? decodeURIComponent(idf.replace("eq.", "")) : null;
       const row = DB[table].find((r) => String(r.id) === id);
-      if (row) Object.assign(row, b);
+      if (row) {
+        const origId = row.id;
+        Object.assign(row, b);
+        row.id = origId;
+      }
       saveDB(); return send(res, 204, null);
     }
     return send(res, 403, {});
@@ -1007,6 +1022,18 @@ const server = http.createServer({
   }
   // Bot / saldırı filtresi
   if (botGate(req, res, u)) return;
+
+  // CORS preflight
+  if (req.method === "OPTIONS") {
+    res.writeHead(204, Object.assign({
+      "Access-Control-Allow-Origin": req.headers.origin || "*",
+      "Access-Control-Allow-Methods": "GET, POST, PATCH, PUT, DELETE, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization, apikey",
+      "Access-Control-Max-Age": "86400"
+    }, SECURITY_HEADERS));
+    res.end();
+    return;
+  }
 
   if (u.pathname.startsWith("/rest/v1/") || u.pathname.startsWith("/auth/v1/") || u.pathname.startsWith("/api/")) {
     try { await handleApi(req, res, u); }
