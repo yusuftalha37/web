@@ -614,6 +614,8 @@ img, svg { max-width: 100%; }
   height: 440px;
 }
 
+.showroom-clickable .slide { cursor: pointer; }
+
 .slide-bg {
   position: absolute;
   inset: 0;
@@ -634,9 +636,7 @@ img, svg { max-width: 100%; }
 .slide-bg-art svg { width: 100%; height: 100%; display: block; }
 
 .slide-shade {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, rgba(7, 28, 44, 0.82) 0%, rgba(7, 28, 44, 0.45) 55%, rgba(7, 28, 44, 0.08) 100%);
+  display: none;
 }
 
 .slide-content {
@@ -654,7 +654,7 @@ img, svg { max-width: 100%; }
   line-height: 1.2;
   max-width: 640px;
   margin-bottom: 14px;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8), 0 2px 14px rgba(0, 0, 0, 0.6);
 }
 
 .slide-sub {
@@ -662,7 +662,7 @@ img, svg { max-width: 100%; }
   font-size: 15px;
   max-width: 560px;
   margin-bottom: 22px;
-  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.45);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8), 0 2px 10px rgba(0, 0, 0, 0.55);
 }
 
 .showroom-nav {
@@ -4243,8 +4243,8 @@ img, svg { max-width: 100%; }
               <small class="photo-hint">Görsel yüklemezseniz kategoriye uygun hazır çizim gösterilir.</small>
             </div>
             <div class="form-group">
-              <label for="slTitle">Başlık *</label>
-              <input type="text" id="slTitle" required placeholder="Örn. Yüksek Verimli Güneş Panelleri">
+              <label for="slTitle">Başlık</label>
+              <input type="text" id="slTitle" placeholder="Örn. Yüksek Verimli Güneş Panelleri (isteğe bağlı)">
             </div>
             <div class="form-group">
               <label for="slSub">Alt başlık</label>
@@ -5948,15 +5948,25 @@ function initSite(root) {
     showroom.addEventListener("mouseleave", start);
 
     // Dokunmatik / fare ile kaydırma
-    let x0 = null;
-    showroom.addEventListener("pointerdown", (e) => { x0 = e.clientX; stop(); });
+    let x0 = null, dragged = false;
+    showroom.addEventListener("pointerdown", (e) => { x0 = e.clientX; dragged = false; stop(); });
     window.addEventListener("pointerup", (e) => {
       if (x0 === null) return;
       const dx = e.clientX - x0;
-      if (Math.abs(dx) > 40) (dx < 0 ? next : prev)();
+      if (Math.abs(dx) > 40) { dragged = true; (dx < 0 ? next : prev)(); }
       x0 = null;
       start();
     });
+
+    // Slaytın herhangi bir yerine tıklayınca hedef sayfaya git
+    showroomTrack.addEventListener("click", (e) => {
+      if (e.target.closest("a, button, .btn, .showroom-arrow, .dot")) return;
+      if (dragged) { dragged = false; return; }
+      const s = slides[index];
+      if (!s) return;
+      location.href = pageLink(s.btnLink || "urunler.html");
+    });
+    showroomTrack.classList.add("showroom-clickable");
 
     go(0);
     start();
@@ -7473,11 +7483,6 @@ slideForm.addEventListener("submit", (e) => {
   e.preventDefault();
   const status = document.getElementById("slStatus");
   const title = document.getElementById("slTitle").value.trim();
-  if (!title) {
-    status.textContent = "Lütfen bir başlık girin.";
-    status.className = "form-status err";
-    return;
-  }
   try {
     Store.saveSlide({
       id: document.getElementById("slId").value || "",

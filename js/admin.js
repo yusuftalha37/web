@@ -936,11 +936,6 @@ slideForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   const status = document.getElementById("slStatus");
   const title = document.getElementById("slTitle").value.trim();
-  if (!title) {
-    status.textContent = "Lütfen bir başlık girin.";
-    status.className = "form-status err";
-    return;
-  }
   try {
     await Store.saveSlide({
       id: document.getElementById("slId").value || "",

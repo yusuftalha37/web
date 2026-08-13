@@ -545,15 +545,26 @@ function initSite(root) {
     showroom.addEventListener("mouseleave", start);
 
     // Dokunmatik / fare ile kaydırma
-    let x0 = null;
-    showroom.addEventListener("pointerdown", (e) => { x0 = e.clientX; stop(); });
+    let x0 = null, dragged = false;
+    showroom.addEventListener("pointerdown", (e) => { x0 = e.clientX; dragged = false; stop(); });
     window.addEventListener("pointerup", (e) => {
       if (x0 === null) return;
       const dx = e.clientX - x0;
-      if (Math.abs(dx) > 40) (dx < 0 ? next : prev)();
+      if (Math.abs(dx) > 40) { dragged = true; (dx < 0 ? next : prev)(); }
       x0 = null;
       start();
     });
+
+    // Slaytın herhangi bir yerine tıklayınca hedef sayfaya git
+    // (ok, nokta, buton ve linklere dokunma; sürükleme sonrası tıklamayı sayma)
+    showroomTrack.addEventListener("click", (e) => {
+      if (e.target.closest("a, button, .btn, .showroom-arrow, .dot")) return;
+      if (dragged) { dragged = false; return; }
+      const s = slides[index];
+      if (!s) return;
+      location.href = pageLink(s.btnLink || "urunler.html");
+    });
+    showroomTrack.classList.add("showroom-clickable");
 
     go(0);
     start();
