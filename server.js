@@ -1002,6 +1002,48 @@ async function handleApi(req, res, u) {
   return send(res, 405, { error: "method" });
 }
 
+// -------------------- Dinamik sitemap.xml --------------------
+// Her istekte güncel ürün listesinden üretilir; admin panelden eklenen
+// her ürün otomatik olarak sitemap'e (ve dolayısıyla Google'a) girer.
+const SITE_BASE = (process.env.SITE_URL || "https://solararena.store").replace(/\/+$/, "");
+function xmlEscape(s) {
+  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&apos;");
+}
+function serveSitemap(res) {
+  const staticPages = [
+    { loc: "/", freq: "weekly", pri: "1.0" },
+    { loc: "/urunler.html", freq: "daily", pri: "0.9" },
+    { loc: "/blog.html", freq: "weekly", pri: "0.7" },
+    { loc: "/makale-amortisman.html", freq: "monthly", pri: "0.6" },
+    { loc: "/makale-solar-paket.html", freq: "monthly", pri: "0.6" },
+    { loc: "/makale-solar-su-pompasi.html", freq: "monthly", pri: "0.6" },
+    { loc: "/makale-panel-inverter-aku.html", freq: "monthly", pri: "0.6" }
+  ];
+  const urls = staticPages.map((p) =>
+    `  <url><loc>${SITE_BASE}${p.loc}</loc><changefreq>${p.freq}</changefreq><priority>${p.pri}</priority></url>`);
+  // Kategori sayfaları (urunler.html?cat=XXX)
+  (DB.categories || []).forEach((c) => {
+    if (!c || !c.id) return;
+    const loc = SITE_BASE + "/urunler.html?cat=" + encodeURIComponent(c.id);
+    urls.push(`  <url><loc>${xmlEscape(loc)}</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>`);
+  });
+  // Ürün detay sayfaları (urun.html?id=XXX)
+  (DB.products || []).forEach((p) => {
+    if (!p || !p.id) return;
+    const loc = SITE_BASE + "/urun.html?id=" + encodeURIComponent(p.id);
+    urls.push(`  <url><loc>${xmlEscape(loc)}</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>`);
+  });
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>\n` +
+    `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
+    urls.join("\n") + `\n</urlset>\n`;
+  res.writeHead(200, Object.assign({
+    "Content-Type": "application/xml; charset=utf-8",
+    "Cache-Control": "public, max-age=3600"
+  }, SECURITY_HEADERS));
+  res.end(xml);
+}
+
 // -------------------- Sunucu --------------------
 loadDB();
 const server = http.createServer({
@@ -1034,6 +1076,9 @@ const server = http.createServer({
     res.end();
     return;
   }
+
+  // Dinamik sitemap — statik dosyadan önce (güncel ürünlerle üretilir)
+  if (u.pathname === "/sitemap.xml") { serveSitemap(res); return; }
 
   if (u.pathname.startsWith("/rest/v1/") || u.pathname.startsWith("/auth/v1/") || u.pathname.startsWith("/api/")) {
     try { await handleApi(req, res, u); }
