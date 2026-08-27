@@ -963,6 +963,18 @@ function escHtml(s) {
   }[c]));
 }
 
+// Ürün adını SEO dostu URL parçasına (slug) çevirir.
+// ÖNEMLİ: server.js'teki slugify ile BİREBİR aynı olmalı; aksi halde
+// sitemap'teki adres ile sayfanın tanıdığı adres uyuşmaz.
+var _SLUG_TR = { "ç": "c", "ğ": "g", "ı": "i", "ö": "o", "ş": "s", "ü": "u", "Ç": "c", "Ğ": "g", "İ": "i", "Ö": "o", "Ş": "s", "Ü": "u", "I": "i" };
+function slugify(str) {
+  return String(str == null ? "" : str)
+    .replace(/[çğıöşüÇĞİÖŞÜI]/g, function (m) { return _SLUG_TR[m] || m; })
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 // Admin panelinden düzenlenen site içeriğini (telefon, e-posta, adres,
 // footer metinleri) [data-site] işaretli öğelere yerleştirir.
 function applySiteContent(root) {

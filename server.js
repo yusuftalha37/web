@@ -1010,6 +1010,17 @@ function xmlEscape(s) {
   return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;")
     .replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&apos;");
 }
+// Ürün adını SEO dostu slug'a çevirir.
+// ÖNEMLİ: js/store.js'teki slugify ile BİREBİR aynı olmalı; aksi halde
+// sitemap'teki adres ile ürün sayfasının tanıdığı adres uyuşmaz.
+const _SLUG_TR = { "ç": "c", "ğ": "g", "ı": "i", "ö": "o", "ş": "s", "ü": "u", "Ç": "c", "Ğ": "g", "İ": "i", "Ö": "o", "Ş": "s", "Ü": "u", "I": "i" };
+function slugify(str) {
+  return String(str == null ? "" : str)
+    .replace(/[çğıöşüÇĞİÖŞÜI]/g, (m) => _SLUG_TR[m] || m)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
 function serveSitemap(res) {
   const staticPages = [
     { loc: "/", freq: "weekly", pri: "1.0" },
@@ -1028,10 +1039,15 @@ function serveSitemap(res) {
     const loc = SITE_BASE + "/urunler.html?cat=" + encodeURIComponent(c.id);
     urls.push(`  <url><loc>${xmlEscape(loc)}</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>`);
   });
-  // Ürün detay sayfaları (urun.html?id=XXX)
+  // Ürün detay sayfaları — SEO dostu adres: urun.html?urun=<ürün-adı-slug>
+  // Aynı slug'a düşen ürün olursa benzersizliği korumak için sonuna sıra eklenir.
+  const seen = {};
   (DB.products || []).forEach((p) => {
     if (!p || !p.id) return;
-    const loc = SITE_BASE + "/urun.html?id=" + encodeURIComponent(p.id);
+    let slug = slugify(p.name) || slugify(p.id);
+    if (seen[slug]) { seen[slug]++; slug = slug + "-" + seen[slug]; }
+    else { seen[slug] = 1; }
+    const loc = SITE_BASE + "/urun.html?urun=" + encodeURIComponent(slug);
     urls.push(`  <url><loc>${xmlEscape(loc)}</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>`);
   });
   const xml = `<?xml version="1.0" encoding="UTF-8"?>\n` +

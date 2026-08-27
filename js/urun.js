@@ -12,11 +12,34 @@ function initProductPage(root) {
     ? ({ "urunler.html": "#magaza", "index.html": "#", "sepet.html": "#sepet" }[href] || href)
     : href);
 
-  // Ürün kimliği
-  let id = new URLSearchParams(location.search).get("id");
-  if (!id && location.hash.indexOf("#urun/") === 0) id = decodeURIComponent(location.hash.slice(6));
-
-  const p = Store.getProducts().find((x) => x.id === id);
+  // Ürün kimliği — SEO dostu ad (?urun=slug) ya da eski kod (?id=XXX / #urun/XXX)
+  const params = new URLSearchParams(location.search);
+  let id = params.get("id");
+  let urunSlug = params.get("urun");
+  if (!id && !urunSlug && location.hash.indexOf("#urun/") === 0) {
+    urunSlug = decodeURIComponent(location.hash.slice(6)); // hash değeri slug ya da eski id olabilir
+  }
+  const products = Store.getProducts();
+  let p = null;
+  if (id) p = products.find((x) => x.id === id);
+  if (!p && urunSlug) {
+    // 1) doğrudan ad-slug eşleşmesi
+    p = products.find((x) => slugify(x.name) === urunSlug);
+    // 2) aynı slug'a düşen ürünler için sıra eki (-2, -3 …)
+    if (!p) {
+      const mm = urunSlug.match(/^(.*)-(\d+)$/);
+      if (mm) {
+        const base = mm[1], n = parseInt(mm[2], 10);
+        const matches = products.filter((x) => slugify(x.name) === base);
+        if (matches.length >= n) p = matches[n - 1];
+      }
+    }
+    // 3) son çare: eski id ile gelen bağlantılar
+    if (!p) p = products.find((x) => x.id === urunSlug);
+  }
+  // Ürünün SEO dostu adresi (canonical/og için) — sitemap ile aynı kural
+  const prodSlug = p ? slugify(p.name) || slugify(p.id) : "";
+  const prodPath = "/urun.html?urun=" + encodeURIComponent(prodSlug);
   try { document.title = (p ? p.name + " Fiyatı ve Özellikleri" : "Ürün bulunamadı") + " | Solar Arena"; } catch (_) {}
 
   // ---- Dinamik SEO: meta açıklama + canonical + ürün yapılandırılmış verisi ----
@@ -27,9 +50,9 @@ function initProductPage(root) {
       md.content = p.name + " uygun fiyat ve stoktan aynı gün kargo ile. " + (p.specs || []).slice(0, 2).join(" · ") + " — Türkiye'nin her yerine gönderim.";
       let cn = document.querySelector('link[rel="canonical"]');
       if (!cn) { cn = document.createElement("link"); cn.rel = "canonical"; document.head.appendChild(cn); }
-      cn.href = "https://solararena.store/urun.html?id=" + encodeURIComponent(p.id);
+      cn.href = "https://solararena.store" + prodPath;
       // Open Graph / sosyal paylaşım
-      const prodUrl = "https://solararena.store/urun.html?id=" + encodeURIComponent(p.id);
+      const prodUrl = "https://solararena.store" + prodPath;
       const ogImg = (p.photo && /^https?:\/\//.test(p.photo)) ? p.photo
         : (p.photo && p.photo.indexOf("/uploads/") === 0) ? "https://solararena.store" + p.photo
         : "https://solararena.store/og-image.jpg";
@@ -58,7 +81,7 @@ function initProductPage(root) {
         "brand": { "@type": "Brand", "name": "Solar Arena" },
         "offers": {
           "@type": "Offer",
-          "url": "https://solararena.store/urun.html?id=" + encodeURIComponent(p.id),
+          "url": prodUrl,
           "priceCurrency": "TRY",
           "price": p.price,
           "availability": p.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",

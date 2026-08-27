@@ -153,7 +153,13 @@ function initSite(root) {
     return norm(q).split(/\s+/).filter(Boolean).every((w) => hay.includes(w));
   }
 
-  const productHref = (id) => (typeof goPage === "function") ? "#urun/" + id : "urun.html?id=" + encodeURIComponent(id);
+  // SEO dostu ürün bağlantısı: adres barında ürünün adı (slug) görünür
+  const productHref = (p) => {
+    const slug = slugify(p.name) || slugify(p.id);
+    return (typeof goPage === "function")
+      ? "#urun/" + encodeURIComponent(slug)
+      : "urun.html?urun=" + encodeURIComponent(slug);
+  };
 
   function productCard(p) {
     const low = p.stock <= 5;
@@ -161,7 +167,7 @@ function initSite(root) {
     const authBadge = p.authorized
       ? `<span class="auth-badge" title="${escHtml(authLabel)}"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>${escHtml(authLabel)}</span>`
       : "";
-    const href = productHref(p.id);
+    const href = productHref(p);
     return `
       <article class="product">
         <div class="product-img${p.photo ? " has-photo" : ""}">
