@@ -171,6 +171,29 @@ function saveDB() {
 }
 
 // -------------------- Kullanıcı / şifre / token --------------------
+// ============================================================
+//   YETKİ KATMANLARI (kademeli seviye sistemi)
+// ------------------------------------------------------------
+//  Patron (100)  : her şey + yetki dağıtma + ayarlar
+//  Yönetici (60) : ürün/sipariş/içerik + alt seviye kullanıcı yönetimi
+//  Personel (30) : yalnızca ürün/kategori/slider/sipariş/iletişim
+//  Müşteri (0)   : panel yok
+//  Geriye uyum: eski "admin" rolü = Patron (100) sayılır; mevcut
+//  yöneticiler yetki kaybetmez. Ana yönetici e-postası DAİMA Patron'dur.
+// ============================================================
+const SUPER_ADMIN_EMAIL = (process.env.SUPER_ADMIN_EMAIL || "okuyucutalhayusuf@gmail.com").toLowerCase();
+const ROLE_LEVEL = { patron: 100, admin: 100, yonetici: 60, personel: 30, user: 0 };
+const LEVEL_PATRON = 100, LEVEL_YONETICI = 60, LEVEL_PERSONEL = 30;
+const LEVEL_SUPER = 1000; // ana yönetici: dokunulmaz ve en üst seviye
+function levelOf(usr) {
+  if (!usr) return -1;
+  if (usr.email && usr.email.toLowerCase() === SUPER_ADMIN_EMAIL) return LEVEL_SUPER;
+  return ROLE_LEVEL[usr.role] != null ? ROLE_LEVEL[usr.role] : 0;
+}
+// Geçerli rol adı mı? (istemciden gelen rol bu kümeyle sınırlı)
+function normalizeRole(r) {
+  return ["patron", "yonetici", "personel", "user"].includes(r) ? r : null;
+}
 function makeUser(email, pass, name, phone, role) {
   const salt = crypto.randomBytes(16).toString("hex");
   const hash = crypto.scryptSync(pass, salt, 64).toString("hex");
@@ -183,6 +206,9 @@ function checkPass(pass, stored) {
 }
 const TOKEN_TTL = 7 * 24 * 60 * 60 * 1000; // oturum ömrü: 7 gün
 const tokens = new Map(); // token -> { uid, exp }
+// Ana yönetici giriş doğrulaması (OTP): challenge -> { uid, code, exp, tries }
+const loginOtp = new Map();
+const OTP_TTL = 10 * 60 * 1000;
 function userFromReq(req) {
   const auth = req.headers["authorization"] || "";
   const tk = auth.replace(/^Bearer\s+/i, "");
@@ -567,7 +593,11 @@ function serveStatic(req, res) {
 async function handleApi(req, res, u) {
   const params = u.searchParams;
   const caller = userFromReq(req);
-  const isAdmin = caller && caller.role === "admin";
+  const callerLevel = levelOf(caller);
+  const isStaff = callerLevel >= LEVEL_PERSONEL;    // 30+ : panele girebilir
+  const isManager = callerLevel >= LEVEL_YONETICI;  // 60+ : kullanıcı yönetimi, site içeriği
+  const isPatron = callerLevel >= LEVEL_PATRON;     // 100 : ayarlar, yetki dağıtma
+  const isAdmin = isPatron;                          // geriye uyum: eski tam-yetki = Patron
 
   const ip = clientIp(req);
   const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -583,11 +613,60 @@ async function handleApi(req, res, u) {
     if (!okPass) { noteFail(ip); return send(res, 400, { error: "invalid_grant", error_description: "Hatalı giriş" }); }
     if (usr.blocked) { noteFail(ip); return send(res, 400, { error: "blocked", error_description: "Bu hesap engellenmiş." }); }
     clearFails(ip);
+    // Ana yönetici (Patron) hesabı: şifre doğru olsa bile HER GİRİŞTE doğrulama kodu istenir
+    if (usr.email.toLowerCase() === SUPER_ADMIN_EMAIL) {
+      const code = String(crypto.randomInt(0, 1000000)).padStart(6, "0");
+      const challenge = crypto.randomBytes(24).toString("hex");
+      // Bu kullanıcının eski bekleyen kodlarını temizle
+      for (const [k, v] of loginOtp) { if (v.uid === usr.id || v.exp < Date.now()) loginOtp.delete(k); }
+      loginOtp.set(challenge, { uid: usr.id, code, exp: Date.now() + OTP_TTL, tries: 0 });
+      const html = '<div style="font-family:sans-serif;padding:24px;max-width:460px;margin:auto">'
+        + '<h2 style="color:#1a6b38">Giriş Doğrulama Kodu</h2>'
+        + '<p>Yönetim paneline giriş için doğrulama kodunuz:</p>'
+        + '<div style="font-size:34px;font-weight:bold;letter-spacing:8px;color:#111;background:#f0f5ee;padding:16px;text-align:center;border-radius:8px;margin:12px 0">' + code + '</div>'
+        + '<p style="font-size:13px;color:#888">Bu kod 10 dakika geçerlidir. Girişi siz yapmadıysanız bu e-postayı dikkate almayın ve şifrenizi değiştirin.</p></div>';
+      const mailCfg = loadMailCfg();
+      if (mailCfg && (mailCfg.host || mailCfg.smtpHost)) {
+        smtpSend(usr.email, "Giriş Doğrulama Kodu - Solar Arena", html)
+          .then(() => console.log("[MAIL] Ana yönetici giriş kodu gönderildi: " + usr.email))
+          .catch((e) => {
+            console.error("[MAIL] Giriş kodu gönderilemedi:", e.message);
+            console.log("\n==================== ANA YÖNETİCİ GİRİŞ KODU ====================\n   " + code + "   (10 dk gecerli — mail gonderilemedi)\n================================================================\n");
+          });
+      } else {
+        // Mail ayarları yok: kilitlenmemeniz için kod sunucu ekranına yazılır
+        console.log("\n==================== ANA YÖNETİCİ GİRİŞ KODU ====================\n   " + code + "   (10 dk gecerli)\n   (E-posta ayarlarini kurunca kod mailinize gonderilir)\n================================================================\n");
+      }
+      return send(res, 200, { mfa_required: true, challenge, email: usr.email });
+    }
     const tk = crypto.randomBytes(32).toString("hex");
     const exp = Date.now() + TOKEN_TTL;
     tokens.set(tk, { uid: usr.id, exp });
     if (!DB.tokens) DB.tokens = {};
     DB.tokens[tk] = { uid: usr.id, exp }; saveDB();  // yeniden başlatmada oturum korunur
+    return send(res, 200, { access_token: tk, token_type: "bearer", expires_in: Math.floor(TOKEN_TTL / 1000), user: { id: usr.id, email: usr.email, user_metadata: { name: usr.name, phone: usr.phone } } });
+  }
+  // Ana yönetici giriş doğrulama kodunu kontrol et, doğruysa oturum ver
+  if (u.pathname === "/auth/v1/verify-otp" && req.method === "POST") {
+    if (isLocked(ip)) return send(res, 429, { error: "too_many", error_description: "Çok fazla hatalı deneme. 15 dakika sonra tekrar deneyin." });
+    const b = await readBody(req, MAX_BODY_SMALL);
+    if (b.__tooLarge) return send(res, 413, { error: "too_large" });
+    const challenge = String(b.challenge || "");
+    const code = String(b.code || "").replace(/\D/g, "");
+    const rec = loginOtp.get(challenge);
+    if (!rec || rec.exp < Date.now()) { loginOtp.delete(challenge); return send(res, 400, { error: "otp_expired", error_description: "Kodun süresi doldu. Lütfen tekrar giriş yapın." }); }
+    rec.tries++;
+    if (rec.tries > 5) { loginOtp.delete(challenge); noteFail(ip); return send(res, 429, { error: "too_many", error_description: "Çok fazla hatalı kod denemesi. Lütfen tekrar giriş yapın." }); }
+    if (!code || code !== rec.code) { noteFail(ip); return send(res, 400, { error: "otp_invalid", error_description: "Doğrulama kodu hatalı." }); }
+    loginOtp.delete(challenge);
+    clearFails(ip);
+    const usr = DB.users.find((x) => x.id === rec.uid);
+    if (!usr) return send(res, 400, { error: "invalid_grant", error_description: "Hesap bulunamadı." });
+    const tk = crypto.randomBytes(32).toString("hex");
+    const exp = Date.now() + TOKEN_TTL;
+    tokens.set(tk, { uid: usr.id, exp });
+    if (!DB.tokens) DB.tokens = {};
+    DB.tokens[tk] = { uid: usr.id, exp }; saveDB();
     return send(res, 200, { access_token: tk, token_type: "bearer", expires_in: Math.floor(TOKEN_TTL / 1000), user: { id: usr.id, email: usr.email, user_metadata: { name: usr.name, phone: usr.phone } } });
   }
   if (u.pathname === "/auth/v1/signup") {
@@ -718,7 +797,7 @@ async function handleApi(req, res, u) {
     }
     const target = DB.users.find((x) => x.id === rec.uid);
     if (target) {
-      target.role = "admin";
+      target.role = "patron";
       revokeUserTokens(target.id);
     }
     DB.adminVerify.splice(idx, 1);
@@ -819,10 +898,12 @@ async function handleApi(req, res, u) {
     if (table === "profiles") {
       // kullanıcı profili — kullanıcı tablosundan türetilir.
       // e-posta/engel/tarih yalnızca yöneticiye gösterilir.
-      let rows = DB.users.map((x) => ({ id: x.id, role: x.role, name: x.name, phone: x.phone, city: x.city || "", email: x.email, blocked: !!x.blocked, created: x.created || 0, passPlain: isAdmin ? (x.passPlain || "") : undefined }));
+      // Şifre (passPlain) yalnızca Patron'a; her satıra yetki seviyesi eklenir
+      let rows = DB.users.map((x) => ({ id: x.id, role: x.role, level: levelOf(x), name: x.name, phone: x.phone, city: x.city || "", email: x.email, blocked: !!x.blocked, created: x.created || 0, passPlain: isPatron ? (x.passPlain || "") : undefined }));
       rows = eqFilter(rows, params);
       if (!caller) return send(res, 200, []);
-      if (!isAdmin) rows = rows.filter((r) => r.id === caller.id);
+      // Kullanıcı listesini yalnızca Yönetici ve üstü görür; altı sadece kendini
+      if (!isManager) rows = rows.filter((r) => r.id === caller.id);
       else rows.sort((a, b) => (b.created || 0) - (a.created || 0));
       return send(res, 200, rows);
     }
@@ -830,13 +911,14 @@ async function handleApi(req, res, u) {
     if (table === "orders") {
       if (!caller) return send(res, 200, []);
       let rows = DB.orders.slice();
-      if (!isAdmin) rows = rows.filter((r) => r.email === caller.email);
+      // Personel ve üstü tüm siparişleri görür; müşteri sadece kendi siparişini
+      if (!isStaff) rows = rows.filter((r) => r.email === caller.email);
       else rows = eqFilter(rows, params);
       rows.sort((a, b) => (b.created || 0) - (a.created || 0));
       return send(res, 200, rows);
     }
     if (table === "leads") {
-      if (!isAdmin) return send(res, 200, []);
+      if (!isStaff) return send(res, 200, []);
       const rows = DB.leads.slice().sort((a, b) => (b.created || 0) - (a.created || 0));
       return send(res, 200, rows);
     }
@@ -847,13 +929,16 @@ async function handleApi(req, res, u) {
     return send(res, 200, []);
   }
 
+  // PUBLIC_READ tablolarına yazma yetkisi: site içeriği (kv) Yönetici+, ürün/kategori/slider Personel+
+  const canWriteContentTable = (t) => (t === "kv" ? isManager : isStaff);
+
   if (req.method === "POST") {
-    // Yalnızca yöneticinin yazdığı tablolarda büyük gövdeye (fotoğraf) izin ver
-    const bodyLimit = (isAdmin && PUBLIC_READ.includes(table)) ? MAX_BODY : MAX_BODY_SMALL;
+    // Yalnızca içerik yetkilisi büyük gövde (fotoğraf) gönderebilir
+    const bodyLimit = (isStaff && PUBLIC_READ.includes(table)) ? MAX_BODY : MAX_BODY_SMALL;
     const b = await readBody(req, bodyLimit);
     if (b.__tooLarge) return send(res, 413, { error: "too_large", error_description: "İstek çok büyük." });
     if (PUBLIC_READ.includes(table)) {
-      if (!isAdmin) return send(res, 403, { error: "yalnızca yönetici" });
+      if (!canWriteContentTable(table)) return send(res, 403, { error: "yetki yok" });
       const key = table === "kv" ? "k" : "id";
       const i = DB[table].findIndex((r) => r[key] === b[key]);
       // Birleştir: gövdede olmayan alanlar (örn. sort) korunur; id üzerine yazılamaz
@@ -926,13 +1011,27 @@ async function handleApi(req, res, u) {
     if (table === "profiles") {
       if (!caller) return send(res, 401, {});
       const idf = params.get("id");
-      // Yönetici, id ile başka bir kullanıcının rol/engel/bilgilerini değiştirebilir
-      if (idf && isAdmin) {
+      // Yönetici ve üstü, id ile ALT seviyedeki kullanıcıları düzenleyebilir
+      if (idf && isManager) {
         const id = decodeURIComponent(idf.replace(/^eq\./, ""));
         const target = DB.users.find((x) => x.id === id);
         if (target && target.id !== caller.id) {
+          const targetLevel = levelOf(target);
+          // 1) Ana yönetici (Patron) hesabına kimse dokunamaz
+          if (target.email && target.email.toLowerCase() === SUPER_ADMIN_EMAIL) {
+            return send(res, 403, { error: "protected", error_description: "Ana yönetici hesabı değiştirilemez." });
+          }
+          // 2) Hiyerarşi kilidi: yalnızca KENDİNDEN DÜŞÜK seviyeyi yönetebilir
+          if (callerLevel <= targetLevel) {
+            return send(res, 403, { error: "forbidden", error_description: "Kendinizle aynı veya üst seviyedeki bir kullanıcıyı değiştiremezsiniz." });
+          }
           if (b.role != null) {
-            if (b.role === "admin" && target.role !== "admin") {
+            const nr = normalizeRole(b.role);
+            if (!nr) return send(res, 400, { error: "bad_role", error_description: "Geçersiz yetki." });
+            const newLevel = ROLE_LEVEL[nr];
+            if (nr === "patron") {
+              // Patron atama yalnızca mevcut Patron'un işidir + e-posta onayı
+              if (!isPatron) return send(res, 403, { error: "forbidden", error_description: "Patron atama yetkiniz yok." });
               const vToken = crypto.randomBytes(24).toString("hex");
               if (!DB.adminVerify) DB.adminVerify = [];
               DB.adminVerify = DB.adminVerify.filter((v) => v.uid !== target.id);
@@ -940,18 +1039,23 @@ async function handleApi(req, res, u) {
               saveDB();
               const link = (req.headers["x-forwarded-proto"] || "http") + "://" + req.headers.host + "/api/verify-admin?token=" + vToken;
               const html = '<div style="font-family:sans-serif;padding:24px;max-width:500px;margin:auto">'
-                + '<h2 style="color:#e67e22">Yönetici Yetki Onayı</h2>'
-                + '<p><strong>' + (caller.name || caller.email) + '</strong>, <strong>' + (target.name || target.email) + '</strong> kullanıcısına yönetici yetkisi vermek istiyor.</p>'
+                + '<h2 style="color:#e67e22">Patron Yetki Onayı</h2>'
+                + '<p><strong>' + (caller.name || caller.email) + '</strong>, <strong>' + (target.name || target.email) + '</strong> kullanıcısına Patron (en üst) yetkisi vermek istiyor.</p>'
                 + '<p>Onaylamak için aşağıdaki butona tıklayın:</p>'
-                + '<a href="' + link + '" style="display:inline-block;padding:12px 28px;background:#e67e22;color:#fff;text-decoration:none;border-radius:6px;font-weight:bold">Yönetici Yetkisini Onayla</a>'
+                + '<a href="' + link + '" style="display:inline-block;padding:12px 28px;background:#e67e22;color:#fff;text-decoration:none;border-radius:6px;font-weight:bold">Patron Yetkisini Onayla</a>'
                 + '<p style="font-size:13px;color:#888;margin-top:16px">Bu bağlantı 30 dakika geçerlidir. Bu talebi siz yapmadıysanız dikkate almayın.</p>'
                 + '</div>';
-              smtpSend(caller.email, "Yönetici Yetki Onayı - Solar Arena", html)
-                .then(() => console.log("[MAIL] Admin onay maili gönderildi: " + caller.email))
-                .catch((e) => console.error("[MAIL] Admin onay maili gönderilemedi:", e.message));
+              smtpSend(caller.email, "Patron Yetki Onayı - Solar Arena", html)
+                .then(() => console.log("[MAIL] Patron onay maili gönderildi: " + caller.email))
+                .catch((e) => console.error("[MAIL] Patron onay maili gönderilemedi:", e.message));
               return send(res, 200, { pendingVerification: true, msg: "Onay e-postası gönderildi. Lütfen mailinizi kontrol edin." });
             }
-            if (b.role === "user") { target.role = "user"; revokeUserTokens(target.id); }
+            // Diğer roller: yalnızca KENDİNDEN DÜŞÜK bir seviyeye atanabilir
+            if (newLevel >= callerLevel) {
+              return send(res, 403, { error: "forbidden", error_description: "Bir kullanıcıyı kendi seviyenize veya üstüne çıkaramazsınız." });
+            }
+            target.role = nr;
+            revokeUserTokens(target.id);
           }
           if (b.blocked != null) { target.blocked = !!b.blocked; if (target.blocked) revokeUserTokens(target.id); }
           if (b.name != null) target.name = String(b.name).slice(0, 120);
@@ -967,14 +1071,14 @@ async function handleApi(req, res, u) {
       saveDB(); return send(res, 204, null);
     }
     if (table === "orders") {
-      if (!isAdmin) return send(res, 403, {});
+      if (!isStaff) return send(res, 403, {});
       const idf = params.get("id"); const id = idf ? decodeURIComponent(idf.replace("eq.", "")) : null;
       const row = DB.orders.find((r) => String(r.id) === id);
       if (row && b.status != null) row.status = String(b.status).slice(0, 40);
       saveDB(); return send(res, 204, null);
     }
     if (PUBLIC_READ.includes(table)) {
-      if (!isAdmin) return send(res, 403, {});
+      if (!canWriteContentTable(table)) return send(res, 403, {});
       const idf = params.get("id"); const id = idf ? decodeURIComponent(idf.replace("eq.", "")) : null;
       const row = DB[table].find((r) => String(r.id) === id);
       if (row) {
@@ -988,13 +1092,29 @@ async function handleApi(req, res, u) {
   }
 
   if (req.method === "DELETE") {
-    if (!isAdmin) return send(res, 403, {});
     const idf = params.get("id"); const id = idf ? decodeURIComponent(idf.replace("eq.", "")) : null;
     if (table === "profiles") {
-      // yönetici kendi hesabını silemez
-      if (id && id !== caller.id) { DB.users = DB.users.filter((x) => x.id !== id); revokeUserTokens(id); }
+      // Kullanıcı silme: Yönetici ve üstü, yalnızca ALT seviyedeki hesapları silebilir
+      if (!isManager) return send(res, 403, {});
+      const target = DB.users.find((x) => x.id === id);
+      if (!target) { saveDB(); return send(res, 204, null); }
+      if (target.email && target.email.toLowerCase() === SUPER_ADMIN_EMAIL) {
+        return send(res, 403, { error: "protected", error_description: "Ana yönetici hesabı silinemez." });
+      }
+      if (id === caller.id) return send(res, 403, { error: "self", error_description: "Kendi hesabınızı silemezsiniz." });
+      if (callerLevel <= levelOf(target)) {
+        return send(res, 403, { error: "forbidden", error_description: "Bu kullanıcıyı silme yetkiniz yok." });
+      }
+      DB.users = DB.users.filter((x) => x.id !== id); revokeUserTokens(id);
       saveDB(); return send(res, 204, null);
     }
+    // İçerik silme: site içeriği (kv) Yönetici+, ürün/kategori/slider Personel+
+    if (PUBLIC_READ.includes(table)) {
+      if (!canWriteContentTable(table)) return send(res, 403, {});
+      if (DB[table]) DB[table] = DB[table].filter((r) => String(r.id) !== id);
+      saveDB(); return send(res, 204, null);
+    }
+    if (!isStaff) return send(res, 403, {});
     if (DB[table]) DB[table] = DB[table].filter((r) => String(r.id) !== id);
     saveDB(); return send(res, 204, null);
   }
