@@ -77,7 +77,7 @@ function initSite(root) {
     if (currentUser) {
       // Menü kalabalıklaşmasın diye admin için isim yerine panel linki gösterilir
       navAccount.innerHTML =
-        (currentUser.role === "admin"
+        (isStaffRole(currentUser.role)
           ? '<a href="admin.html" class="admin-link">Yönetim Paneli</a>'
           : '<a href="hesap.html" class="admin-link">Hesabım (' + escHtml(currentUser.name.split(" ")[0]) + ")</a>") +
         '<a href="#" class="logout-link">Çıkış</a>';
@@ -476,7 +476,7 @@ function initSite(root) {
   const topbarAccount = $("#topbarAccount");
   if (topbarAccount) {
     if (currentUser) {
-      topbarAccount.innerHTML = currentUser.role === "admin"
+      topbarAccount.innerHTML = isStaffRole(currentUser.role)
         ? '<a href="admin.html">Yönetim Paneli</a><span class="topbar-sep">|</span><a href="#" class="logout-link">Çıkış</a>'
         : '<a href="hesap.html">Hesabım</a><span class="topbar-sep">|</span><a href="#" class="logout-link">Çıkış</a>';
       topbarAccount.querySelector(".logout-link").addEventListener("click", (e) => {

@@ -1,9 +1,13 @@
 // ============ GİRİŞ / KAYIT SAYFASI ============
 
+// Panele girebilen roller (Patron/Yönetici/Personel + eski "admin")
+const STAFF_ROLES = ["admin", "patron", "yonetici", "personel"];
+const isStaffRole = (r) => STAFF_ROLES.includes(r);
+
 // Zaten giriş yapılmışsa doğru sayfaya yönlendir
 const existing = Store.session();
 if (existing) {
-  location.href = existing.role === "admin" ? "admin.html" : "index.html";
+  location.href = isStaffRole(existing.role) ? "admin.html" : "index.html";
 }
 
 // Sekme geçişi
@@ -38,6 +42,16 @@ loginForm.addEventListener("submit", async (e) => {
   }
 
   const result = await Store.login(email, pass);
+  // Ana yönetici: doğrulama kodu adımına geç
+  if (result.mfa) {
+    pendingChallenge = result.challenge;
+    loginForm.hidden = true;
+    otpForm.hidden = false;
+    document.querySelectorAll(".auth-tab").forEach((t) => (t.style.display = "none"));
+    setStatus(otpStatus, "Kod " + (result.email || "e-postanıza") + " adresine gönderildi.", true);
+    setTimeout(() => otpCodeInput.focus(), 100);
+    return;
+  }
   if (!result.ok) {
     setStatus(status, result.error, false);
     return;
@@ -45,8 +59,42 @@ loginForm.addEventListener("submit", async (e) => {
 
   setStatus(status, "Giriş başarılı, yönlendiriliyorsunuz…", true);
   setTimeout(() => {
-    location.href = result.session.role === "admin" ? "admin.html" : "index.html";
+    location.href = isStaffRole(result.session.role) ? "admin.html" : "index.html";
   }, 600);
+});
+
+// ---- Ana yönetici doğrulama kodu (OTP) ----
+const otpForm = document.getElementById("otpForm");
+const otpStatus = document.getElementById("otpStatus");
+const otpCodeInput = document.getElementById("otpCode");
+const otpBack = document.getElementById("otpBack");
+let pendingChallenge = null;
+
+otpForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const code = otpCodeInput.value.replace(/\D/g, "");
+  if (code.length !== 6) {
+    setStatus(otpStatus, "Lütfen 6 haneli kodu girin.", false);
+    return;
+  }
+  const result = await Store.verifyOtp(pendingChallenge, code);
+  if (!result.ok) {
+    setStatus(otpStatus, result.error, false);
+    return;
+  }
+  setStatus(otpStatus, "Doğrulandı, yönlendiriliyorsunuz…", true);
+  setTimeout(() => {
+    location.href = isStaffRole(result.session.role) ? "admin.html" : "index.html";
+  }, 600);
+});
+
+otpBack.addEventListener("click", (e) => {
+  e.preventDefault();
+  pendingChallenge = null;
+  otpForm.hidden = true;
+  loginForm.hidden = false;
+  document.querySelectorAll(".auth-tab").forEach((t) => (t.style.display = ""));
+  otpCodeInput.value = "";
 });
 
 // Şifremi unuttum

@@ -61,7 +61,7 @@ document.getElementById("accountLogout").addEventListener("click", (e) => {
 // ============ TOPBAR HESAP ============
 const topbarAccount = document.getElementById("topbarAccount");
 if (topbarAccount && me) {
-  topbarAccount.innerHTML = me.role === "admin"
+  topbarAccount.innerHTML = isStaffRole(me.role)
     ? '<a href="admin.html">Yönetim Paneli</a><span class="topbar-sep">|</span><a href="#" class="logout-link">Çıkış</a>'
     : '<a href="hesap.html">Hesabım</a><span class="topbar-sep">|</span><a href="#" class="logout-link">Çıkış</a>';
   const logoutLink = topbarAccount.querySelector(".logout-link");

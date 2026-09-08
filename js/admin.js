@@ -1,12 +1,26 @@
 // ============ YÖNETİM PANELİ ============
 
-// Erişim koruması: yalnızca admin rolü girebilir.
-// NOT: Bu istemci tarafı bir korumadır; sunucuya bağlanınca
-// yetki kontrolü mutlaka sunucuda da yapılmalıdır.
+// Erişim koruması: yalnızca yetkili roller (Patron/Yönetici/Personel) girebilir.
+// NOT: Bu istemci tarafı bir korumadır; asıl yetki kontrolü sunucuda yapılır.
+// ---- Yetki katmanları (server.js ile aynı seviyeler) ----
+const ROLE_LEVEL = { patron: 100, admin: 100, yonetici: 60, personel: 30, user: 0 };
+const roleLevel = (r) => ROLE_LEVEL[r] != null ? ROLE_LEVEL[r] : 0;
+const ROLE_LABEL = { patron: "Patron", admin: "Patron", yonetici: "Yönetici", personel: "Personel", user: "Müşteri" };
 const adminSession = Store.session();
-if (!adminSession || adminSession.role !== "admin") {
+const myLevel = adminSession ? roleLevel(adminSession.role) : 0;
+if (!adminSession || myLevel < 30) {
   location.href = "giris.html";
 }
+// Her panel bölümünün gerektirdiği minimum yetki seviyesi
+const VIEW_MIN_LEVEL = {
+  dashboard: 30, products: 30, upload: 30, categories: 30, slides: 30,
+  orders: 30, leads: 30, content: 60, users: 60, settings: 100
+};
+// Yetkisi yetmeyen bölümlerin menü butonlarını gizle (asıl kısıt sunucuda)
+document.querySelectorAll(".admin-nav-btn").forEach((btn) => {
+  const v = btn.getAttribute("data-view");
+  if (VIEW_MIN_LEVEL[v] != null && myLevel < VIEW_MIN_LEVEL[v]) btn.style.display = "none";
+});
 
 Store.ready(function () {
 
@@ -1083,6 +1097,30 @@ async function renderUsers() {
   filterAndRenderUsers();
 }
 
+// ---- Yetki katmanı yardımcıları ----
+const normalizeRoleClient = (r) => r === "admin" ? "patron" : (["patron", "yonetici", "personel", "user"].includes(r) ? r : "user");
+const userLevel = (u) => (typeof u.level === "number" ? u.level : roleLevel(u.role));
+const manageable = (u) => userLevel(u) < myLevel; // yalnızca kendinden düşük seviye yönetilebilir
+function roleBadge(role) {
+  const lv = roleLevel(role), label = ROLE_LABEL[role] || "Müşteri";
+  if (lv >= 100) return '<span class="pill pill-warn">' + label + "</span>";
+  if (lv >= 60) return '<span class="pill pill-info">' + label + "</span>";
+  if (lv >= 30) return '<span class="pill pill-ok">' + label + "</span>";
+  return "Müşteri";
+}
+function assignableRoles() {
+  const roles = ["user"];
+  if (myLevel > 30) roles.push("personel");
+  if (myLevel > 60) roles.push("yonetici");
+  if (myLevel >= 100) roles.push("patron");
+  return roles;
+}
+function roleSelectHtml(u) {
+  if (!manageable(u)) return '<span class="pill">' + roleBadge(u.role).replace(/<[^>]+>/g, "") + " (kilitli)</span>";
+  const cur = normalizeRoleClient(u.role);
+  const opts = assignableRoles().map((r) => `<option value="${r}"${r === cur ? " selected" : ""}>${ROLE_LABEL[r]}</option>`).join("");
+  return `<select class="row-role-select row-btn" data-id="${escHtml(u.id)}" data-current="${escHtml(cur)}" title="Yetki seviyesi">${opts}</select>`;
+}
 function filterAndRenderUsers() {
   const tbody = document.getElementById("userRows");
   const q = (document.getElementById("userSearchInput").value || "").trim().toLowerCase();
@@ -1101,13 +1139,13 @@ function filterAndRenderUsers() {
         <td>${escHtml(u.email || "—")}</td>
         <td>${escHtml(u.phone || "—")}</td>
         <td>${escHtml(u.city || "—")}</td>
-        <td>${u.role === "admin" ? '<span class="pill pill-warn">Yönetici</span>' : "Müşteri"}</td>
+        <td>${roleBadge(u.role)}</td>
         <td>${u.blocked ? '<span class="pill pill-warn">Engelli</span>' : '<span class="pill pill-ok">Aktif</span>'}</td>
-        <td class="cell-actions">${isSelf ? "—" : `
+        <td class="cell-actions">${isSelf ? '<span class="pill">Siz</span>' : `
           <button class="row-btn row-btn-info" data-act="detail" data-id="${escHtml(u.id)}" data-email="${escHtml(u.email)}" data-name="${escHtml(u.name || "")}" data-phone="${escHtml(u.phone || "")}" data-city="${escHtml(u.city || "")}" data-role="${escHtml(u.role)}" data-created="${u.created || 0}">Detaylar</button>
-          <button class="row-btn" data-act="role" data-id="${escHtml(u.id)}" data-role="${escHtml(u.role)}">${u.role === "admin" ? "Yetkiyi Al" : "Yönetici Yap"}</button>
-          <button class="row-btn" data-act="block" data-id="${escHtml(u.id)}" data-blocked="${u.blocked ? 1 : 0}">${u.blocked ? "Engeli Kaldır" : "Engelle"}</button>
-          <button class="row-btn row-btn-danger" data-act="deluser" data-id="${escHtml(u.id)}" data-name="${escHtml(u.name || u.email)}">Sil</button>`}
+          ${roleSelectHtml(u)}
+          <button class="row-btn" data-act="block" data-id="${escHtml(u.id)}" data-blocked="${u.blocked ? 1 : 0}"${manageable(u) ? "" : " disabled"}>${u.blocked ? "Engeli Kaldır" : "Engelle"}</button>
+          <button class="row-btn row-btn-danger" data-act="deluser" data-id="${escHtml(u.id)}" data-name="${escHtml(u.name || u.email)}"${manageable(u) ? "" : " disabled"}>Sil</button>`}
         </td>
       </tr>`;
   }).join("") ||
@@ -1125,22 +1163,6 @@ document.getElementById("userRows").addEventListener("click", async (e) => {
     openUserDetail(btn.dataset);
     return;
   }
-  if (act === "role") {
-    const makeAdmin = btn.dataset.role !== "admin";
-    if (!confirm(makeAdmin
-      ? "Bu kullanıcı yönetici yapılsın mı? E-posta adresinize onay maili gönderilecek."
-      : "Bu kullanıcının yönetici yetkisi kaldırılsın mı?")) return;
-    try {
-      const res = await Store.setUserRole(id, makeAdmin ? "admin" : "user");
-      if (res.pending) {
-        alert(res.msg || "Onay e-postası gönderildi. Lütfen mailinizi kontrol edip onaylayın.");
-      } else {
-        renderUsers();
-      }
-    } catch (err) {
-      alert("Hata: " + (err.message || "Rol değiştirilemedi."));
-    }
-  }
   if (act === "block") {
     const block = btn.dataset.blocked !== "1";
     if (!confirm(block
@@ -1153,6 +1175,33 @@ document.getElementById("userRows").addEventListener("click", async (e) => {
     if (!confirm('"' + (btn.dataset.name || "") + '" hesabı kalıcı olarak silinsin mi?')) return;
     await Store.deleteUser(id);
     renderUsers();
+  }
+});
+
+// Rol (yetki seviyesi) değiştirme — seçim kutusu
+document.getElementById("userRows").addEventListener("change", async (e) => {
+  const sel = e.target.closest(".row-role-select");
+  if (!sel) return;
+  const id = sel.dataset.id;
+  const newRole = sel.value;
+  const oldRole = sel.dataset.current;
+  if (newRole === oldRole) return;
+  const label = ROLE_LABEL[newRole] || newRole;
+  const msg = newRole === "patron"
+    ? 'Bu kullanıcıya "Patron" (en üst) yetkisi verilsin mi? E-posta adresinize onay maili gönderilecek.'
+    : 'Bu kullanıcının yetkisi "' + label + '" olarak değiştirilsin mi?';
+  if (!confirm(msg)) { sel.value = oldRole; return; }
+  try {
+    const res = await Store.setUserRole(id, newRole);
+    if (res && res.pending) {
+      alert(res.msg || "Onay e-postası gönderildi. Lütfen mailinizi kontrol edip onaylayın.");
+      sel.value = oldRole;
+    } else {
+      renderUsers();
+    }
+  } catch (err) {
+    alert("Hata: " + (err.message || "Yetki değiştirilemedi."));
+    sel.value = oldRole;
   }
 });
 
@@ -1209,7 +1258,7 @@ function openUserDetail(data) {
   document.getElementById("udEmailShow").value = email;
   document.getElementById("udPhone").value = data.phone || "";
   document.getElementById("udCity").value = data.city || "";
-  document.getElementById("udRole").value = data.role === "admin" ? "Yönetici" : "Müşteri";
+  document.getElementById("udRole").value = ROLE_LABEL[data.role] || "Müşteri";
   document.getElementById("udCreated").value = data.created && +data.created > 0 ? dateFmt(+data.created) : "—";
   document.getElementById("udProfileStatus").textContent = "";
   document.getElementById("udProfileStatus").className = "form-status";

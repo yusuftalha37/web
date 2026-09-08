@@ -468,29 +468,37 @@ const Store = (() => {
     return { ok: true };
   }
 
+  // Sunucudan gelen token yanıtından oturum kurar (login ve OTP doğrulama ortak kullanır)
+  async function sessionFromToken(data) {
+    const tk = data.access_token;
+    const user = data.user || {};
+    const meta = user.user_metadata || {};
+    let role = "user", phone = meta.phone || "", name = meta.name || (user.email || "");
+    try {
+      const prof = await fetch(SB_URL + "/rest/v1/profiles?id=eq." + user.id + "&select=role,phone,name", {
+        headers: { apikey: SB_KEY, Authorization: "Bearer " + tk }
+      }).then((x) => x.json());
+      if (prof && prof[0]) { role = prof[0].role || role; phone = prof[0].phone || phone; name = prof[0].name || name; }
+    } catch (_) {}
+    const s = { name, email: user.email, role, phone, token: tk, uid: user.id };
+    write("gp-session", s);
+    return { ok: true, session: s };
+  }
   async function login(email, pass) {
     email = (email || "").trim().toLowerCase();
     if (persist) {
       const r = await gotrue("token?grant_type=password", { email, password: pass });
+      // Ana yönetici hesabı: şifre doğru ama doğrulama kodu gerekiyor
+      if (r.ok && r.data && r.data.mfa_required) {
+        return { ok: false, mfa: true, challenge: r.data.challenge, email: r.data.email || email };
+      }
       if (!r.ok) {
         const d = r.data || {};
         if (r.status === 429) return { ok: false, error: d.error_description || "Çok fazla hatalı deneme. 15 dakika sonra tekrar deneyin." };
         if (d.error === "blocked") return { ok: false, error: d.error_description || "Bu hesap engellenmiş." };
         return { ok: false, error: d.error_description || "E-posta veya şifre hatalı." };
       }
-      const tk = r.data.access_token;
-      const user = r.data.user || {};
-      const meta = user.user_metadata || {};
-      let role = "user", phone = meta.phone || "", name = meta.name || email;
-      try {
-        const prof = await fetch(SB_URL + "/rest/v1/profiles?id=eq." + user.id + "&select=role,phone,name", {
-          headers: { apikey: SB_KEY, Authorization: "Bearer " + tk }
-        }).then((x) => x.json());
-        if (prof && prof[0]) { role = prof[0].role || role; phone = prof[0].phone || phone; name = prof[0].name || name; }
-      } catch (_) {}
-      const s = { name, email, role, phone, token: tk, uid: user.id };
-      write("gp-session", s);
-      return { ok: true, session: s };
+      return await sessionFromToken(r.data);
     }
     const user = getUsersLocal().find((u) => u.email === email && u.pass === hash(pass));
     if (!user) return { ok: false, error: "E-posta veya şifre hatalı." };
@@ -498,6 +506,15 @@ const Store = (() => {
     const s = { name: user.name, email: user.email, role: user.role };
     write("gp-session", s);
     return { ok: true, session: s };
+  }
+  // Ana yönetici giriş doğrulama kodunu kontrol eder, doğruysa oturumu kurar
+  async function verifyOtp(challenge, code) {
+    const r = await gotrue("verify-otp", { challenge, code });
+    if (!r.ok || !r.data || !r.data.access_token) {
+      const d = r.data || {};
+      return { ok: false, error: d.error_description || "Kod doğrulanamadı." };
+    }
+    return await sessionFromToken(r.data);
   }
 
   // ===================== KULLANICI YÖNETİMİ (yalnızca admin) =====================
@@ -769,7 +786,7 @@ const Store = (() => {
     getBrands, getTreeCategories, isBrandCat, catChildren, catTree,
     catDescendantIds, catPath, canReparent,
     getSlides, saveSlide, deleteSlide, moveSlide,
-    register, login, logout, session,
+    register, login, verifyOtp, logout, session,
     getUser, updateProfile, changePassword, adminUpdateUser,
     getUserAddresses, setUserAddresses, getUserFavorites,
     listUsers, setUserRole, setUserBlocked, deleteUser, adminCreateUser,
@@ -973,6 +990,11 @@ function slugify(str) {
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
+}
+
+// Yönetim paneline girebilen roller (Patron/Yönetici/Personel + eski "admin")
+function isStaffRole(role) {
+  return ["admin", "patron", "yonetici", "personel"].indexOf(role) !== -1;
 }
 
 // Admin panelinden düzenlenen site içeriğini (telefon, e-posta, adres,
