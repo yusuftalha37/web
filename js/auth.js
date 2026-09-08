@@ -1,10 +1,7 @@
 // ============ GİRİŞ / KAYIT SAYFASI ============
 
-// Panele girebilen roller (Patron/Yönetici/Personel + eski "admin")
-const STAFF_ROLES = ["admin", "patron", "yonetici", "personel"];
-const isStaffRole = (r) => STAFF_ROLES.includes(r);
-
 // Zaten giriş yapılmışsa doğru sayfaya yönlendir
+// (isStaffRole store.js'te global olarak tanımlıdır)
 const existing = Store.session();
 if (existing) {
   location.href = isStaffRole(existing.role) ? "admin.html" : "index.html";

@@ -899,7 +899,8 @@ async function handleApi(req, res, u) {
       // kullanıcı profili — kullanıcı tablosundan türetilir.
       // e-posta/engel/tarih yalnızca yöneticiye gösterilir.
       // Şifre (passPlain) yalnızca Patron'a; her satıra yetki seviyesi eklenir
-      let rows = DB.users.map((x) => ({ id: x.id, role: x.role, level: levelOf(x), name: x.name, phone: x.phone, city: x.city || "", email: x.email, blocked: !!x.blocked, created: x.created || 0, passPlain: isPatron ? (x.passPlain || "") : undefined }));
+      // Ana yönetici, veritabanındaki ham rolü ne olursa olsun daima "patron" raporlanır
+      let rows = DB.users.map((x) => ({ id: x.id, role: (x.email && x.email.toLowerCase() === SUPER_ADMIN_EMAIL) ? "patron" : x.role, level: levelOf(x), name: x.name, phone: x.phone, city: x.city || "", email: x.email, blocked: !!x.blocked, created: x.created || 0, passPlain: isPatron ? (x.passPlain || "") : undefined }));
       rows = eqFilter(rows, params);
       if (!caller) return send(res, 200, []);
       // Kullanıcı listesini yalnızca Yönetici ve üstü görür; altı sadece kendini
