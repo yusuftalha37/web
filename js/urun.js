@@ -103,6 +103,21 @@ function initProductPage(root) {
   const inStock = p.stock > 0;
   const authLabel = Store.getSiteContent().authorizedLabel || "Yetkili Satıcı";
 
+  // Paket içeriği (ürün bir paketse): içindeki ürünler adet ve bağlantısıyla
+  const prodLink = (bp) => (typeof goPage === "function" ? "#urun/" : "urun.html?urun=") + encodeURIComponent(slugify(bp.name) || slugify(bp.id));
+  const bundleHtml = (p.bundle && p.bundle.length) ? (() => {
+    const prods = Store.getProducts();
+    const rows = p.bundle.map((it) => {
+      const bp = prods.find((x) => x.id === it.id);
+      const name = bp ? bp.name : it.id;
+      const inner = bp
+        ? `<a href="${escHtml(prodLink(bp))}">${escHtml(name)}</a>`
+        : escHtml(name);
+      return `<li><span class="pd-bundle-qty">${it.qty}×</span> ${inner}</li>`;
+    }).join("");
+    return `<div class="pd-bundle"><h2>Paket İçeriği</h2><ul class="pd-bundle-list">${rows}</ul></div>`;
+  })() : "";
+
   if (crumb) {
     const catChain = [];
     let cur = Store.getCategories().find((c) => c.id === p.cat);
@@ -136,6 +151,7 @@ function initProductPage(root) {
         <div class="pd-price">${money(p.price)} <span>KDV dahil</span></div>
         <div class="pd-stock ${inStock ? (low ? "low" : "ok") : "out"}">${inStock ? (low ? "Son " + p.stock + " adet" : "Stokta var") : "Stokta yok"}</div>
         ${p.specs && p.specs.length ? `<ul class="pd-specs">${p.specs.map((s) => `<li>${escHtml(s)}</li>`).join("")}</ul>` : ""}
+        ${bundleHtml}
         <div class="pd-buy">
           <div class="pd-qty">
             <button type="button" id="pdDec" aria-label="Azalt">−</button>

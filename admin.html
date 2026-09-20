@@ -23,6 +23,7 @@
       <button class="admin-nav-btn active" data-view="dashboard">Genel Bakış</button>
       <button class="admin-nav-btn" data-view="products">Ürünler</button>
       <button class="admin-nav-btn" data-view="upload">Ürün Yükle</button>
+      <button class="admin-nav-btn" data-view="packages">Paketler</button>
       <button class="admin-nav-btn" data-view="categories">Kategoriler</button>
       <button class="admin-nav-btn" data-view="slides">Vitrin (Slider)</button>
       <button class="admin-nav-btn" data-view="orders">Siparişler</button>
@@ -140,6 +141,76 @@
           <h2>Mağaza Önizlemesi</h2>
           <div class="upload-preview" id="uploadPreview"></div>
           <p class="panel-hint">Ürününüz mağazada bu şekilde görünecek. Formu doldurdukça önizleme güncellenir.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAKETLER -->
+    <section class="admin-view" id="view-packages" hidden>
+      <div class="upload-grid">
+        <div class="admin-panel">
+          <h2 id="pkFormTitle">Yeni Paket Oluştur</h2>
+          <p class="panel-hint">Mevcut ürünlerinizi seçip bir araya getirin. Paket, mağazada tek bir ürün gibi satılır; ürün sayfasında içindeki ürünler listelenir.</p>
+          <form id="packageForm">
+            <input type="hidden" id="pkId">
+            <div class="form-group">
+              <label for="pkName">Paket adı *</label>
+              <input type="text" id="pkName" required placeholder="Örn. Bağ Evi Başlangıç Paketi">
+            </div>
+            <div class="form-group">
+              <label>Paket fotoğrafı</label>
+              <div class="drop-zone" id="pkDropZone">
+                <input type="file" id="pkPhotoFile" accept="image/*" hidden>
+                <div class="drop-zone-inner">
+                  <strong>Fotoğrafı buraya sürükleyip bırakın</strong>
+                  <span>veya tıklayıp seçin — otomatik küçültülür</span>
+                </div>
+              </div>
+              <input type="text" id="pkPhotoUrl" class="up-url" placeholder="veya görsel bağlantısı: https://...">
+              <button type="button" class="row-btn row-btn-danger" id="pkPhotoRemove">Fotoğrafı Kaldır</button>
+            </div>
+
+            <div class="form-group">
+              <label>Paket içeriği <small>(ürün seçip adet girin, Ekle'ye basın)</small></label>
+              <div class="pk-picker">
+                <select id="pkProductSelect"></select>
+                <input type="number" id="pkProductQty" min="1" value="1" title="Adet">
+                <button type="button" class="btn btn-small" id="pkAddItem">Ekle</button>
+              </div>
+              <div class="pk-items" id="pkItems"></div>
+              <p class="pk-sum" id="pkSum"></p>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="pkPrice">Paket satış fiyatı (₺, KDV dahil) *</label>
+                <input type="number" id="pkPrice" required min="1" step="1" placeholder="94500">
+              </div>
+              <div class="form-group">
+                <label for="pkStock">Stok adedi *</label>
+                <input type="number" id="pkStock" required min="0" step="1" placeholder="5">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="pkDesc">Ek açıklama <small>(her satıra bir madde — isteğe bağlı)</small></label>
+              <textarea id="pkDesc" rows="2" placeholder="Kurulum kılavuzu dahil&#10;Telefonla teknik destek"></textarea>
+            </div>
+            <label class="check-label"><input type="checkbox" id="pkHit"> Çok satan — ana sayfa vitrininde göster</label>
+            <div class="pk-form-actions">
+              <button type="submit" class="btn btn-block">Paketi Kaydet</button>
+              <button type="button" class="btn btn-outline btn-block" id="pkCancelEdit" hidden>Vazgeç (yeni paket)</button>
+            </div>
+            <p class="form-status" id="pkStatus" role="status"></p>
+          </form>
+        </div>
+        <div class="admin-panel">
+          <h2>Mevcut Paketler</h2>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Paket</th><th>İçerik</th><th>Fiyat</th><th>Stok</th><th></th></tr></thead>
+              <tbody id="packageRows"></tbody>
+            </table>
+          </div>
         </div>
       </div>
     </section>

@@ -13,7 +13,7 @@ if (!adminSession || myLevel < 30) {
 }
 // Her panel bölümünün gerektirdiği minimum yetki seviyesi
 const VIEW_MIN_LEVEL = {
-  dashboard: 30, products: 30, upload: 30, categories: 30, slides: 30,
+  dashboard: 30, products: 30, upload: 30, packages: 30, categories: 30, slides: 30,
   orders: 30, leads: 30, content: 60, users: 60, settings: 100
 };
 // Yetkisi yetmeyen bölümlerin menü butonlarını gizle (asıl kısıt sunucuda)
@@ -132,6 +132,7 @@ const VIEW_TITLES = {
   dashboard: "Genel Bakış",
   products: "Ürünler",
   upload: "Ürün Yükle",
+  packages: "Paketler",
   categories: "Kategoriler",
   slides: "Vitrin (Slider)",
   orders: "Siparişler",
@@ -541,7 +542,187 @@ uploadForm.addEventListener("submit", async (e) => {
 
 renderUploadPreview();
 
-// ---------- KATEGORİLER ----------
+// ---------- PAKETLER ----------
+const packageForm = document.getElementById("packageForm");
+const pkDropZone = document.getElementById("pkDropZone");
+const pkPhotoFile = document.getElementById("pkPhotoFile");
+const pkPhotoUrl = document.getElementById("pkPhotoUrl");
+const pkStatus = document.getElementById("pkStatus");
+const pkItemsBox = document.getElementById("pkItems");
+const pkSum = document.getElementById("pkSum");
+let pkPhoto = "";
+let pkItemsState = []; // [{ id, qty }]
+const PK_DROP_DEFAULT = pkDropZone.querySelector(".drop-zone-inner").innerHTML;
+const tl = (n) => "₺" + Math.round(n || 0).toLocaleString("tr-TR");
+
+function setPkPhoto(src) {
+  pkPhoto = src || "";
+  const inner = pkDropZone.querySelector(".drop-zone-inner");
+  inner.innerHTML = pkPhoto
+    ? `<img src="${escHtml(pkPhoto)}" alt="Önizleme"><span>Değiştirmek için tıklayın</span>`
+    : PK_DROP_DEFAULT;
+  pkDropZone.classList.toggle("has-photo", !!pkPhoto);
+}
+pkDropZone.addEventListener("click", () => pkPhotoFile.click());
+pkDropZone.addEventListener("dragover", (e) => { e.preventDefault(); pkDropZone.classList.add("drag"); });
+pkDropZone.addEventListener("dragleave", () => pkDropZone.classList.remove("drag"));
+pkDropZone.addEventListener("drop", (e) => {
+  e.preventDefault(); pkDropZone.classList.remove("drag");
+  const file = e.dataTransfer.files[0];
+  if (file) readImageFile(file, (u) => { setPkPhoto(u); pkPhotoUrl.value = ""; });
+});
+pkPhotoFile.addEventListener("change", () => {
+  const file = pkPhotoFile.files[0];
+  if (file) readImageFile(file, (u) => { setPkPhoto(u); pkPhotoUrl.value = ""; });
+});
+pkPhotoUrl.addEventListener("input", () => { if (pkPhotoUrl.value.trim()) setPkPhoto(pkPhotoUrl.value.trim()); });
+document.getElementById("pkPhotoRemove").addEventListener("click", () => { setPkPhoto(""); pkPhotoUrl.value = ""; pkPhotoFile.value = ""; });
+
+// Paketin içine konabilecek ürünler (paketler hariç — paket içine paket konmaz)
+function fillPkProductSelect() {
+  const sel = document.getElementById("pkProductSelect");
+  if (!sel) return;
+  const prev = sel.value;
+  const prods = Store.getProducts().filter((p) => !(p.bundle && p.bundle.length));
+  sel.innerHTML = prods.map((p) => `<option value="${escHtml(p.id)}">${escHtml(p.name)} — ${tl(p.price)}</option>`).join("")
+    || '<option value="">(önce ürün ekleyin)</option>';
+  if (prev) sel.value = prev;
+}
+
+function renderPkItems() {
+  const prods = Store.getProducts();
+  let sum = 0;
+  pkItemsBox.innerHTML = pkItemsState.map((it, i) => {
+    const p = prods.find((x) => x.id === it.id);
+    if (p) sum += (p.price || 0) * it.qty;
+    return `<div class="pk-item"><span>${escHtml(p ? p.name : it.id)} <b>× ${it.qty}</b></span>` +
+      `<button type="button" class="row-btn row-btn-danger" data-pkremove="${i}">Kaldır</button></div>`;
+  }).join("") || '<p class="pk-empty">Henüz ürün eklenmedi. Yukarıdan seçip "Ekle"ye basın.</p>';
+  pkSum.textContent = pkItemsState.length ? "İçindeki ürünlerin toplam değeri (referans): " + tl(sum) : "";
+}
+
+document.getElementById("pkAddItem").addEventListener("click", () => {
+  const id = document.getElementById("pkProductSelect").value;
+  const qty = Math.max(1, parseInt(document.getElementById("pkProductQty").value, 10) || 1);
+  if (!id) return;
+  const existing = pkItemsState.find((it) => it.id === id);
+  if (existing) existing.qty += qty; else pkItemsState.push({ id, qty });
+  document.getElementById("pkProductQty").value = 1;
+  renderPkItems();
+});
+pkItemsBox.addEventListener("click", (e) => {
+  const btn = e.target.closest("[data-pkremove]");
+  if (!btn) return;
+  pkItemsState.splice(+btn.dataset.pkremove, 1);
+  renderPkItems();
+});
+
+function resetPackageForm() {
+  packageForm.reset();
+  document.getElementById("pkId").value = "";
+  pkItemsState = [];
+  setPkPhoto("");
+  renderPkItems();
+  document.getElementById("pkFormTitle").textContent = "Yeni Paket Oluştur";
+  document.getElementById("pkCancelEdit").hidden = true;
+  pkStatus.textContent = "";
+}
+document.getElementById("pkCancelEdit").addEventListener("click", resetPackageForm);
+
+function editPackage(pk) {
+  document.getElementById("pkId").value = pk.id;
+  document.getElementById("pkName").value = pk.name || "";
+  document.getElementById("pkPrice").value = pk.price || "";
+  document.getElementById("pkStock").value = pk.stock != null ? pk.stock : "";
+  document.getElementById("pkHit").checked = !!pk.hit;
+  document.getElementById("pkDesc").value = (pk.specs || []).join("\n");
+  pkItemsState = (pk.bundle || []).map((it) => ({ id: it.id, qty: it.qty }));
+  setPkPhoto(pk.photo || "");
+  renderPkItems();
+  document.getElementById("pkFormTitle").textContent = "Paketi Düzenle";
+  document.getElementById("pkCancelEdit").hidden = false;
+  document.querySelector('.admin-nav-btn[data-view="packages"]').click();
+  window.scrollTo(0, 0);
+}
+
+function renderPackages() {
+  fillPkProductSelect();
+  const tbody = document.getElementById("packageRows");
+  if (!tbody) return;
+  const prods = Store.getProducts();
+  const pkgs = prods.filter((p) => p.bundle && p.bundle.length);
+  tbody.innerHTML = pkgs.map((pk) => {
+    const content = pk.bundle.map((it) => {
+      const p = prods.find((x) => x.id === it.id);
+      return escHtml(p ? p.name : it.id) + " ×" + it.qty;
+    }).join(", ");
+    return `<tr>
+      <td class="cell-strong">${escHtml(pk.name)}</td>
+      <td class="pk-content-cell">${content}</td>
+      <td>${tl(pk.price)}</td>
+      <td>${pk.stock}</td>
+      <td class="cell-actions">
+        <button class="row-btn" data-act="pkedit" data-id="${escHtml(pk.id)}">Düzenle</button>
+        <button class="row-btn row-btn-danger" data-act="pkdel" data-id="${escHtml(pk.id)}">Sil</button>
+      </td></tr>`;
+  }).join("") || '<tr><td colspan="5" class="empty-row">Henüz paket oluşturulmadı.</td></tr>';
+}
+
+document.getElementById("packageRows").addEventListener("click", async (e) => {
+  const btn = e.target.closest(".row-btn");
+  if (!btn) return;
+  const { id, act } = btn.dataset;
+  const pk = Store.getProducts().find((p) => p.id === id);
+  if (act === "pkedit" && pk) editPackage(pk);
+  if (act === "pkdel" && pk && confirm(`"${pk.name}" paketi silinsin mi?`)) {
+    try { await Store.deleteProduct(id); renderAll(); }
+    catch (err) { alert("Silme başarısız: " + (err.message || "Sunucu hatası.")); }
+  }
+});
+
+packageForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const name = document.getElementById("pkName").value.trim();
+  const price = parseInt(document.getElementById("pkPrice").value, 10) || 0;
+  if (!name || price <= 0) {
+    pkStatus.textContent = "Lütfen paket adını ve geçerli bir fiyat girin.";
+    pkStatus.className = "form-status err"; return;
+  }
+  if (!pkItemsState.length) {
+    pkStatus.textContent = "Pakete en az bir ürün ekleyin.";
+    pkStatus.className = "form-status err"; return;
+  }
+  pkStatus.textContent = "Kaydediliyor…";
+  pkStatus.className = "form-status ok";
+  const existingId = document.getElementById("pkId").value;
+  try {
+    await Store.saveProduct({
+      id: existingId || "pkg-" + Date.now(),
+      name,
+      cat: "paket",
+      cats: [],
+      img: "kit",
+      photo: pkPhoto,
+      hit: document.getElementById("pkHit").checked,
+      authorized: false,
+      price,
+      stock: parseInt(document.getElementById("pkStock").value, 10) || 0,
+      specs: document.getElementById("pkDesc").value.split("\n").map((s) => s.trim()).filter(Boolean),
+      bundle: pkItemsState.map((it) => ({ id: it.id, qty: it.qty }))
+    });
+  } catch (err) {
+    pkStatus.textContent = saveErrorText(err);
+    pkStatus.className = "form-status err"; return;
+  }
+  resetPackageForm();
+  pkStatus.textContent = '"' + name + '" paketi kaydedildi.';
+  pkStatus.className = "form-status ok";
+  renderAll();
+});
+
+renderPkItems();
+
+
 function renderCategories() {
   const products = Store.getProducts();
   const tree = Store.catTree();          // hiyerarşi (derinlikli, DFS sırasında)
@@ -1898,6 +2079,7 @@ function renderAll() {
   refreshCatFormParent();
   renderDashboard();
   renderProducts();
+  renderPackages();
   renderCategories();
   renderSlides();
   renderOrders();

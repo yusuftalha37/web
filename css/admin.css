@@ -673,6 +673,18 @@
 .ct-img-actions { display: flex; gap: 8px; }
 .ct-img-btn { font-size: 12px !important; padding: 5px 12px !important; }
 
+/* ---- Paketler ---- */
+.pk-picker { display: flex; gap: 8px; align-items: center; }
+.pk-picker select { flex: 1; min-width: 0; padding: 8px 10px; border: 1px solid var(--border); border-radius: var(--radius); font-size: 13px; background: #fff; }
+.pk-picker input[type="number"] { width: 64px; padding: 8px; border: 1px solid var(--border); border-radius: var(--radius); font-size: 13px; text-align: center; }
+.pk-items { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
+.pk-item { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 12px; background: #f0f5ee; border: 1px solid var(--border); border-radius: var(--radius); font-size: 13px; }
+.pk-item b { color: #1a6b38; }
+.pk-empty { color: #94a3b8; font-size: 13px; margin-top: 8px; }
+.pk-sum { margin-top: 8px; font-size: 12.5px; color: #5a6e5e; font-weight: 600; }
+.pk-content-cell { font-size: 12px; color: #5a6e5e; max-width: 260px; }
+.pk-form-actions { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+
 .up-url {
   width: 100%;
   margin-top: 8px;

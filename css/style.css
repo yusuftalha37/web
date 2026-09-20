@@ -960,6 +960,32 @@ img, svg { max-width: 100%; }
   font-weight: bold;
 }
 
+/* Paket rozeti (mağaza kartı) */
+.bundle-ribbon {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 2;
+  font-size: 10px;
+  font-weight: bold;
+  letter-spacing: 0.02em;
+  padding: 3px 9px;
+  border-radius: var(--radius);
+  background: linear-gradient(#38a55e, var(--orange));
+  color: #fff;
+  border: 1px solid var(--orange-dark);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+/* Paket içeriği (ürün sayfası) */
+.pd-bundle { margin: 0 0 18px; padding: 14px 16px; background: var(--bg-alt); border: 1px solid var(--border); border-radius: var(--radius); }
+.pd-bundle h2 { font-size: 15px; margin: 0 0 10px; color: var(--blue); }
+.pd-bundle-list { list-style: none; margin: 0; padding: 0; }
+.pd-bundle-list li { display: flex; align-items: baseline; gap: 8px; padding: 5px 0; font-size: 13.5px; border-top: 1px dashed var(--border); }
+.pd-bundle-list li:first-child { border-top: none; }
+.pd-bundle-qty { font-weight: bold; color: var(--orange-dark); min-width: 32px; }
+.pd-bundle-list a { color: var(--blue); text-decoration: none; }
+.pd-bundle-list a:hover { text-decoration: underline; }
+
 .pd-buy { display: flex; gap: 12px; align-items: stretch; margin-bottom: 10px; }
 .pd-qty {
   display: flex;

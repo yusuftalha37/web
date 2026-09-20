@@ -163,6 +163,7 @@ function initSite(root) {
 
   function productCard(p) {
     const low = p.stock <= 5;
+    const isBundle = p.bundle && p.bundle.length;
     const authLabel = (Store.getSiteContent().authorizedLabel || "Yetkili Satıcı");
     const authBadge = p.authorized
       ? `<span class="auth-badge" title="${escHtml(authLabel)}"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>${escHtml(authLabel)}</span>`
@@ -172,6 +173,7 @@ function initSite(root) {
       <article class="product">
         <div class="product-img${p.photo ? " has-photo" : ""}">
           <span class="stock-badge${low ? " low" : ""}">${low ? "Son " + p.stock + " adet" : "Stokta"}</span>
+          ${isBundle ? '<span class="bundle-ribbon">Paket</span>' : ""}
           ${p.authorized ? `<span class="auth-ribbon">${escHtml(authLabel)}</span>` : ""}
           <a href="${href}" class="product-medialink" aria-label="${escHtml(p.name)}">${productMedia(p)}</a>
         </div>
