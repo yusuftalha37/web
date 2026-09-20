@@ -1154,7 +1154,19 @@ function serveSitemap(res) {
     { loc: "/makale-kac-kw-panel.html", freq: "monthly", pri: "0.6" },
     { loc: "/makale-mahsuplasma.html", freq: "monthly", pri: "0.6" },
     { loc: "/makale-panel-bakim.html", freq: "monthly", pri: "0.6" },
-    { loc: "/makale-on-grid-off-grid-hibrit.html", freq: "monthly", pri: "0.6" }
+    { loc: "/makale-on-grid-off-grid-hibrit.html", freq: "monthly", pri: "0.6" },
+    { loc: "/makale-panel-cesitleri.html", freq: "monthly", pri: "0.6" },
+    { loc: "/makale-panel-verimi.html", freq: "monthly", pri: "0.6" },
+    { loc: "/makale-aku-cesitleri.html", freq: "monthly", pri: "0.6" },
+    { loc: "/makale-mppt-pwm.html", freq: "monthly", pri: "0.6" },
+    { loc: "/makale-kablo-konnektor.html", freq: "monthly", pri: "0.6" },
+    { loc: "/makale-inverter-cesitleri.html", freq: "monthly", pri: "0.6" },
+    { loc: "/makale-cati-montaj.html", freq: "monthly", pri: "0.6" },
+    { loc: "/makale-karavan-kurulum.html", freq: "monthly", pri: "0.6" },
+    { loc: "/makale-bagevi-offgrid.html", freq: "monthly", pri: "0.6" },
+    { loc: "/makale-panel-yon-egim.html", freq: "monthly", pri: "0.6" },
+    { loc: "/makale-baglanti-semasi.html", freq: "monthly", pri: "0.6" },
+    { loc: "/makale-sulama-kurulum.html", freq: "monthly", pri: "0.6" }
   ];
   const urls = staticPages.map((p) =>
     `  <url><loc>${SITE_BASE}${p.loc}</loc><changefreq>${p.freq}</changefreq><priority>${p.pri}</priority></url>`);

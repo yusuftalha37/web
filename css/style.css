@@ -1180,6 +1180,14 @@ img, svg { max-width: 100%; }
 .article-related a:hover { text-decoration: underline; }
 
 .blog-list { display: flex; flex-direction: column; gap: 16px; }
+.blog-cat-title {
+  font-size: 20px;
+  color: var(--blue);
+  margin: 34px 0 14px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--orange);
+}
+.blog-cat-title:first-child { margin-top: 0; }
 .blog-card {
   border: 1px solid var(--border);
   border-radius: var(--radius);
