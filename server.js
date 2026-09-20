@@ -1166,7 +1166,17 @@ function serveSitemap(res) {
     { loc: "/makale-bagevi-offgrid.html", freq: "monthly", pri: "0.6" },
     { loc: "/makale-panel-yon-egim.html", freq: "monthly", pri: "0.6" },
     { loc: "/makale-baglanti-semasi.html", freq: "monthly", pri: "0.6" },
-    { loc: "/makale-sulama-kurulum.html", freq: "monthly", pri: "0.6" }
+    { loc: "/makale-sulama-kurulum.html", freq: "monthly", pri: "0.6" },
+    { loc: "/makale-klima-solar.html", freq: "monthly", pri: "0.6" },
+    { loc: "/makale-elektrikli-arac-sarj.html", freq: "monthly", pri: "0.6" },
+    { loc: "/makale-sera-tarim.html", freq: "monthly", pri: "0.6" },
+    { loc: "/makale-ticari-ges.html", freq: "monthly", pri: "0.6" },
+    { loc: "/makale-hangi-cihazlar.html", freq: "monthly", pri: "0.6" },
+    { loc: "/makale-yanlis-bilinenler.html", freq: "monthly", pri: "0.6" },
+    { loc: "/makale-panel-fiyat.html", freq: "monthly", pri: "0.6" },
+    { loc: "/makale-kis-verimi.html", freq: "monthly", pri: "0.6" },
+    { loc: "/makale-garanti.html", freq: "monthly", pri: "0.6" },
+    { loc: "/makale-topraklama.html", freq: "monthly", pri: "0.6" }
   ];
   const urls = staticPages.map((p) =>
     `  <url><loc>${SITE_BASE}${p.loc}</loc><changefreq>${p.freq}</changefreq><priority>${p.pri}</priority></url>`);
