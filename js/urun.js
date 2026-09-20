@@ -107,15 +107,18 @@ function initProductPage(root) {
   }
   function buildBundleGallery(pk) {
     const prods = Store.getProducts();
-    const items = pk.bundle.map((it) => prods.find((x) => x.id === it.id)).filter(Boolean);
+    const items = pk.bundle.map((it) => ({ p: prods.find((x) => x.id === it.id), qty: it.qty })).filter((x) => x.p);
     if (!items.length) return null;
     const slides = [];
-    // 1) Kolaj sayfası
+    // 1) Kolaj sayfası — her hücrede ürün görseli + adet rozeti
     const n = Math.min(items.length, 4);
-    const cells = items.slice(0, 4).map((bp) => `<div class="pd-collage-cell">${bundleVisual(bp)}</div>`).join("");
-    slides.push(`<div class="pd-slide pd-collage pd-collage-${n}">${cells}</div>`);
+    const cells = items.slice(0, 4).map((it) =>
+      `<div class="pd-collage-cell"><span class="pd-collage-qty">${it.qty}×</span>${bundleVisual(it.p)}</div>`
+    ).join("");
+    const extra = items.length > 4 ? `<span class="pd-collage-more">+${items.length - 4} ürün daha</span>` : "";
+    slides.push(`<div class="pd-slide pd-collage pd-collage-${n}">${cells}${extra}</div>`);
     // 2..) Her ürünün kendi görseli
-    items.forEach((bp) => slides.push(`<div class="pd-slide">${bundleVisual(bp)}<span class="pd-slide-cap">${escHtml(bp.name)}</span></div>`));
+    items.forEach((it) => slides.push(`<div class="pd-slide">${bundleVisual(it.p)}<span class="pd-slide-cap">${it.qty}× ${escHtml(it.p.name)}</span></div>`));
     const dots = slides.map((_, i) => `<button class="pd-dot${i === 0 ? " active" : ""}" data-i="${i}" aria-label="Görsel ${i + 1}"></button>`).join("");
     return `<div class="pd-gallery" data-slides="${slides.length}">
       <div class="pd-gallery-track">${slides.join("")}</div>

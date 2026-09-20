@@ -937,26 +937,55 @@ img, svg { max-width: 100%; }
   padding: 7px 12px;
   text-align: center;
 }
-/* Kolaj sayfası — içindeki ürünlerin fotoğrafları grid */
-.pd-collage { display: grid; gap: 6px; padding: 14px; align-content: stretch; }
+/* Kolaj sayfası — içindeki ürünlerin fotoğrafları mozaik grid */
+.pd-collage { display: grid; gap: 8px; padding: 16px; align-content: stretch; background: linear-gradient(135deg, #eef4ec, #ffffff); position: relative; }
 .pd-collage-1 { grid-template-columns: 1fr; }
 .pd-collage-2 { grid-template-columns: 1fr 1fr; }
-.pd-collage-3 { grid-template-columns: 1fr 1fr; }
-.pd-collage-3 .pd-collage-cell:nth-child(3) { grid-column: span 2; }
-.pd-collage-4 { grid-template-columns: 1fr 1fr; }
+/* 3 ürün: ilki büyük (öne çıkan), diğer ikisi yanında */
+.pd-collage-3 { grid-template-columns: 1.5fr 1fr; grid-template-rows: 1fr 1fr; }
+.pd-collage-3 .pd-collage-cell:first-child { grid-row: span 2; }
+.pd-collage-4 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
 .pd-collage-cell {
+  position: relative;
   background: #fff;
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 10px;
-  min-height: 150px;
+  padding: 12px;
+  min-height: 148px;
   overflow: hidden;
+  box-shadow: 0 1px 4px rgba(15, 61, 32, 0.06);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
-.pd-collage-cell img { max-height: 150px; width: auto; object-fit: contain; }
-.pd-collage-cell svg { width: 90%; height: auto; }
+.pd-collage-cell:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(15, 61, 32, 0.13); }
+.pd-collage-cell img { max-height: 100%; max-width: 100%; width: auto; object-fit: contain; }
+.pd-collage-cell svg { width: 88%; height: auto; }
+.pd-collage-qty {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  z-index: 2;
+  background: var(--orange);
+  color: #fff;
+  font-size: 11px;
+  font-weight: bold;
+  padding: 2px 8px;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
+}
+.pd-collage-more {
+  position: absolute;
+  right: 12px;
+  bottom: 10px;
+  background: rgba(15, 61, 32, 0.82);
+  color: #fff;
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 12px;
+}
 /* Oklar ve noktalar */
 .pd-gal-arrow {
   position: absolute;
