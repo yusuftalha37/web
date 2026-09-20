@@ -1150,7 +1150,11 @@ function serveSitemap(res) {
     { loc: "/makale-amortisman.html", freq: "monthly", pri: "0.6" },
     { loc: "/makale-solar-paket.html", freq: "monthly", pri: "0.6" },
     { loc: "/makale-solar-su-pompasi.html", freq: "monthly", pri: "0.6" },
-    { loc: "/makale-panel-inverter-aku.html", freq: "monthly", pri: "0.6" }
+    { loc: "/makale-panel-inverter-aku.html", freq: "monthly", pri: "0.6" },
+    { loc: "/makale-kac-kw-panel.html", freq: "monthly", pri: "0.6" },
+    { loc: "/makale-mahsuplasma.html", freq: "monthly", pri: "0.6" },
+    { loc: "/makale-panel-bakim.html", freq: "monthly", pri: "0.6" },
+    { loc: "/makale-on-grid-off-grid-hibrit.html", freq: "monthly", pri: "0.6" }
   ];
   const urls = staticPages.map((p) =>
     `  <url><loc>${SITE_BASE}${p.loc}</loc><changefreq>${p.freq}</changefreq><priority>${p.pri}</priority></url>`);
