@@ -98,7 +98,36 @@ function initProductPage(root) {
     return;
   }
 
-  const media = p.photo ? `<img src="${escHtml(p.photo)}" alt="${escHtml(p.name)}">` : (PRODUCT_ART[p.img] || PRODUCT_ART.panel);
+  // Paket ise: içindeki ürünlerin görsellerinden çok sayfalı galeri
+  // (1. sayfa otomatik kolaj, sonraki sayfalar tek tek ürün fotoğrafları)
+  function bundleVisual(bp) {
+    return bp && bp.photo
+      ? `<img src="${escHtml(bp.photo)}" alt="${escHtml(bp.name)}" loading="lazy">`
+      : (PRODUCT_ART[(bp && bp.img) || "panel"] || PRODUCT_ART.panel);
+  }
+  function buildBundleGallery(pk) {
+    const prods = Store.getProducts();
+    const items = pk.bundle.map((it) => prods.find((x) => x.id === it.id)).filter(Boolean);
+    if (!items.length) return null;
+    const slides = [];
+    // 1) Kolaj sayfası
+    const n = Math.min(items.length, 4);
+    const cells = items.slice(0, 4).map((bp) => `<div class="pd-collage-cell">${bundleVisual(bp)}</div>`).join("");
+    slides.push(`<div class="pd-slide pd-collage pd-collage-${n}">${cells}</div>`);
+    // 2..) Her ürünün kendi görseli
+    items.forEach((bp) => slides.push(`<div class="pd-slide">${bundleVisual(bp)}<span class="pd-slide-cap">${escHtml(bp.name)}</span></div>`));
+    const dots = slides.map((_, i) => `<button class="pd-dot${i === 0 ? " active" : ""}" data-i="${i}" aria-label="Görsel ${i + 1}"></button>`).join("");
+    return `<div class="pd-gallery" data-slides="${slides.length}">
+      <div class="pd-gallery-track">${slides.join("")}</div>
+      <button type="button" class="pd-gal-arrow pd-gal-prev" aria-label="Önceki">‹</button>
+      <button type="button" class="pd-gal-arrow pd-gal-next" aria-label="Sonraki">›</button>
+      <div class="pd-gallery-dots">${dots}</div>
+    </div>`;
+  }
+  const bundleGallery = (p.bundle && p.bundle.length) ? buildBundleGallery(p) : null;
+  const media = bundleGallery
+    ? bundleGallery
+    : (p.photo ? `<img src="${escHtml(p.photo)}" alt="${escHtml(p.name)}">` : (PRODUCT_ART[p.img] || PRODUCT_ART.panel));
   const low = p.stock <= 5;
   const inStock = p.stock > 0;
   const authLabel = Store.getSiteContent().authorizedLabel || "Yetkili Satıcı";
@@ -140,7 +169,7 @@ function initProductPage(root) {
 
   wrap.innerHTML = `
     <div class="pd-grid">
-      <div class="pd-media${p.photo ? " has-photo" : ""}">
+      <div class="pd-media${(p.photo || bundleGallery) ? " has-photo" : ""}${bundleGallery ? " pd-media-gallery" : ""}">
         ${p.authorized ? `<span class="auth-ribbon">${escHtml(authLabel)}</span>` : ""}
         ${media}
       </div>
@@ -168,6 +197,26 @@ function initProductPage(root) {
         </div>
       </div>
     </div>`;
+
+  // Paket görsel galerisi — ok ve nokta ile sayfalar arası geçiş
+  const gal = root.querySelector(".pd-gallery");
+  if (gal) {
+    const track = gal.querySelector(".pd-gallery-track");
+    const gdots = Array.from(gal.querySelectorAll(".pd-dot"));
+    const total = parseInt(gal.dataset.slides, 10) || 1;
+    let gi = 0;
+    const goGal = (i) => {
+      gi = (i + total) % total;
+      track.style.transform = "translateX(-" + gi * 100 + "%)";
+      gdots.forEach((d, di) => d.classList.toggle("active", di === gi));
+    };
+    const nx = gal.querySelector(".pd-gal-next");
+    const pv = gal.querySelector(".pd-gal-prev");
+    if (nx) nx.addEventListener("click", () => goGal(gi + 1));
+    if (pv) pv.addEventListener("click", () => goGal(gi - 1));
+    gdots.forEach((d) => d.addEventListener("click", () => goGal(+d.dataset.i)));
+    if (total <= 1) gal.classList.add("pd-gallery-single");
+  }
 
   const qtyEl = root.querySelector("#pdQty");
   const clampQty = () => {

@@ -912,6 +912,88 @@ img, svg { max-width: 100%; }
 .pd-media img { max-height: 420px; width: auto; object-fit: contain; }
 .pd-media svg { width: 80%; height: auto; }
 
+/* Paket görsel galerisi (çok sayfalı: kolaj + tek tek ürünler) */
+.pd-media-gallery { padding: 0; overflow: hidden; }
+.pd-gallery { position: relative; width: 100%; overflow: hidden; }
+.pd-gallery-track { display: flex; transition: transform 0.35s ease; }
+.pd-slide {
+  flex: 0 0 100%;
+  min-height: 340px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 24px;
+  box-sizing: border-box;
+}
+.pd-slide img { max-height: 380px; width: auto; object-fit: contain; }
+.pd-slide svg { width: 78%; height: auto; }
+.pd-slide-cap {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  background: rgba(15, 61, 32, 0.72);
+  color: #fff;
+  font-size: 12.5px;
+  padding: 7px 12px;
+  text-align: center;
+}
+/* Kolaj sayfası — içindeki ürünlerin fotoğrafları grid */
+.pd-collage { display: grid; gap: 6px; padding: 14px; align-content: stretch; }
+.pd-collage-1 { grid-template-columns: 1fr; }
+.pd-collage-2 { grid-template-columns: 1fr 1fr; }
+.pd-collage-3 { grid-template-columns: 1fr 1fr; }
+.pd-collage-3 .pd-collage-cell:nth-child(3) { grid-column: span 2; }
+.pd-collage-4 { grid-template-columns: 1fr 1fr; }
+.pd-collage-cell {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  min-height: 150px;
+  overflow: hidden;
+}
+.pd-collage-cell img { max-height: 150px; width: auto; object-fit: contain; }
+.pd-collage-cell svg { width: 90%; height: auto; }
+/* Oklar ve noktalar */
+.pd-gal-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 38px; height: 38px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  font-size: 24px;
+  line-height: 1;
+  color: var(--blue);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 3;
+}
+.pd-gal-arrow:hover { background: #fff; border-color: var(--blue); }
+.pd-gal-prev { left: 10px; }
+.pd-gal-next { right: 10px; }
+.pd-gallery-dots {
+  position: absolute;
+  left: 0; right: 0; bottom: 10px;
+  display: flex; justify-content: center; gap: 6px;
+  z-index: 3;
+}
+.pd-dot {
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(15, 61, 32, 0.28);
+  cursor: pointer;
+  padding: 0;
+}
+.pd-dot.active { background: var(--orange); }
+.pd-gallery-single .pd-gal-arrow,
+.pd-gallery-single .pd-gallery-dots { display: none; }
+
 .pd-cat {
   font-size: 11px;
   font-weight: bold;
