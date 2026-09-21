@@ -1097,6 +1097,21 @@ img, svg { max-width: 100%; }
 .pd-bundle-list a { color: var(--blue); text-decoration: none; }
 .pd-bundle-list a:hover { text-decoration: underline; }
 
+/* Benzer Ürünler (ürün sayfası altı) */
+.related-title { font-size: 20px; color: var(--blue); margin: 42px 0 18px; padding-bottom: 10px; border-bottom: 2px solid var(--orange); }
+.related-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.related-card { display: flex; flex-direction: column; background: #fff; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; text-decoration: none; color: var(--text); transition: box-shadow 0.2s ease, transform 0.2s ease; }
+.related-card:hover { box-shadow: 0 5px 16px rgba(15, 61, 32, 0.13); transform: translateY(-3px); border-color: #b8cdbf; }
+.related-img { position: relative; height: 160px; display: flex; align-items: center; justify-content: center; padding: 12px; background: #fff; border-bottom: 1px solid var(--border); }
+.related-img img { max-height: 100%; max-width: 100%; width: auto; object-fit: contain; }
+.related-img svg { width: 82%; height: auto; }
+.related-body { padding: 12px 14px; display: flex; flex-direction: column; gap: 5px; flex: 1; }
+.related-cat { font-size: 10.5px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.03em; }
+.related-name { font-size: 13.5px; font-weight: 600; line-height: 1.3; color: var(--text); flex: 1; }
+.related-price { font-size: 17px; font-weight: bold; color: var(--orange-dark); margin-top: 4px; }
+@media (max-width: 900px) { .related-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 420px) { .related-grid { grid-template-columns: 1fr; } }
+
 .pd-buy { display: flex; gap: 12px; align-items: stretch; margin-bottom: 10px; }
 .pd-qty {
   display: flex;

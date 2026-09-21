@@ -247,6 +247,40 @@ function initProductPage(root) {
       setTimeout(() => { addBtn.textContent = "Sepete Ekle"; }, 1500);
     });
   }
+
+  // ---- Benzer Ürünler ----
+  const relBox = root.querySelector("#relatedProducts");
+  if (relBox) {
+    const all = Store.getProducts();
+    // Öncelik: aynı kategori; yetmezse aynı marka/cats; yine yetmezse diğer ürünler
+    const sameCat = all.filter((x) => x.id !== p.id && x.cat === p.cat);
+    let picks = sameCat.slice();
+    if (picks.length < 4) {
+      const extra = all.filter((x) => x.id !== p.id && x.cat !== p.cat && !picks.some((y) => y.id === x.id));
+      picks = picks.concat(extra).slice(0, 4);
+    } else {
+      picks = picks.slice(0, 4);
+    }
+    if (picks.length) {
+      const relCard = (rp) => {
+        const media = rp.photo
+          ? `<img src="${escHtml(rp.photo)}" alt="${escHtml(rp.name)}" loading="lazy">`
+          : (PRODUCT_ART[rp.img] || PRODUCT_ART.panel);
+        const isB = rp.bundle && rp.bundle.length;
+        return `<a class="related-card" href="${escHtml(prodLink(rp))}">
+          <div class="related-img${rp.photo ? " has-photo" : ""}">${isB ? '<span class="bundle-ribbon">Paket</span>' : ""}${media}</div>
+          <div class="related-body">
+            <span class="related-cat">${escHtml(catName(rp.cat))}</span>
+            <div class="related-name">${escHtml(rp.name)}</div>
+            <div class="related-price">${money(rp.price)}</div>
+          </div>
+        </a>`;
+      };
+      relBox.innerHTML = `<h2 class="related-title">Benzer Ürünler</h2><div class="related-grid">${picks.map(relCard).join("")}</div>`;
+    } else {
+      relBox.innerHTML = "";
+    }
+  }
 }
 
 if (typeof goPage === "function") {

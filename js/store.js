@@ -148,7 +148,7 @@ const Store = (() => {
     why6Text: "Ürünler kapınıza sorunsuz ulaşmazsa veya vazgeçerseniz 14 gün içinde koşulsuz iade ve değişim hakkınız var.",
     // ---- Footer ----
     footerAbout: "Temiz enerjiyle daha aydınlık bir gelecek için 12 yıldır çalışıyoruz.",
-    footerCopyright: "© 2026 Solar Arena Enerji — Bu site örnek/demo amaçlıdır.",
+    footerCopyright: "© 2026 Solar Arena Enerji",
     // ---- Dinamik listeler ----
     faqs: [
       { q: "Güneş paneli sistemi kendini ne kadar sürede amorti eder?", a: "Tüketiminize ve bulunduğunuz bölgeye göre değişmekle birlikte, konut sistemleri ortalama 4-6 yılda, ticari sistemler 3-5 yılda kendini amorti eder. Paneller 25+ yıl üretim yaptığı için kalan yıllar net kazançtır." },
