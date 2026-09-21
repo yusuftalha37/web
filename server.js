@@ -13,6 +13,7 @@ const http = require("http");
 const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
+const zlib = require("zlib");
 const net = require("net");
 const tls = require("tls");
 
@@ -573,17 +574,43 @@ function serveStatic(req, res) {
 
   fs.stat(file, (err, st) => {
     if (err || !st.isFile()) { send(res, 404, { error: "not found" }); return; }
+    const ext = path.extname(file).toLowerCase();
+    // ETag: dosya değişmediyse tarayıcı önbellekten kullanır (içerik yeniden inmez).
+    // Böylece hem hız kazanılır hem güncelleme anında yansır (dosya değişince ETag değişir).
+    const etag = '"' + st.size.toString(16) + "-" + st.mtimeMs.toString(16) + '"';
+    const isText = [".html", ".js", ".css", ".json", ".xml", ".txt", ".svg"].includes(ext);
+    // Metin dosyaları: her kullanımda doğrula (no-cache) — değişmediyse 304 döner, hızlı.
+    // Görseller: 1 gün önbellek.
+    const cacheCtl = isText ? "no-cache" : "public, max-age=86400";
+    const baseHeaders = Object.assign({
+      "Content-Type": MIME[ext] || "application/octet-stream",
+      "Cache-Control": cacheCtl,
+      "ETag": etag
+    }, SECURITY_HEADERS);
+
+    // Tarayıcıdaki kopya güncelse içeriği hiç gönderme
+    if ((req.headers["if-none-match"] || "") === etag) {
+      res.writeHead(304, baseHeaders);
+      res.end();
+      return;
+    }
     fs.readFile(file, (err2, data) => {
       if (err2) { send(res, 404, { error: "not found" }); return; }
-      const ext = path.extname(file).toLowerCase();
-      // Kod/işaretleme dosyaları önbelleğe alınmasın — güncelleme sonrası tarayıcı
-      // her zaman en yeni sürümü çeksin (aksi halde eski admin.js/HTML gösterilir).
-      // Görseller değişmediği için makul süre önbelleklenebilir.
-      const noCache = [".html", ".js", ".css", ".json", ".xml", ".txt"].includes(ext);
-      res.writeHead(200, Object.assign({
-        "Content-Type": MIME[ext] || "application/octet-stream",
-        "Cache-Control": noCache ? "no-cache, no-store, must-revalidate" : "public, max-age=86400"
-      }, SECURITY_HEADERS));
+      // Metin dosyalarını gzip ile sıkıştır (transfer boyutu ~%75 azalır)
+      const acceptsGzip = /\bgzip\b/.test(req.headers["accept-encoding"] || "");
+      if (isText && acceptsGzip && data.length > 512) {
+        zlib.gzip(data, (gzErr, gzData) => {
+          if (gzErr) {
+            res.writeHead(200, baseHeaders);
+            res.end(data);
+            return;
+          }
+          res.writeHead(200, Object.assign({ "Content-Encoding": "gzip", "Vary": "Accept-Encoding" }, baseHeaders));
+          res.end(gzData);
+        });
+        return;
+      }
+      res.writeHead(200, baseHeaders);
       res.end(data);
     });
   });
